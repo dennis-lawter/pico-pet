@@ -1,0 +1,25 @@
+[package]
+name = "super-blank-project"
+version = "0.2.0"
+
+
+[target.thumbv6m-none-eabi]
+runner = "probe-run --chip RP2040"
+
+
+[dependencies]
+rp2040-hal = "0.7.0"
+panic-halt = "0.2.0"
+embedded-hal = { version = "0.2.5", features = ["unproven"] }
+cortex-m = "0.7.2"
+cortex-m-rt = "0.7.3"
+rp2040-boot2 = "0.2.1"
+st7735-lcd = "0.9.0"
+embedded-time = "0.12.1"
+embedded-graphics = "0.8.1"
+fugit = "0.3.7"
+
+
+[[bin]]
+name = "blinky"
+path = "blinky.rs"
