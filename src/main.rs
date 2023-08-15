@@ -1,76 +1,61 @@
+//! Example of graphics on the LCD of the Waveshare RP2040-LCD-0.96
+//!
+//! Draws a red and green line with a blue rectangle.
+//! After that it fills the screen line for line, at the end it starts over with
+//! another colour, RED, GREEN and BLUE.
 #![no_std]
 #![no_main]
+
+
 extern crate embedded_graphics;
 extern crate embedded_hal;
 extern crate embedded_time;
 extern crate fugit;
 extern crate panic_halt;
-extern crate rp2040_hal;
+// extern crate rp2040_hal;
 extern crate st7735_lcd;
 extern crate cortex_m_rt;
 extern crate defmt_rtt;
-// extern crate panic_probe;
+extern crate cortex_m;
+extern crate waveshare_rp2040_lcd_0_96;
 
-// The macro for our start-up function
-use cortex_m_rt::entry;
-
-// Ensure we halt the program on panic (if we don't mention this crate it won't
-// be linked)
-#[allow(unused_imports)]
-use defmt_rtt as _;
-// use panic_probe as _;
-
-// Alias for our HAL crate
-use rp2040_hal as hal;
-
-// Some traits we need
-//use cortex_m::prelude::*;
-use embedded_graphics::image::{Image, ImageRaw, ImageRawLE};
-use embedded_graphics::prelude::*;
-use embedded_graphics::pixelcolor::Rgb565;
-use embedded_hal::digital::v2::OutputPin;
-#[allow(unused_imports)]
-use embedded_time::fixed_point::FixedPoint;
-#[allow(unused_imports)]
-use embedded_time::rate::Extensions;
-use rp2040_hal::clocks::Clock;
-use st7735_lcd::Orientation;
-
+use cortex_m::delay::Delay;
+use embedded_graphics::primitives::Line;
 use fugit::RateExtU32;
+use panic_halt as _;
 
-// A shorter alias for the Peripheral Access Crate, which provides low-level
-// register access
-use hal::pac;
+use waveshare_rp2040_lcd_0_96::entry;
+use waveshare_rp2040_lcd_0_96::{
+    hal::{
+        self,
+        clocks::{init_clocks_and_plls, Clock},
+        pac,
+        pio::PIOExt,
+        watchdog::Watchdog,
+        Sio,
+    },
+    Pins, XOSC_CRYSTAL_FREQ,
+};
 
-/// The linker will place this boot block at the start of our program image. We
-/// need this to help the ROM bootloader get our code up and running.
-#[link_section = ".boot2"]
-#[used]
-pub static BOOT2: [u8; 256] = rp2040_boot2::BOOT_LOADER_W25Q080;
+use embedded_graphics::{
+    pixelcolor::Rgb565,
+    prelude::*,
+    primitives::{PrimitiveStyle, PrimitiveStyleBuilder, Rectangle},
+};
+use st7735_lcd::{Orientation, ST7735};
 
-/// External high-speed crystal on the Raspberry Pi Pico board is 12 MHz. Adjust
-/// if your board has a different frequency
-const XTAL_FREQ_HZ: u32 = 12_000_000u32;
+const LCD_WIDTH: u32 = 128;
+const LCD_HEIGHT: u32 = 128;
 
-/// Entry point to our bare-metal application.
-///
-/// The `#[entry]` macro ensures the Cortex-M start-up code calls this function
-/// as soon as all global variables are initialised.
-///
-/// The function configures the RP2040 peripherals, then performs some example
-/// SPI transactions, then goes to sleep.
 #[entry]
 fn main() -> ! {
-    // Grab our singleton objects
     let mut pac = pac::Peripherals::take().unwrap();
     let core = pac::CorePeripherals::take().unwrap();
 
-    // Set up the watchdog driver - needed by the clock setup code
-    let mut watchdog = hal::Watchdog::new(pac.WATCHDOG);
+    let mut watchdog = Watchdog::new(pac.WATCHDOG);
 
-    // Configure the clocks
-    let clocks = hal::clocks::init_clocks_and_plls(
-        XTAL_FREQ_HZ,
+    let clocks = init_clocks_and_plls(
+        XOSC_CRYSTAL_FREQ,
         pac.XOSC,
         pac.CLOCKS,
         pac.PLL_SYS,
@@ -81,56 +66,109 @@ fn main() -> ! {
     .ok()
     .unwrap();
 
-    let mut delay = cortex_m::delay::Delay::new(core.SYST, clocks.system_clock.freq().to_Hz());
-
-    // The single-cycle I/O block controls our GPIO pins
-    let sio = hal::Sio::new(pac.SIO);
-
-    // Set the pins to their default state
-    let pins = hal::gpio::Pins::new(
+    let sio = Sio::new(pac.SIO);
+    let pins = Pins::new(
         pac.IO_BANK0,
         pac.PADS_BANK0,
         sio.gpio_bank0,
         &mut pac.RESETS,
     );
 
-    // These are implicitly used by the spi driver if they are in the correct mode
-    let _spi_mosi = pins.gpio11.into_mode::<hal::gpio::FunctionSpi>();
-    let _spi_sclk = pins.gpio10.into_mode::<hal::gpio::FunctionSpi>();
-    // let _spi_miso = pins.gpio4.into_mode::<hal::gpio::FunctionSpi>();
-    let spi = hal::Spi::<_, _, 8>::new(pac.SPI0);
+    // Set up the delay for the first core.
+    let sys_freq = clocks.system_clock.freq().to_Hz();
+    let mut delay = Delay::new(core.SYST, sys_freq);
 
-    let mut lcd_led = pins.gpio13.into_push_pull_output();
-    let dc = pins.gpio8.into_push_pull_output();
-    let rst = pins.gpio12.into_push_pull_output();
+    let (mut _pio, _sm0, _, _, _) = pac.PIO0.split(&mut pac.RESETS);
+
+    // https://www.waveshare.com/wiki/RP2040-LCD-0.96
+    // ST7735S LCD
+    let lcd_dc = pins.gp8.into_push_pull_output();
+    let mut _lcd_cs = pins.gp9.into_mode::<hal::gpio::FunctionSpi>();
+    let mut _lcd_clk = pins.gp10.into_mode::<hal::gpio::FunctionSpi>();
+    let mut _lcd_mosi = pins.gp11.into_mode::<hal::gpio::FunctionSpi>();
+    let lcd_rst = pins
+        .gp12
+        .into_push_pull_output_in_state(hal::gpio::PinState::High);
+    let mut _lcd_bl = pins
+        .gp25
+        .into_push_pull_output_in_state(hal::gpio::PinState::High);
+
+    let spi = hal::Spi::<_, _, 8>::new(pac.SPI1);
 
     // Exchange the uninitialised SPI driver for an initialised one
     let spi = spi.init(
         &mut pac.RESETS,
-        RateExtU32::Hz(125_000_000u32),
-        RateExtU32::Hz(12_000_000u32),
+        clocks.peripheral_clock.freq(),
+        10.MHz(),
         &embedded_hal::spi::MODE_0,
     );
 
-    let mut disp = st7735_lcd::ST7735::new(spi, dc, rst, true, false, 132, 162);
+    // LCD is a 65K IPS LCD 160x80, color order is BGR and a offset 1,26 pixel.
+    // LCD controller can correct this by settings the order bit (bit 3) in MADCTL register.
+    // Also the colours are inverted, LCD controller can also correct this by writing to INVON register with no paramters.
+    // All this is handled by the ST7735 crate.
+    let mut display = ST7735::new(spi, lcd_dc, lcd_rst, true, false, LCD_WIDTH, LCD_HEIGHT);
 
-    disp.init(&mut delay).unwrap();
-    disp.set_orientation(&Orientation::Landscape).unwrap();
-    disp.clear(Rgb565::BLUE).unwrap();
-    disp.set_offset(0, 0);
+    display.init(&mut delay).unwrap();
+    display.set_orientation(&Orientation::Landscape).unwrap();
 
-    let image_raw: ImageRawLE<Rgb565> =
-        ImageRaw::new(include_bytes!("../assets/ferris.raw"), 86);
+    display.set_offset(1, 2);
 
-    let image: Image<_> = Image::new(&image_raw, Point::new(34, 8));
+    let lcd_zero = Point::zero();
+    let lcd_max_corner = Point::new((LCD_WIDTH - 1) as i32, (LCD_HEIGHT - 1) as i32);
 
-    image.draw(&mut disp).unwrap();
-    
-    // Wait until the background and image have been rendered otherwise
-    // the screen will show random pixels for a brief moment
-    lcd_led.set_high().unwrap();
+    let style = PrimitiveStyleBuilder::new()
+        .fill_color(Rgb565::BLUE)
+        .build();
 
-    loop { continue; }
+    Rectangle::with_corners(lcd_zero, lcd_max_corner)
+        .into_styled(style)
+        .draw(&mut display)
+        .unwrap();
+
+    let style = PrimitiveStyleBuilder::new()
+        .fill_color(Rgb565::BLACK)
+        .build();
+
+    Rectangle::with_corners(
+        Point::new(1, 1),
+        Point::new((LCD_WIDTH - 2) as i32, (LCD_HEIGHT - 2) as i32),
+    )
+    .into_styled(style)
+    .draw(&mut display)
+    .unwrap();
+
+    Line::new(lcd_zero, lcd_max_corner)
+        .into_styled(PrimitiveStyle::with_stroke(Rgb565::RED, 1))
+        .draw(&mut display)
+        .unwrap();
+
+    Line::new(
+        Point::new(0, (LCD_HEIGHT - 1) as i32),
+        Point::new((LCD_WIDTH - 1) as i32, 0),
+    )
+    .into_styled(PrimitiveStyle::with_stroke(Rgb565::GREEN, 1))
+    .draw(&mut display)
+    .unwrap();
+
+    // Infinite colour wheel loop
+    let mut l: i32 = 0;
+    let mut c = Rgb565::RED;
+    loop {
+        // Line::new(Point::new(0, l), Point::new((LCD_WIDTH - 1) as i32, l))
+        //     .into_styled(PrimitiveStyle::with_stroke(c, 1))
+        //     .draw(&mut display)
+        //     .unwrap();
+        // delay.delay_ms(10);
+        // l += 1;
+        // if l == LCD_HEIGHT as i32 {
+        //     l = 0;
+        //     c = match c {
+        //         Rgb565::RED => Rgb565::GREEN,
+        //         Rgb565::GREEN => Rgb565::BLUE,
+        //         _ => Rgb565::RED,
+        //     }
+        // }
+        continue;
+    }
 }
-
-// End of file

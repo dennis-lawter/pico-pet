@@ -8,7 +8,7 @@ runner = "probe-run --chip RP2040"
 
 
 [dependencies]
-rp2040-hal = "0.7.0"
+#rp2040-hal = "0.7.0"
 panic-halt = "0.2.0"
 embedded-hal = { version = "0.2.5", features = ["unproven"] }
 cortex-m = "0.7.2"
@@ -19,6 +19,7 @@ embedded-time = "0.12.1"
 embedded-graphics = "0.8.1"
 fugit = "0.3.7"
 defmt-rtt = "0.4.0"
+waveshare-rp2040-lcd-0-96 = "0.6.0"
 
 [[bin]]
 name = "picoscreen"
