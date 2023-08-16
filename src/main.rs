@@ -3,6 +3,7 @@
 
 extern crate cortex_m;
 extern crate cortex_m_rt;
+extern crate debugless_unwrap;
 extern crate defmt_rtt;
 extern crate embedded_graphics;
 extern crate embedded_hal;
@@ -12,91 +13,44 @@ extern crate panic_halt;
 extern crate st7735_lcd;
 extern crate waveshare_rp2040_lcd_0_96;
 
-use cortex_m::delay::Delay;
-use fugit::RateExtU32;
-#[allow(unused_imports)]
-use panic_halt as _;
-
-use waveshare_rp2040_lcd_0_96::entry;
-use waveshare_rp2040_lcd_0_96::{
-    hal::{
-        self,
-        clocks::{init_clocks_and_plls, Clock},
-        pac,
-        pio::PIOExt,
-        watchdog::Watchdog,
-        Sio,
-    },
-    Pins, XOSC_CRYSTAL_FREQ,
+use debugless_unwrap::*;
+use embedded_graphics::{
+    pixelcolor::Rgb565,
+    prelude::{DrawTarget, RgbColor},
 };
 
-use embedded_graphics::{pixelcolor::Rgb565, prelude::*};
-use st7735_lcd::{Orientation, ST7735};
+use embedded_hal::digital::v2::OutputPin;
+#[allow(unused_imports)]
+use panic_halt as _;
+use waveshare_rp2040_lcd_0_96::entry;
 
-const LCD_WIDTH: u32 = 128;
-const LCD_HEIGHT: u32 = 128;
+mod system;
+use system::System;
 
 #[entry]
 fn main() -> ! {
-    let mut pac = pac::Peripherals::take().unwrap();
-    let core = pac::CorePeripherals::take().unwrap();
-
-    let mut watchdog = Watchdog::new(pac.WATCHDOG);
-
-    let clocks = init_clocks_and_plls(
-        XOSC_CRYSTAL_FREQ,
-        pac.XOSC,
-        pac.CLOCKS,
-        pac.PLL_SYS,
-        pac.PLL_USB,
-        &mut pac.RESETS,
-        &mut watchdog,
-    )
-    .ok()
-    .unwrap();
-
-    let sio = Sio::new(pac.SIO);
-    let pins = Pins::new(
-        pac.IO_BANK0,
-        pac.PADS_BANK0,
-        sio.gpio_bank0,
-        &mut pac.RESETS,
-    );
-
-    let sys_freq = clocks.system_clock.freq().to_Hz();
-    let mut delay = Delay::new(core.SYST, sys_freq);
-
-    let (mut _pio, _sm0, _, _, _) = pac.PIO0.split(&mut pac.RESETS);
-
-    let lcd_dc = pins.gp8.into_push_pull_output();
-    let mut _lcd_cs = pins.gp9.into_mode::<hal::gpio::FunctionSpi>();
-    let mut _lcd_clk = pins.gp10.into_mode::<hal::gpio::FunctionSpi>();
-    let mut _lcd_mosi = pins.gp11.into_mode::<hal::gpio::FunctionSpi>();
-    let lcd_rst = pins
-        .gp12
-        .into_push_pull_output_in_state(hal::gpio::PinState::High);
-    let mut _lcd_bl = pins
-        .gp25
-        .into_push_pull_output_in_state(hal::gpio::PinState::High);
-
-    let spi = hal::Spi::<_, _, 8>::new(pac.SPI1);
-
-    let spi = spi.init(
-        &mut pac.RESETS,
-        clocks.peripheral_clock.freq(),
-        10.MHz(),
-        &embedded_hal::spi::MODE_0,
-    );
-
-    let mut display = ST7735::new(spi, lcd_dc, lcd_rst, false, false, LCD_WIDTH, LCD_HEIGHT);
-
-    display.init(&mut delay).unwrap();
-    display.set_orientation(&Orientation::Landscape).unwrap();
-
-    display.set_offset(1, 2);
-
-    display.clear(Rgb565::BLACK).unwrap();
+    let mut system = System::new();
+    system.display.clear(Rgb565::BLACK).debugless_unwrap();
     loop {
-        continue;
+        system.delay.delay_ms(990);
+        system.lcd_bl.set_low().debugless_unwrap();
+        system.display.clear(Rgb565::RED).debugless_unwrap();
+        system.delay.delay_ms(10);
+        system.lcd_bl.set_high().debugless_unwrap();
+        system.delay.delay_ms(990);
+        system.lcd_bl.set_low().debugless_unwrap();
+        system.display.clear(Rgb565::GREEN).debugless_unwrap();
+        system.delay.delay_ms(10);
+        system.lcd_bl.set_high().debugless_unwrap();
+        system.delay.delay_ms(990);
+        system.lcd_bl.set_low().debugless_unwrap();
+        system.display.clear(Rgb565::BLUE).debugless_unwrap();
+        system.delay.delay_ms(10);
+        system.lcd_bl.set_high().debugless_unwrap();
+        system.delay.delay_ms(990);
+        system.lcd_bl.set_low().debugless_unwrap();
+        system.display.clear(Rgb565::BLACK).debugless_unwrap();
+        system.delay.delay_ms(10);
+        system.lcd_bl.set_high().debugless_unwrap();
     }
 }
