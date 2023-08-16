@@ -2,8 +2,8 @@
 name = "pico-pet"
 version = "0.1.0"
 
-[target.thumbv6m-none-eabi]
-runner = "probe-run --chip RP2040"
+#[target.thumbv6m-none-eabi]
+#runner = "probe-run --chip RP2040"
 
 [dependencies]
 panic-halt = "0.2.0"
@@ -17,6 +17,7 @@ embedded-graphics = "0.8.1"
 fugit = "0.3.7"
 defmt-rtt = "0.4.0"
 waveshare-rp2040-lcd-0-96 = "0.6.0"
+debugless-unwrap = "0.0.4"
 
 [[bin]]
 name = "pico-pet"
