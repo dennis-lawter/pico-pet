@@ -7,12 +7,13 @@ use waveshare_rp2040_lcd_0_96::{
     hal::{
         self,
         clocks::{init_clocks_and_plls, Clock},
+        gpio::Pins,
         pac,
         pio::PIOExt,
         watchdog::Watchdog,
         Sio,
     },
-    Pins, XOSC_CRYSTAL_FREQ,
+    XOSC_CRYSTAL_FREQ,
 };
 
 use st7735_lcd::{Orientation, ST7735};
@@ -28,6 +29,10 @@ pub struct System {
     >,
     pub lcd_bl: hal::gpio::Pin<hal::gpio::bank0::Gpio13, hal::gpio::Output<hal::gpio::PushPull>>,
     pub delay: Delay,
+    pub key0: hal::gpio::Pin<hal::gpio::bank0::Gpio15, hal::gpio::Input<hal::gpio::PullUp>>,
+    pub key1: hal::gpio::Pin<hal::gpio::bank0::Gpio17, hal::gpio::Input<hal::gpio::PullUp>>,
+    pub key2: hal::gpio::Pin<hal::gpio::bank0::Gpio2, hal::gpio::Input<hal::gpio::PullUp>>,
+    pub key3: hal::gpio::Pin<hal::gpio::bank0::Gpio3, hal::gpio::Input<hal::gpio::PullUp>>,
 }
 impl System {
     pub fn new() -> Self {
@@ -55,21 +60,28 @@ impl System {
             sio.gpio_bank0,
             &mut pac.RESETS,
         );
+
+        // disable backlight ASAP to hide artifacts
         let mut lcd_bl = pins
-            .gp13
+            .gpio13
             .into_push_pull_output_in_state(hal::gpio::PinState::Low);
+
+        let key0 = pins.gpio15.into_pull_up_input();
+        let key1 = pins.gpio17.into_pull_up_input();
+        let key2 = pins.gpio2.into_pull_up_input();
+        let key3 = pins.gpio3.into_pull_up_input();
 
         let sys_freq = clocks.system_clock.freq().to_Hz();
         let mut delay = Delay::new(core.SYST, sys_freq);
 
         let (mut _pio, _sm0, _, _, _) = pac.PIO0.split(&mut pac.RESETS);
 
-        let lcd_dc = pins.gp8.into_push_pull_output();
-        let mut _lcd_cs = pins.gp9.into_mode::<hal::gpio::FunctionSpi>();
-        let mut _lcd_clk = pins.gp10.into_mode::<hal::gpio::FunctionSpi>();
-        let mut _lcd_mosi = pins.gp11.into_mode::<hal::gpio::FunctionSpi>();
+        let lcd_dc = pins.gpio8.into_push_pull_output();
+        let mut _lcd_cs = pins.gpio9.into_mode::<hal::gpio::FunctionSpi>();
+        let mut _lcd_clk = pins.gpio10.into_mode::<hal::gpio::FunctionSpi>();
+        let mut _lcd_mosi = pins.gpio11.into_mode::<hal::gpio::FunctionSpi>();
         let lcd_rst = pins
-            .gp12
+            .gpio12
             .into_push_pull_output_in_state(hal::gpio::PinState::High);
 
         let spi = hal::Spi::<_, _, 8>::new(pac.SPI1);
@@ -94,6 +106,10 @@ impl System {
             display,
             lcd_bl,
             delay,
+            key0,
+            key1,
+            key2,
+            key3,
         }
     }
 }
