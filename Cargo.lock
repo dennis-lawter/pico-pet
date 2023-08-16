@@ -349,6 +349,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d01a5bd0424d00070b0098dd17ebca6f961a959dead1dbcbbbc1d1cd8d3deeba"
 
 [[package]]
+name = "pico-pet"
+version = "0.1.0"
+dependencies = [
+ "cortex-m",
+ "cortex-m-rt",
+ "defmt-rtt",
+ "embedded-graphics",
+ "embedded-hal",
+ "embedded-time",
+ "fugit",
+ "panic-halt",
+ "rp2040-boot2",
+ "st7735-lcd",
+ "waveshare-rp2040-lcd-0-96",
+]
+
+[[package]]
 name = "pio"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -502,23 +519,6 @@ name = "stable_deref_trait"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3"
-
-[[package]]
-name = "super-blank-project"
-version = "0.2.0"
-dependencies = [
- "cortex-m",
- "cortex-m-rt",
- "defmt-rtt",
- "embedded-graphics",
- "embedded-hal",
- "embedded-time",
- "fugit",
- "panic-halt",
- "rp2040-boot2",
- "st7735-lcd",
- "waveshare-rp2040-lcd-0-96",
-]
 
 [[package]]
 name = "syn"
