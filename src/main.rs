@@ -107,53 +107,58 @@ fn main() -> ! {
     // LCD controller can correct this by settings the order bit (bit 3) in MADCTL register.
     // Also the colours are inverted, LCD controller can also correct this by writing to INVON register with no paramters.
     // All this is handled by the ST7735 crate.
-    let mut display = ST7735::new(spi, lcd_dc, lcd_rst, true, false, LCD_WIDTH, LCD_HEIGHT);
+    let mut display = ST7735::new(spi, lcd_dc, lcd_rst, false, false, LCD_WIDTH, LCD_HEIGHT);
 
     display.init(&mut delay).unwrap();
     display.set_orientation(&Orientation::Landscape).unwrap();
 
     display.set_offset(1, 2);
 
-    let lcd_zero = Point::zero();
-    let lcd_max_corner = Point::new((LCD_WIDTH - 1) as i32, (LCD_HEIGHT - 1) as i32);
+    // let lcd_zero = Point::zero();
+    // let lcd_max_corner = Point::new((LCD_WIDTH - 1) as i32, (LCD_HEIGHT - 1) as i32);
 
-    let style = PrimitiveStyleBuilder::new()
-        .fill_color(Rgb565::BLUE)
-        .build();
+    // let style = PrimitiveStyleBuilder::new()
+    //     .fill_color(Rgb565::BLUE)
+    //     .build();
 
-    Rectangle::with_corners(lcd_zero, lcd_max_corner)
-        .into_styled(style)
-        .draw(&mut display)
-        .unwrap();
+    // Rectangle::with_corners(lcd_zero, lcd_max_corner)
+    //     .into_styled(style)
+    //     .draw(&mut display)
+    //     .unwrap();
 
-    let style = PrimitiveStyleBuilder::new()
-        .fill_color(Rgb565::BLACK)
-        .build();
+    // let style = PrimitiveStyleBuilder::new()
+    //     .fill_color(Rgb565::BLACK)
+    //     .build();
 
-    Rectangle::with_corners(
-        Point::new(1, 1),
-        Point::new((LCD_WIDTH - 2) as i32, (LCD_HEIGHT - 2) as i32),
-    )
-    .into_styled(style)
-    .draw(&mut display)
-    .unwrap();
+    // Rectangle::with_corners(
+    //     Point::new(1, 1),
+    //     Point::new((LCD_WIDTH - 2) as i32, (LCD_HEIGHT - 2) as i32),
+    // )
+    // .into_styled(style)
+    // .draw(&mut display)
+    // .unwrap();
 
-    Line::new(lcd_zero, lcd_max_corner)
-        .into_styled(PrimitiveStyle::with_stroke(Rgb565::RED, 1))
-        .draw(&mut display)
-        .unwrap();
+    // display.clear(Rgb565::BLUE).unwrap();
 
-    Line::new(
-        Point::new(0, (LCD_HEIGHT - 1) as i32),
-        Point::new((LCD_WIDTH - 1) as i32, 0),
-    )
-    .into_styled(PrimitiveStyle::with_stroke(Rgb565::GREEN, 1))
-    .draw(&mut display)
-    .unwrap();
+    // Line::new(lcd_zero, lcd_max_corner)
+    //     .into_styled(PrimitiveStyle::with_stroke(Rgb565::RED, 1))
+    //     .draw(&mut display)
+    //     .unwrap();
+
+    // Line::new(
+    //     Point::new(0, (LCD_HEIGHT - 1) as i32),
+    //     Point::new((LCD_WIDTH - 1) as i32, 0),
+    // )
+    // .into_styled(PrimitiveStyle::with_stroke(Rgb565::GREEN, 1))
+    // .draw(&mut display)
+    // .unwrap();
 
     // Infinite colour wheel loop
-    let mut l: i32 = 0;
-    let mut c = Rgb565::RED;
+    // let mut l: i32 = 0;
+    // let mut c = Rgb565::RED;
+
+
+    display.clear(Rgb565::BLACK).unwrap();
     loop {
         // Line::new(Point::new(0, l), Point::new((LCD_WIDTH - 1) as i32, l))
         //     .into_styled(PrimitiveStyle::with_stroke(c, 1))
