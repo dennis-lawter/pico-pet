@@ -8,11 +8,14 @@ use waveshare_rp2040_lcd_0_96::{
         self,
         clocks::{init_clocks_and_plls, Clock},
         gpio::Pins,
+        multicore::Multicore,
         pac,
         pio::PIOExt,
+        sio::SioFifo,
         watchdog::Watchdog,
         Sio,
     },
+    pac::{PPB, PSM},
     XOSC_CRYSTAL_FREQ,
 };
 
@@ -21,7 +24,9 @@ use st7735_lcd::{Orientation, ST7735};
 const LCD_WIDTH: u32 = 128;
 const LCD_HEIGHT: u32 = 128;
 
-pub struct System {
+static mut HEAP: [u8; 1024] = [0; 1024];
+
+pub struct System<'a> {
     pub display: ST7735<
         hal::Spi<hal::spi::Enabled, pac::SPI1, 8>,
         hal::gpio::Pin<hal::gpio::bank0::Gpio8, hal::gpio::Output<hal::gpio::PushPull>>,
@@ -33,9 +38,13 @@ pub struct System {
     pub key1: hal::gpio::Pin<hal::gpio::bank0::Gpio17, hal::gpio::Input<hal::gpio::PullUp>>,
     pub key2: hal::gpio::Pin<hal::gpio::bank0::Gpio2, hal::gpio::Input<hal::gpio::PullUp>>,
     pub key3: hal::gpio::Pin<hal::gpio::bank0::Gpio3, hal::gpio::Input<hal::gpio::PullUp>>,
+    psm_ptr: *mut PSM,
+    ppb_ptr: *mut PPB,
+    fifo_ptr: *mut SioFifo,
+    mc: Multicore<'a>,
 }
-impl System {
-    pub fn new() -> Self {
+impl<'a> System<'_> {
+    pub fn new<'b>() -> Self {
         let mut pac = pac::Peripherals::take().unwrap();
         let core = pac::CorePeripherals::take().unwrap();
 
@@ -100,16 +109,43 @@ impl System {
 
         display.set_offset(1, 2);
 
-        lcd_bl.set_high().unwrap();
-
-        Self {
-            display,
-            lcd_bl,
-            delay,
-            key0,
-            key1,
-            key2,
-            key3,
+        let psm: PSM = pac.PSM;
+        let ppb: PPB = pac.PPB;
+        let fifo: SioFifo = sio.fifo;
+        let psm_ptr: *mut PSM = unsafe { &mut *(&mut HEAP as *mut _ as *mut PSM) };
+        let ppb_ptr: *mut PPB = unsafe { &mut *(&mut HEAP as *mut _ as *mut PPB) };
+        let fifo_ptr: *mut SioFifo = unsafe { &mut *(&mut HEAP as *mut _ as *mut SioFifo) };
+        unsafe {
+            core::ptr::write(psm_ptr, psm);
+            core::ptr::write(ppb_ptr, ppb);
+            core::ptr::write(fifo_ptr, fifo);
         }
+
+        unsafe {
+            let mc = Multicore::new(&mut *psm_ptr, &mut *ppb_ptr, &mut *fifo_ptr);
+            lcd_bl.set_high().unwrap();
+
+            Self {
+                display,
+                lcd_bl,
+                delay,
+                key0,
+                key1,
+                key2,
+                key3,
+                psm_ptr,
+                ppb_ptr,
+                fifo_ptr,
+                mc,
+            }
+        }
+    }
+}
+
+impl<'a> Drop for System<'a> {
+    fn drop(&mut self) {
+        unsafe { core::ptr::drop_in_place(self.psm_ptr) };
+        unsafe { core::ptr::drop_in_place(self.ppb_ptr) };
+        unsafe { core::ptr::drop_in_place(self.fifo_ptr) };
     }
 }

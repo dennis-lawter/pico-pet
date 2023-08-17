@@ -1,8 +1,6 @@
 #![no_std]
 #![no_main]
-#![feature(slice_flatten)]
 
-// extern crate alloc;
 extern crate cortex_m;
 extern crate cortex_m_rt;
 extern crate debugless_unwrap;
@@ -16,7 +14,6 @@ extern crate panic_halt;
 extern crate st7735_lcd;
 extern crate waveshare_rp2040_lcd_0_96;
 
-// use alloc::{format, string::String};
 use debugless_unwrap::*;
 use embedded_graphics::{
     image::{Image, ImageRawLE},
@@ -27,7 +24,6 @@ use embedded_graphics::{
     Drawable,
 };
 
-use embedded_hal::digital::v2::InputPin;
 use fixedstr::{str8, try_format};
 #[allow(unused_imports)]
 use panic_halt as _;
@@ -35,21 +31,20 @@ use waveshare_rp2040_lcd_0_96::entry;
 
 mod system;
 use system::System;
-mod myferris;
-use myferris::MyFerris;
 
 #[entry]
 fn main() -> ! {
     let mut system = System::new();
     // let my_ferris = MyFerris::new();
     system.display.clear(Rgb565::BLACK).debugless_unwrap();
-    let mut img_bytes = include_bytes!("../assets/ferris.raw").clone();
+    // let mut img_bytes = include_bytes!("../assets/ferris.raw").clone();
+    let img_bytes = include_bytes!("../assets/ferris.raw").clone();
     let mut frame_count = 0usize;
 
     let style = MonoTextStyle::new(&FONT_6X10, Rgb565::WHITE);
 
-    let num_chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-    let mut frame_str = [' '; 10];
+    // let num_chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    // let mut frame_str = [' '; 10];
 
     loop {
         // if frame_count >= 1 << 16 {
