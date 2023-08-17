@@ -24,10 +24,19 @@ use embedded_graphics::{
     Drawable,
 };
 
+use embedded_hal::digital::v2::ToggleableOutputPin;
 use fixedstr::{str8, try_format};
 #[allow(unused_imports)]
 use panic_halt as _;
-use waveshare_rp2040_lcd_0_96::entry;
+use waveshare_rp2040_lcd_0_96::{
+    entry,
+    hal::{
+        self,
+        multicore::{Multicore, Stack},
+        Sio,
+    },
+    pac,
+};
 
 mod system;
 use system::System;
@@ -35,66 +44,79 @@ use system::System;
 #[entry]
 fn main() -> ! {
     let mut system = System::new();
-    // let my_ferris = MyFerris::new();
     system.display.clear(Rgb565::BLACK).debugless_unwrap();
-    // let mut img_bytes = include_bytes!("../assets/ferris.raw").clone();
-    let img_bytes = include_bytes!("../assets/ferris.raw").clone();
-    let mut frame_count = 0usize;
 
+    // spawn thread
+    unsafe {
+        let mut mc = Multicore::new(
+            &mut *system.psm_ptr,
+            &mut *system.ppb_ptr,
+            &mut *system.fifo_ptr,
+        );
+        let cores = &mut mc.cores();
+        let core1 = &mut cores[1];
+        let sys_freq = system.sys_freq;
+        let _test = core1.spawn(&mut CORE1_STACK.mem, move || side_loop(sys_freq));
+    }
+
+    main_loop(&mut system)
+}
+
+static mut CORE1_STACK: Stack<4096> = Stack::new();
+fn side_loop(sys_freq: u32) -> ! {
+    let mut pac = unsafe { pac::Peripherals::steal() };
+    let core = unsafe { pac::CorePeripherals::steal() };
+
+    let mut sio = Sio::new(pac.SIO);
+    // let pins = hal::gpio::Pins::new(
+    //     pac.IO_BANK0,
+    //     pac.PADS_BANK0,
+    //     sio.gpio_bank0,
+    //     &mut pac.RESETS,
+    // );
+
+    // // let mut led_pin = pins.gpio25.into_push_pull_output();
+    let mut delay = cortex_m::delay::Delay::new(core.SYST, sys_freq);
+    let mut i = 0u32;
+    loop {
+        // let input = sio.fifo.read();
+        // if let Some(word) = input {}
+        //     //     delay.delay_ms(1000);
+        //     //     led_pin.toggle().unwrap();
+        //     //     //     led_pin.toggle().unwrap();
+        //     //     //     sio.fifo.write_blocking(CORE1_TASK_COMPLETE);
+        //     //     // };
+        i += 1;
+        delay.delay_ms(1000);
+        sio.fifo.write(i);
+    }
+}
+
+fn main_loop(system: &mut System) -> ! {
     let style = MonoTextStyle::new(&FONT_6X10, Rgb565::WHITE);
+    let mut frame_count;
+    let img_bytes = include_bytes!("../assets/ferris.raw").clone();
 
-    // let num_chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-    // let mut frame_str = [' '; 10];
+    let fifo = unsafe { &mut *system.fifo_ptr };
 
     loop {
-        // if frame_count >= 1 << 16 {
-        //     continue;
-        // }
+        let input = fifo.read();
+        frame_count = input.unwrap_or(0);
 
-        frame_count += 1;
-        // for i in 0..img_bytes.len() {
-        //     img_bytes[i] += 1;
-        // }
+        // frame_count += 1;
+        // frame_count = unsafe { CORE1_STACK.mem[frame_count] };
 
         let img_raw: ImageRawLE<Rgb565> = ImageRawLE::new(&img_bytes, 86);
         let img = Image::with_center(&img_raw, Point { x: 64, y: 32 });
         img.draw(&mut system.display).debugless_unwrap();
-
-        // frame_str = [' '; 10];
-        // let mut frame_count_copy = frame_count;
-        // let mut i = 8;
-        // while frame_count_copy > 0 {
-        //     frame_str[i] = num_chars[frame_count_copy % 10];
-        //     frame_count_copy = frame_count_copy / 10;
-        //     i -= 1;
-        // }
-        // frame_str[9] = '\0';
-
-        // let frame_count_str = char_array_to_str(&frame_str).unwrap();
-
-        // let frame_count_str = format!("{}", frame_count);
 
         let frame_count_str = try_format!(str8, "{}", frame_count).unwrap();
 
         Text::new(frame_count_str.as_str(), Point::new(20, 128 - 12), style)
             .draw(&mut system.display)
             .debugless_unwrap();
-        // if system.key0.is_low().debugless_unwrap() {
-        //     system.display.clear(Rgb565::RED).debugless_unwrap();
-        // } else if system.key1.is_low().debugless_unwrap() {
-        //     system.display.clear(Rgb565::GREEN).debugless_unwrap();
-        // } else if system.key2.is_low().debugless_unwrap() {
-        //     system.display.clear(Rgb565::BLUE).debugless_unwrap();
-        // } else if system.key3.is_low().debugless_unwrap() {
-        //     system.display.clear(Rgb565::WHITE).debugless_unwrap();
-        // } else {
-        //     continue;
-        // }
         img.draw(&mut system.display).debugless_unwrap();
-        // system.display.clear(Rgb565::RED).debugless_unwrap();
-        // system.display.clear(Rgb565::GREEN).debugless_unwrap();
-        // system.display.clear(Rgb565::BLUE).debugless_unwrap();
-        system.delay.delay_ms(500);
+        system.delay.delay_ms(1000);
         system.display.clear(Rgb565::BLACK).debugless_unwrap();
     }
 }
