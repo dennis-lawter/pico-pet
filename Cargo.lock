@@ -206,6 +206,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "fixedstr"
+version = "0.4.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1812b91c5a4ba0f9f567634ab68e7d8907a7fb27846a8fddbce3c2088b692c28"
+
+[[package]]
 name = "float-cmp"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -365,6 +371,7 @@ dependencies = [
  "embedded-graphics",
  "embedded-hal",
  "embedded-time",
+ "fixedstr",
  "fugit",
  "panic-halt",
  "rp2040-boot2",
