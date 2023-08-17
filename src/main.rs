@@ -24,14 +24,12 @@ use embedded_graphics::{
     Drawable,
 };
 
-use embedded_hal::digital::v2::ToggleableOutputPin;
 use fixedstr::{str8, try_format};
 #[allow(unused_imports)]
 use panic_halt as _;
 use waveshare_rp2040_lcd_0_96::{
     entry,
     hal::{
-        self,
         multicore::{Multicore, Stack},
         Sio,
     },
@@ -64,28 +62,13 @@ fn main() -> ! {
 
 static mut CORE1_STACK: Stack<4096> = Stack::new();
 fn side_loop(sys_freq: u32) -> ! {
-    let mut pac = unsafe { pac::Peripherals::steal() };
+    let pac = unsafe { pac::Peripherals::steal() };
     let core = unsafe { pac::CorePeripherals::steal() };
 
     let mut sio = Sio::new(pac.SIO);
-    // let pins = hal::gpio::Pins::new(
-    //     pac.IO_BANK0,
-    //     pac.PADS_BANK0,
-    //     sio.gpio_bank0,
-    //     &mut pac.RESETS,
-    // );
-
-    // // let mut led_pin = pins.gpio25.into_push_pull_output();
     let mut delay = cortex_m::delay::Delay::new(core.SYST, sys_freq);
     let mut i = 0u32;
     loop {
-        // let input = sio.fifo.read();
-        // if let Some(word) = input {}
-        //     //     delay.delay_ms(1000);
-        //     //     led_pin.toggle().unwrap();
-        //     //     //     led_pin.toggle().unwrap();
-        //     //     //     sio.fifo.write_blocking(CORE1_TASK_COMPLETE);
-        //     //     // };
         i += 1;
         delay.delay_ms(1000);
         sio.fifo.write(i);
@@ -102,9 +85,6 @@ fn main_loop(system: &mut System) -> ! {
     loop {
         let input = fifo.read();
         frame_count = input.unwrap_or(0);
-
-        // frame_count += 1;
-        // frame_count = unsafe { CORE1_STACK.mem[frame_count] };
 
         let img_raw: ImageRawLE<Rgb565> = ImageRawLE::new(&img_bytes, 86);
         let img = Image::with_center(&img_raw, Point { x: 64, y: 32 });
