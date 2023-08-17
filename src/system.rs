@@ -106,7 +106,7 @@ impl System {
         display.init(&mut delay).unwrap();
         display.set_orientation(&Orientation::Portrait).unwrap();
 
-        display.set_offset(1, 2);
+        display.set_offset(2, 1);
 
         let psm: PSM = pac.PSM;
         let ppb: PPB = pac.PPB;
