@@ -104,7 +104,7 @@ impl System {
         let mut display = ST7735::new(spi, lcd_dc, lcd_rst, false, false, LCD_WIDTH, LCD_HEIGHT);
 
         display.init(&mut delay).unwrap();
-        display.set_orientation(&Orientation::Landscape).unwrap();
+        display.set_orientation(&Orientation::Portrait).unwrap();
 
         display.set_offset(1, 2);
 
