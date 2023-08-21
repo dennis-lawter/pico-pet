@@ -38,6 +38,7 @@ use waveshare_rp2040_lcd_0_96::{
     pac,
 };
 
+mod render;
 mod system;
 use system::System;
 
@@ -103,34 +104,38 @@ const RGB_332_TO_RGB_565: [u16; 256] = [
 ];
 
 fn main_loop(system: &mut System) -> ! {
-    let style = MonoTextStyle::new(&FONT_6X10, Rgb565::WHITE);
+    // let text_style = MonoTextStyle::new(&FONT_6X10, Rgb565::WHITE);
     let mut frame_count = 0;
     let img_bytes_332 = include_bytes!("../rgb332/scaledferris.png.data").clone();
-    let mut img_bytes = [0u8; 32 * 24 * 2];
-    for i in 0..32 * 24 {
-        let index: usize = img_bytes_332[i].into();
-        let x = RGB_332_TO_RGB_565[index];
-        let x = x.to_le_bytes();
-        img_bytes[i * 2] = x[0];
-        img_bytes[(i * 2) + 1] = x[1];
-    }
+    // let mut img_bytes = [0u8; 32 * 24 * 2];
+    // for i in 0..32 * 24 {
+    //     let index: usize = img_bytes_332[i].into();
+    //     let x = RGB_332_TO_RGB_565[index];
+    //     let x = x.to_le_bytes();
+    //     img_bytes[i * 2] = x[0];
+    //     img_bytes[(i * 2) + 1] = x[1];
+    // }
 
     let fifo = unsafe { &mut *system.fifo_ptr };
 
-    let mut crab_pos = Point { x: 64, y: 32 };
-    let mut crab_rect = Rectangle::new(
-        Point::new(crab_pos.x - 15, crab_pos.y - 11),
-        Size::new(32, 24),
-    );
-    let black_clear_rect_style = PrimitiveStyle::with_fill(Rgb565::BLACK);
+    // let mut crab_pos = Point { x: 64, y: 32 };
+    // let mut crab_rect = Rectangle::new(
+    //     Point::new(crab_pos.x - 15, crab_pos.y - 11),
+    //     Size::new(32, 24),
+    // );
 
-    let text_clear_rect = Rectangle::new(Point::new(0, 128 - 10), Size::new(128, 10));
+    // let black_clear_rect_style = PrimitiveStyle::with_fill(Rgb565::BLACK);
 
-    let img_raw: ImageRawLE<Rgb565> = ImageRawLE::new(&img_bytes, 32);
+    // let text_clear_rect = Rectangle::new(Point::new(0, 128 - 10), Size::new(128, 10));
 
-    let img = Image::with_center(&img_raw, crab_pos);
-    img.draw(&mut system.display).debugless_unwrap();
+    // let img_raw: ImageRawLE<Rgb565> = ImageRawLE::new(&img_bytes, 32);
 
+    // let img = Image::with_center(&img_raw, crab_pos);
+    // img.draw(&mut system.display).debugless_unwrap();
+
+    let mut crab_x = 16;
+    let mut crab_y = 16;
+    let bg = [0b010_010_01; 128 * 128];
     loop {
         let input = fifo.read();
         frame_count = match input {
@@ -138,42 +143,46 @@ fn main_loop(system: &mut System) -> ! {
             None => frame_count,
         };
 
-        let frame_count_str = try_format!(str8, "{}", frame_count).unwrap();
-        text_clear_rect
-            .draw_styled(&black_clear_rect_style, &mut system.display)
-            .unwrap();
-        Text::new(frame_count_str.as_str(), Point::new(1, 127), style)
-            .draw(&mut system.display)
-            .debugless_unwrap();
+        render::blit(&0, &0, &128, &128, &bg);
+        render::blit(&crab_x, &crab_y, &32, &24, &img_bytes_332);
+        render::draw(&mut system.display);
 
-        let mut crab_moved = false;
+        // let frame_count_str = try_format!(str8, "{}", frame_count).unwrap();
+        // text_clear_rect
+        //     .draw_styled(&black_clear_rect_style, &mut system.display)
+        //     .unwrap();
+        // Text::new(frame_count_str.as_str(), Point::new(1, 127), text_style)
+        //     .draw(&mut system.display)
+        //     .debugless_unwrap();
+
+        // let mut crab_moved = false;
 
         if system.key0.is_low().unwrap() {
-            crab_moved = true;
-            crab_pos.x -= 1;
+            // crab_moved = true;
+            crab_x -= 1;
         }
         if system.key1.is_low().unwrap() {
-            crab_moved = true;
-            crab_pos.y += 1;
+            // crab_moved = true;
+            crab_y += 1;
         }
         if system.key2.is_low().unwrap() {
-            crab_moved = true;
-            crab_pos.y -= 1;
+            // crab_moved = true;
+            crab_y -= 1;
         }
         if system.key3.is_low().unwrap() {
-            crab_moved = true;
-            crab_pos.x += 1;
+            // crab_moved = true;
+            crab_x += 1;
         }
-        if crab_moved {
-            // system.delay.delay_ms(250);
-            // system.display.clear(Rgb565::BLACK).debugless_unwrap();
-            crab_rect
-                .draw_styled(&black_clear_rect_style, &mut system.display)
-                .unwrap();
-            let img = Image::with_center(&img_raw, crab_pos);
-            crab_rect.top_left.x = crab_pos.x - 15;
-            crab_rect.top_left.y = crab_pos.y - 11;
-            img.draw(&mut system.display).debugless_unwrap();
-        }
+        // if crab_moved {
+        //     // system.delay.delay_ms(250);
+        //     // system.display.clear(Rgb565::BLACK).debugless_unwrap();
+        //     crab_rect
+        //         .draw_styled(&black_clear_rect_style, &mut system.display)
+        //         .unwrap();
+        //     let img = Image::with_center(&img_raw, crab_pos);
+        //     crab_rect.top_left.x = crab_pos.x - 15;
+        //     crab_rect.top_left.y = crab_pos.y - 11;
+        //     img.draw(&mut system.display).debugless_unwrap();
+        // }
     }
 }
