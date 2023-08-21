@@ -38,6 +38,7 @@ use waveshare_rp2040_lcd_0_96::{
     pac,
 };
 
+mod font;
 mod render;
 mod system;
 use system::System;
@@ -93,9 +94,11 @@ fn main_loop(system: &mut System) -> ! {
             None => frame_count,
         };
 
-        render::flood(0b111_111_00);
+        // render::flood(0b111_111_00);
+        render::flood(0b000_000_00);
         render::blit(&32, &32, &32, &24, &img_bytes_332);
         render::blit(&crab_x, &crab_y, &32, &24, &img_bytes_332);
+        render::test_blit_text();
         render::draw(&mut system.display);
         if system.key0.is_low().unwrap() {
             // crab_moved = true;

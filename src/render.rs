@@ -1,4 +1,11 @@
-use embedded_graphics::mono_font::{ascii::FONT_8X13_BOLD, iso_8859_1::FONT_8X13_BOLD};
+use embedded_graphics::{
+    mono_font::{
+        ascii::{FONT_6X10, FONT_8X13_BOLD},
+        MonoTextStyle,
+    },
+    pixelcolor::Rgb565,
+    prelude::RgbColor,
+};
 use st7735_lcd::ST7735;
 use waveshare_rp2040_lcd_0_96::{hal, pac};
 
@@ -28,7 +35,17 @@ const RGB_332_TO_RGB_565: [u16; 256] = [
     0xfc80, 0xfc8a, 0xfc95, 0xfc9f, 0xfda0, 0xfdaa, 0xfdb5, 0xfdbf, 0xfec0, 0xfeca, 0xfed5, 0xfedf,
     0xffe0, 0xffea, 0xfff5, 0xffff,
 ];
+
 const ALPHA_MASK: u8 = 0b11100011;
+
+const FONT: &[u8; 1248] = include_bytes!("../assets/font_8x13.data");
+const FONT_BOLD: &[u8; 1248] = include_bytes!("../assets/font_8x13_bold.data");
+const FONT_ITALIC: &[u8; 1248] = include_bytes!("../assets/font_8x13_italic.data");
+enum FontStyle {
+    NORMAL,
+    BOLD,
+    ITALIC,
+}
 
 pub fn draw(
     display: &mut ST7735<
@@ -76,4 +93,59 @@ pub fn flood(color: u8) {
     unsafe {
         BUFFER = [mapped_color; 128 * 128];
     }
+}
+
+// pub fn blit_text(x0: i32, y0: i32, text: &[char]) {
+
+// }
+
+pub fn test_blit_text() {
+    // const FONT_A: [u8; 13] = [
+    //     0b00000000, //
+    //     0b00000000, //
+    //     0b00011000, //
+    //     0b00100100, //
+    //     0b01000010, //
+    //     0b01000010, //
+    //     0b01000010, //
+    //     0b01111110, //
+    //     0b01000010, //
+    //     0b01000010, //
+    //     0b01000010, //
+    //     0b00000000, //
+    //     0b00000000, //
+    // ];
+
+    let mut glyph = [0b111_000_11u8; 8 * 13];
+    let glyph_x = 8 / 8;
+    let glyph_y = 26;
+    for y in 0..13 {
+        let data_row = FONT[(y + glyph_y) * 16 + glyph_x];
+        // let data_row = FONT_A[y];
+        if data_row & 0b1000_0000 == 0b1000_0000 {
+            glyph[y * 8 + 0] = 0b111_111_11;
+        }
+        if data_row & 0b0100_0000 == 0b0100_0000 {
+            glyph[y * 8 + 1] = 0b111_111_11;
+        }
+        if data_row & 0b0010_0000 == 0b0010_0000 {
+            glyph[y * 8 + 2] = 0b111_111_11;
+        }
+        if data_row & 0b0001_0000 == 0b0001_0000 {
+            glyph[y * 8 + 3] = 0b111_111_11;
+        }
+        if data_row & 0b0000_1000 == 0b0000_1000 {
+            glyph[y * 8 + 4] = 0b111_111_11;
+        }
+        if data_row & 0b0000_0100 == 0b0000_0100 {
+            glyph[y * 8 + 5] = 0b111_111_11;
+        }
+        if data_row & 0b0000_0010 == 0b0000_0010 {
+            glyph[y * 8 + 6] = 0b111_111_11;
+        }
+        if data_row & 0b0000_0001 == 0b0000_0001 {
+            glyph[y * 8 + 7] = 0b111_111_11;
+        }
+    }
+    blit(&0, &0, &8, &13, &glyph);
 }
