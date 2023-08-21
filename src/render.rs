@@ -59,11 +59,15 @@ pub fn draw(
 
 pub fn blit(x0: &i32, y0: &i32, w: &usize, h: &usize, sprite_data: &[u8]) {
     for y in 0..*h {
-        if y as i32 + y0 > 128 {
+        if y as i32 + y0 >= 128 {
             return;
+        } else if y as i32 + y0 < 0 {
+            continue;
         }
         for x in 0..*w {
             if x as i32 + x0 >= 128 {
+                continue;
+            } else if x as i32 + x0 < 0 {
                 continue;
             }
             let src_coord = y * w + x;
