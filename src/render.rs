@@ -59,14 +59,14 @@ pub fn draw(
     }
 }
 
-pub fn blit(x0: &i32, y0: &i32, w: &usize, h: &usize, sprite_data: &[u8]) {
-    for y in 0..*h {
+pub fn blit(x0: i32, y0: i32, w: usize, h: usize, sprite_data: &[u8]) {
+    for y in 0..h {
         if y as i32 + y0 >= 128 {
             return;
         } else if y as i32 + y0 < 0 {
             continue;
         }
-        for x in 0..*w {
+        for x in 0..w {
             if x as i32 + x0 >= 128 {
                 break;
             } else if x as i32 + x0 < 0 {
@@ -95,57 +95,58 @@ pub fn flood(color: u8) {
     }
 }
 
-// pub fn blit_text(x0: i32, y0: i32, text: &[char]) {
-
-// }
-
-pub fn test_blit_text() {
-    // const FONT_A: [u8; 13] = [
-    //     0b00000000, //
-    //     0b00000000, //
-    //     0b00011000, //
-    //     0b00100100, //
-    //     0b01000010, //
-    //     0b01000010, //
-    //     0b01000010, //
-    //     0b01111110, //
-    //     0b01000010, //
-    //     0b01000010, //
-    //     0b01000010, //
-    //     0b00000000, //
-    //     0b00000000, //
-    // ];
-
-    let mut glyph = [0b111_000_11u8; 8 * 13];
-    let glyph_x = 8 / 8;
-    let glyph_y = 26;
-    for y in 0..13 {
-        let data_row = FONT[(y + glyph_y) * 16 + glyph_x];
-        // let data_row = FONT_A[y];
-        if data_row & 0b1000_0000 == 0b1000_0000 {
-            glyph[y * 8 + 0] = 0b111_111_11;
-        }
-        if data_row & 0b0100_0000 == 0b0100_0000 {
-            glyph[y * 8 + 1] = 0b111_111_11;
-        }
-        if data_row & 0b0010_0000 == 0b0010_0000 {
-            glyph[y * 8 + 2] = 0b111_111_11;
-        }
-        if data_row & 0b0001_0000 == 0b0001_0000 {
-            glyph[y * 8 + 3] = 0b111_111_11;
-        }
-        if data_row & 0b0000_1000 == 0b0000_1000 {
-            glyph[y * 8 + 4] = 0b111_111_11;
-        }
-        if data_row & 0b0000_0100 == 0b0000_0100 {
-            glyph[y * 8 + 5] = 0b111_111_11;
-        }
-        if data_row & 0b0000_0010 == 0b0000_0010 {
-            glyph[y * 8 + 6] = 0b111_111_11;
-        }
-        if data_row & 0b0000_0001 == 0b0000_0001 {
-            glyph[y * 8 + 7] = 0b111_111_11;
+pub fn blit_char_arr(x0: i32, y0: i32, color: u8, text: &[char]) {
+    let mut x = x0;
+    let mut y = y0;
+    for c in text {
+        match c {
+            '\n' => {
+                y += 13;
+                x = x0;
+            }
+            _ => {
+                blit_char(x, y, color, *c);
+                x += 8;
+            }
         }
     }
-    blit(&0, &0, &8, &13, &glyph);
+}
+
+fn char_to_offset(c: char) -> (usize, usize) {
+    let x = (c as usize - 32) % 16;
+    let y = (c as usize - 32) / 16;
+    (x, y * 13)
+}
+
+pub fn blit_char(x0: i32, y0: i32, color: u8, c: char) {
+    let mut glyph = [0b111_000_11u8; 8 * 13];
+    let (glyph_x, glyph_y) = char_to_offset(c);
+    for y in 0..13 {
+        let data_row = FONT[(y + glyph_y) * 16 + glyph_x];
+        if data_row & 0b1000_0000 == 0b1000_0000 {
+            glyph[y * 8 + 0] = color.clone();
+        }
+        if data_row & 0b0100_0000 == 0b0100_0000 {
+            glyph[y * 8 + 1] = color.clone();
+        }
+        if data_row & 0b0010_0000 == 0b0010_0000 {
+            glyph[y * 8 + 2] = color.clone();
+        }
+        if data_row & 0b0001_0000 == 0b0001_0000 {
+            glyph[y * 8 + 3] = color.clone();
+        }
+        if data_row & 0b0000_1000 == 0b0000_1000 {
+            glyph[y * 8 + 4] = color.clone();
+        }
+        if data_row & 0b0000_0100 == 0b0000_0100 {
+            glyph[y * 8 + 5] = color.clone();
+        }
+        if data_row & 0b0000_0010 == 0b0000_0010 {
+            glyph[y * 8 + 6] = color.clone();
+        }
+        if data_row & 0b0000_0001 == 0b0000_0001 {
+            glyph[y * 8 + 7] = color.clone();
+        }
+    }
+    blit(x0, y0, 8, 13, &glyph);
 }
