@@ -167,3 +167,155 @@ pub fn blit_char(x0: i32, y0: i32, color: u8, c: char) {
     }
     blit(x0, y0, 8, 13, &glyph);
 }
+
+pub fn fill_rect(x0: i32, y0: i32, w: usize, h: usize, color: u8) {
+    let ext_color = RGB_332_TO_RGB_565[color as usize];
+    for y in y0..y0 + (h as i32) {
+        if y >= 128 {
+            return;
+        } else if y < 0 {
+            continue;
+        }
+        for x in x0..x0 + (w as i32) {
+            if x >= 128 {
+                break;
+            } else if x < 0 {
+                continue;
+            }
+            let dst_coord: i32 = (y as i32) * 128 + (x as i32);
+            unsafe {
+                let dst_coord_usize: usize = dst_coord as usize;
+                BUFFER[dst_coord_usize] = ext_color;
+            }
+        }
+    }
+}
+
+pub fn h_solid_line(x0: i32, y0: i32, w: usize, color: u8) {
+    let ext_color = RGB_332_TO_RGB_565[color as usize];
+    for x in x0..x0 + w as i32 {
+        if (y0 * 128 + x) > 128 * 128 {
+            return;
+        }
+        unsafe {
+            BUFFER[(y0 * 128 + x) as usize] = ext_color;
+        }
+    }
+}
+
+pub fn v_solid_line(x0: i32, y0: i32, h: usize, color: u8) {
+    let ext_color = RGB_332_TO_RGB_565[color as usize];
+    for y in y0..y0 + h as i32 {
+        if (y * 128 + x0) > 128 * 128 {
+            return;
+        }
+        unsafe {
+            BUFFER[(y * 128 + x0) as usize] = ext_color;
+        }
+    }
+}
+
+pub fn h_dithered_line(x0: i32, y0: i32, w: usize, color: u8) {
+    let ext_color = RGB_332_TO_RGB_565[color as usize];
+    let (x0, w) = if (y0 + x0) % 2 == 0 {
+        (x0 + 1, w - 1)
+    } else {
+        (x0, w)
+    };
+    for x in (x0..x0 + w as i32).step_by(2) {
+        if (y0 * 128 + x) > 128 * 128 {
+            return;
+        }
+        unsafe {
+            BUFFER[(y0 * 128 + x) as usize] = ext_color;
+        }
+    }
+}
+
+pub fn v_dithered_line(x0: i32, y0: i32, h: usize, color: u8) {
+    let ext_color = RGB_332_TO_RGB_565[color as usize];
+    let (y0, h) = if (y0 + x0) % 2 == 0 {
+        (y0 + 1, h - 1)
+    } else {
+        (y0, h)
+    };
+    for y in (y0..y0 + h as i32).step_by(2) {
+        if (y * 128 + x0) > 128 * 128 {
+            return;
+        }
+        unsafe {
+            BUFFER[(y * 128 + x0) as usize] = ext_color;
+        }
+    }
+}
+
+pub fn dialog_box(text: &str) {
+    fill_rect(0, 128 - (4 + 4 + 13), 128, 4 + 4 + 13, 0b111_111_11);
+    fancy_border(0, 128 + 1 - (4 + 4 + 13), 128, 4 + 4 + 13 - 2);
+    blit_str(4, 128 - 21 + 4, 0b000_000_11, text)
+}
+
+fn fancy_border(x0: i32, y0: i32, w: usize, h: usize) {
+    let hard_color = 0b000_000_10;
+    let color = 0b000_000_11;
+    let soft_color = 0b010_010_11;
+
+    // pipes
+    h_solid_line(x0, y0, w, color);
+    h_solid_line(x0, y0 + 3, w, color);
+    h_solid_line(x0, y0 + h as i32 - 4, w, color);
+    h_solid_line(x0, y0 + h as i32 - 1, w, color);
+
+    v_solid_line(x0, y0, h, color);
+    v_solid_line(x0 + 3, y0, h, color);
+    v_solid_line(x0 + w as i32 - 4, y0, h, color);
+    v_solid_line(x0 + w as i32 - 1, y0, h, color);
+
+    // ditherfill
+    h_dithered_line(x0, y0 + 1, w, soft_color);
+    h_dithered_line(x0, y0 + 2, w, soft_color);
+    h_dithered_line(x0, y0 + h as i32 - 3, w, soft_color);
+    h_dithered_line(x0, y0 + h as i32 - 2, w, soft_color);
+
+    v_dithered_line(x0 + 1, y0, h, soft_color);
+    v_dithered_line(x0 + 2, y0, h, soft_color);
+    v_dithered_line(x0 + w as i32 - 3, y0, h, soft_color);
+    v_dithered_line(x0 + w as i32 - 2, y0, h, soft_color);
+
+    // corners
+    // top left
+    h_solid_line(x0, y0, 7, hard_color);
+    h_solid_line(x0, y0 + 1, 6, hard_color);
+    h_solid_line(x0, y0 + 2, 5, hard_color);
+    h_solid_line(x0, y0 + 3, 4, hard_color);
+    h_solid_line(x0, y0 + 4, 3, hard_color);
+    h_solid_line(x0, y0 + 5, 2, hard_color);
+    h_solid_line(x0, y0 + 6, 1, hard_color);
+
+    // bot left
+    h_solid_line(x0, y0 + h as i32 - 7, 1, hard_color);
+    h_solid_line(x0, y0 + h as i32 - 6, 2, hard_color);
+    h_solid_line(x0, y0 + h as i32 - 5, 3, hard_color);
+    h_solid_line(x0, y0 + h as i32 - 4, 4, hard_color);
+    h_solid_line(x0, y0 + h as i32 - 3, 5, hard_color);
+    h_solid_line(x0, y0 + h as i32 - 2, 6, hard_color);
+    h_solid_line(x0, y0 + h as i32 - 1, 7, hard_color);
+
+    // top right
+    h_solid_line(x0 + w as i32 - 7, y0, 7, hard_color);
+    h_solid_line(x0 + w as i32 - 6, y0 + 1, 6, hard_color);
+    h_solid_line(x0 + w as i32 - 5, y0 + 2, 5, hard_color);
+    h_solid_line(x0 + w as i32 - 4, y0 + 3, 4, hard_color);
+    h_solid_line(x0 + w as i32 - 3, y0 + 4, 3, hard_color);
+    h_solid_line(x0 + w as i32 - 2, y0 + 5, 2, hard_color);
+    h_solid_line(x0 + w as i32 - 1, y0 + 6, 1, hard_color);
+
+    // bot right
+    h_solid_line(x0 + w as i32 - 1, y0 + h as i32 - 7, 1, hard_color);
+    h_solid_line(x0 + w as i32 - 2, y0 + h as i32 - 6, 2, hard_color);
+    h_solid_line(x0 + w as i32 - 3, y0 + h as i32 - 5, 3, hard_color);
+    h_solid_line(x0 + w as i32 - 4, y0 + h as i32 - 4, 4, hard_color);
+    h_solid_line(x0 + w as i32 - 5, y0 + h as i32 - 3, 5, hard_color);
+    h_solid_line(x0 + w as i32 - 6, y0 + h as i32 - 2, 6, hard_color);
+    h_solid_line(x0 + w as i32 - 7, y0 + h as i32 - 1, 7, hard_color);
+}

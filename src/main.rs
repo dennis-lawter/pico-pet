@@ -93,11 +93,7 @@ fn main_loop(system: &mut System) -> ! {
         render::blit(32, 32, 32, 24, &img_bytes_332);
         render::blit(crab_x, crab_y, 32, 24, &img_bytes_332);
 
-        let test_char_arr = ['H', 'e', 'l', 'l', 'o', '\n', 'W', 'o', 'r', 'l', 'd'];
-        render::blit_char_arr(0, 0, 0b110_000_11, &test_char_arr);
-
-        let test_str = "Herp\n& Derp 1337!";
-        render::blit_str(0, 128 - 13 * 2, 0b000_111_00, test_str);
+        render::dialog_box("DIALOG! SO SMOL");
 
         render::draw(&mut system.display);
 
