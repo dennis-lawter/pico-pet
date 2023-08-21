@@ -50,7 +50,7 @@ pub fn blit(x0: &i32, y0: &i32, w: &usize, h: &usize, sprite_data: &[u8]) {
         }
         for x in 0..*w {
             if x as i32 + x0 >= 128 {
-                continue;
+                break;
             } else if x as i32 + x0 < 0 {
                 continue;
             }

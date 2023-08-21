@@ -95,6 +95,7 @@ fn main_loop(system: &mut System) -> ! {
         };
 
         render::blit(&0, &0, &128, &128, &bg);
+        render::blit(&32, &32, &32, &24, &img_bytes_332);
         render::blit(&crab_x, &crab_y, &32, &24, &img_bytes_332);
         render::draw(&mut system.display);
         if system.key0.is_low().unwrap() {
