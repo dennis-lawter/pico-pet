@@ -86,7 +86,6 @@ fn main_loop(system: &mut System) -> ! {
 
     let mut crab_x = 16;
     let mut crab_y = 16;
-    let bg = [0b010_010_01; 128 * 128];
     loop {
         let input = fifo.read();
         frame_count = match input {
@@ -94,7 +93,7 @@ fn main_loop(system: &mut System) -> ! {
             None => frame_count,
         };
 
-        render::blit(&0, &0, &128, &128, &bg);
+        render::flood(0b111_111_00);
         render::blit(&32, &32, &32, &24, &img_bytes_332);
         render::blit(&crab_x, &crab_y, &32, &24, &img_bytes_332);
         render::draw(&mut system.display);

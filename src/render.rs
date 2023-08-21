@@ -1,3 +1,4 @@
+use embedded_graphics::mono_font::{ascii::FONT_8X13_BOLD, iso_8859_1::FONT_8X13_BOLD};
 use st7735_lcd::ST7735;
 use waveshare_rp2040_lcd_0_96::{hal, pac};
 
@@ -66,5 +67,13 @@ pub fn blit(x0: &i32, y0: &i32, w: &usize, h: &usize, sprite_data: &[u8]) {
                 BUFFER[dst_coord_usize] = RGB_332_TO_RGB_565[pixel_index];
             }
         }
+    }
+}
+
+pub fn flood(color: u8) {
+    let color_index = color as usize;
+    let mapped_color = RGB_332_TO_RGB_565[color_index];
+    unsafe {
+        BUFFER = [mapped_color; 128 * 128];
     }
 }
