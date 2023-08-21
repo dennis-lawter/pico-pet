@@ -1,8 +1,8 @@
 use st7735_lcd::ST7735;
 use waveshare_rp2040_lcd_0_96::{hal, pac};
 
-// static BUFFER: [u8; 128 * 128] = [0b111_000_11; 128 * 128];
 static mut BUFFER: [u16; 128 * 128] = [0b00000_111111_00000; 128 * 128];
+
 const RGB_332_TO_RGB_565: [u16; 256] = [
     0x0000, 0x000a, 0x0015, 0x001f, 0x0120, 0x012a, 0x0135, 0x013f, 0x0240, 0x024a, 0x0255, 0x025f,
     0x0360, 0x036a, 0x0375, 0x037f, 0x0480, 0x048a, 0x0495, 0x049f, 0x05a0, 0x05aa, 0x05b5, 0x05bf,
@@ -36,22 +36,6 @@ pub fn draw(
         hal::gpio::Pin<hal::gpio::bank0::Gpio12, hal::gpio::Output<hal::gpio::PushPull>>,
     >,
 ) {
-    // let mut x = 0;
-    // let mut y = 0;
-    // for bit in BUFFER {
-    //     if x >= 128 {
-    //         x = 0;
-    //         y += 1;
-    //     } else {
-    //         x += 1;
-    //     }
-    //     let bit_as_usize: usize = bit.into();
-    //     let ext_color_bit: u16 = RGB_332_TO_RGB_565[bit_as_usize];
-    //     // display.set_pixel(x, y, ext_color_bit).unwrap();
-    // }
-    // display
-    //     .set_pixels_buffered(0, 0, 128, 128, &BUFFER.map(|in|->RGB_332_TO_RGB_565[in]))
-    //     .unwrap();
     unsafe {
         display.write_pixels_buffered(BUFFER).unwrap();
     }
