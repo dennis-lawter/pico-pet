@@ -94,14 +94,18 @@ fn main_loop(system: &mut System) -> ! {
             None => frame_count,
         };
 
-        // render::flood(0b111_111_00);
         render::flood(0b000_000_00);
         render::blit(32, 32, 32, 24, &img_bytes_332);
         render::blit(crab_x, crab_y, 32, 24, &img_bytes_332);
-        // render::blit_char(64, 64, 0b011_000_10, 'w');
+
         let test_char_arr = ['H', 'e', 'l', 'l', 'o', '\n', 'W', 'o', 'r', 'l', 'd'];
         render::blit_char_arr(0, 0, 0b110_000_11, &test_char_arr);
+
+        let test_str = "Herp\n& Derp 1337!";
+        render::blit_str(0, 128 - 13 * 2, 0b000_111_00, test_str);
+
         render::draw(&mut system.display);
+
         if system.key0.is_low().unwrap() {
             // crab_moved = true;
             crab_x -= 1;

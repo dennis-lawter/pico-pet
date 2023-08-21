@@ -95,6 +95,23 @@ pub fn flood(color: u8) {
     }
 }
 
+pub fn blit_str(x0: i32, y0: i32, color: u8, text: &str) {
+    let mut x = x0;
+    let mut y = y0;
+    for c in text.chars() {
+        match c {
+            '\n' => {
+                y += 13;
+                x = x0;
+            }
+            _ => {
+                blit_char(x, y, color, c);
+                x += 8;
+            }
+        }
+    }
+}
+
 pub fn blit_char_arr(x0: i32, y0: i32, color: u8, text: &[char]) {
     let mut x = x0;
     let mut y = y0;
