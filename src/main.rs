@@ -16,19 +16,12 @@ extern crate waveshare_rp2040_lcd_0_96;
 
 use debugless_unwrap::*;
 use embedded_graphics::{
-    image::{Image, ImageRawLE},
-    mono_font::{ascii::FONT_6X10, MonoTextStyle},
     pixelcolor::Rgb565,
-    prelude::{DrawTarget, Point, RgbColor, Size},
-    primitives::{PrimitiveStyle, Rectangle, StyledDrawable},
-    text::Text,
-    Drawable,
+    prelude::{DrawTarget, RgbColor},
 };
 
 use embedded_hal::digital::v2::InputPin;
-use fixedstr::{str8, try_format};
-#[allow(unused_imports)]
-use panic_halt as _;
+
 use waveshare_rp2040_lcd_0_96::{
     entry,
     hal::{
@@ -38,7 +31,9 @@ use waveshare_rp2040_lcd_0_96::{
     pac,
 };
 
-mod font;
+#[allow(unused_imports)]
+use panic_halt as _;
+
 mod render;
 mod system;
 use system::System;
@@ -107,19 +102,15 @@ fn main_loop(system: &mut System) -> ! {
         render::draw(&mut system.display);
 
         if system.key0.is_low().unwrap() {
-            // crab_moved = true;
             crab_x -= 1;
         }
         if system.key1.is_low().unwrap() {
-            // crab_moved = true;
             crab_y += 1;
         }
         if system.key2.is_low().unwrap() {
-            // crab_moved = true;
             crab_y -= 1;
         }
         if system.key3.is_low().unwrap() {
-            // crab_moved = true;
             crab_x += 1;
         }
     }
