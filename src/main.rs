@@ -42,6 +42,7 @@ use system::System;
 fn main() -> ! {
     let mut system = System::new();
     system.display.clear(Rgb565::BLACK).debugless_unwrap();
+    render::init_font();
 
     // spawn thread
     unsafe {
@@ -93,7 +94,8 @@ fn main_loop(system: &mut System) -> ! {
         render::blit(32, 32, 32, 24, &img_bytes_332);
         render::blit(crab_x, crab_y, 32, 24, &img_bytes_332);
 
-        render::dialog_box("DIALOG! SO SMOL");
+        // render::bottom_dialog_box("DIALOG! so smol, so cute");
+        render::fs_dialog_box("When I was\nA small boy\nMy father\nTook me into the city\nTo see a marching band\nHe said \"SON WHEN\nYOU GROW UP\nWOULD YOU BE\nTHE SAVIOR OF THE BROKEN\nTHE BEATEN AND THE DAMNED?\"\nHe said \"WILL YOU\nDEFEAT THEM?\nYOUR DEMONS\nAND ALL THE NONBELIEVERS\nTHE PLANS THAT THEY HAVE MADE.\"");
 
         render::draw(&mut system.display);
 
