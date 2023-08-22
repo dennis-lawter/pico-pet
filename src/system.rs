@@ -1,6 +1,6 @@
 use cortex_m::delay::Delay;
 
-use embedded_hal::digital::v2::OutputPin;
+use embedded_hal::digital::v2::{InputPin, OutputPin};
 use fugit::RateExtU32;
 
 use waveshare_rp2040_lcd_0_96::{
@@ -135,6 +135,22 @@ impl System {
             ppb_ptr,
             fifo_ptr,
         }
+    }
+
+    pub fn key0_pressed(&self) -> bool {
+        self.key0.is_low().unwrap()
+    }
+
+    pub fn key1_pressed(&self) -> bool {
+        self.key1.is_low().unwrap()
+    }
+
+    pub fn key2_pressed(&self) -> bool {
+        self.key2.is_low().unwrap()
+    }
+
+    pub fn key3_pressed(&self) -> bool {
+        self.key3.is_low().unwrap()
     }
 }
 

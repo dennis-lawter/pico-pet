@@ -386,10 +386,13 @@ pub fn bottom_dialog_box(text: &str, style: FontStyle) {
     blit_str(x, y, 0b000_000_11, text, style)
 }
 
-pub fn fs_dialog_box(text: &str) {
+pub fn fs_dialog_box(title: &str, text: &str) {
     fill_rect(0, 0, 128, 128, 0b111_111_11);
     fancy_border(0, 0, 128, 128);
-    blit_str(5, 5, 0b000_000_11, text, FontStyle::Normal)
+    let title_width = 8 * title.len() as i32;
+    let title_x = 64 - (title_width / 2);
+    blit_str(title_x, 5, 0b000_000_00, title, FontStyle::BigBold);
+    blit_str(5, 18, 0b000_000_11, text, FontStyle::Normal)
 }
 
 fn fancy_border(x0: i32, y0: i32, w: usize, h: usize) {

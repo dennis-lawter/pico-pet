@@ -83,6 +83,7 @@ fn main_loop(system: &mut System) -> ! {
 
     let mut crab_x = 16;
     let mut crab_y = 16;
+    let mut in_menu = false;
     loop {
         let input = fifo.read();
         frame_count = match input {
@@ -91,25 +92,51 @@ fn main_loop(system: &mut System) -> ! {
         };
 
         render::flood(0b000_000_00);
-        render::blit(32, 32, 32, 24, &img_bytes_332);
-        render::blit(crab_x, crab_y, 32, 24, &img_bytes_332);
 
-        render::bottom_dialog_box("DIALOG! so smol, so cute", render::FontStyle::BigBold);
-        // render::fs_dialog_box("When I was\nA small boy\nMy father\nTook me into the city\nTo see a marching band\nHe said \"SON WHEN\nYOU GROW UP\nWOULD YOU BE\nTHE SAVIOR OF THE BROKEN\nTHE BEATEN AND THE DAMNED?\"\nHe said \"WILL YOU\nDEFEAT THEM?\nYOUR DEMONS\nAND ALL THE NONBELIEVERS\nTHE PLANS THAT THEY HAVE MADE.\"");
+        match in_menu {
+            true => {
+                render::fs_dialog_box(
+                    "MENU",
+                    r#"[#] brightness
+[ ] sound
+[ ] clock
+[ ] sleep time
+[ ] RESET !!!"#,
+                );
+            }
+            false => {
+                render::blit(32, 32, 32, 24, &img_bytes_332);
+                render::blit(crab_x, crab_y, 32, 24, &img_bytes_332);
+                render::bottom_dialog_box("DIALOG! so smol, so cute", render::FontStyle::Normal);
+            }
+        }
 
         render::draw(&mut system.display);
 
-        if system.key0.is_low().unwrap() {
-            crab_x -= 1;
-        }
-        if system.key1.is_low().unwrap() {
-            crab_y += 1;
-        }
-        if system.key2.is_low().unwrap() {
-            crab_y -= 1;
-        }
-        if system.key3.is_low().unwrap() {
-            crab_x += 1;
+        match in_menu {
+            true => {
+                if system.key0_pressed() {
+                    in_menu = false;
+                }
+            }
+            false => {
+                if system.key0_pressed() && system.key3_pressed() {
+                    in_menu = true;
+                } else {
+                    if system.key0_pressed() {
+                        crab_x -= 1;
+                    }
+                    if system.key1_pressed() {
+                        crab_y += 1;
+                    }
+                    if system.key2_pressed() {
+                        crab_y -= 1;
+                    }
+                    if system.key3_pressed() {
+                        crab_x += 1;
+                    }
+                }
+            }
         }
     }
 }
