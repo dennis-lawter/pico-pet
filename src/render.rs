@@ -30,17 +30,18 @@ const RGB_332_TO_RGB_565: [u16; 256] = [
 
 const ALPHA_MASK: u8 = 0b11100011;
 
-// const FONT: &[u8; 1248] = include_bytes!("../assets/font_8x13.data");
-// const FONT_BOLD: &[u8; 1248] = include_bytes!("../assets/font_8x13_bold.data");
-// const FONT_ITALIC: &[u8; 1248] = include_bytes!("../assets/font_8x13_italic.data");
+const BIG_FONT: &[u8; 1248] = include_bytes!("../assets/font_8x13.data");
+const BIG_FONT_BOLD: &[u8; 1248] = include_bytes!("../assets/font_8x13_bold.data");
+const BIG_FONT_ITALIC: &[u8; 1248] = include_bytes!("../assets/font_8x13_italic.data");
 
 static mut FONT: [[u8; 5]; 96] = [[0; 5]; 96];
 
-// enum FontStyle {
-//     NORMAL,
-//     BOLD,
-//     ITALIC,
-// }
+pub enum FontStyle {
+    Normal,
+    Big,
+    BigBold,
+    BigItalic,
+}
 
 pub fn init_font() {
     let raw = include_bytes!("../assets/font_5x8.data");
@@ -177,7 +178,16 @@ pub fn flood(color: u8) {
     }
 }
 
-pub fn blit_str(x0: i32, y0: i32, color: u8, text: &str) {
+pub fn blit_str(x0: i32, y0: i32, color: u8, text: &str, style: FontStyle) {
+    match style {
+        FontStyle::Normal => blit_normal_str(x0, y0, color, text),
+        FontStyle::Big => blit_big_str(x0, y0, color, text, BIG_FONT),
+        FontStyle::BigBold => blit_big_str(x0, y0, color, text, BIG_FONT_BOLD),
+        FontStyle::BigItalic => blit_big_str(x0, y0, color, text, BIG_FONT_ITALIC),
+    }
+}
+
+fn blit_normal_str(x0: i32, y0: i32, color: u8, text: &str) {
     let mut x = x0;
     let mut y = y0;
     for c in text.chars() {
@@ -187,49 +197,71 @@ pub fn blit_str(x0: i32, y0: i32, color: u8, text: &str) {
                 x = x0;
             }
             _ => {
-                blit_char(x, y, color, c);
+                blit_normal_char(x, y, color, c);
                 x += 5;
             }
         }
     }
 }
 
-// fn char_to_offset(c: char) -> (usize, usize) {
-//     let x = (c as usize - 32) % 16;
-//     let y = (c as usize - 32) / 16;
-//     (x, y * 13)
-// }
+fn blit_big_str(x0: i32, y0: i32, color: u8, text: &str, font_src: &[u8]) {
+    let mut x = x0;
+    let mut y = y0;
+    for c in text.chars() {
+        match c {
+            '\n' => {
+                y += 13;
+                x = x0;
+            }
+            _ => {
+                blit_big_char(x, y, color, c, font_src);
+                x += 8;
+            }
+        }
+    }
+}
 
-pub fn blit_char(x0: i32, y0: i32, color: u8, c: char) {
+fn char_to_offset(c: char) -> (usize, usize) {
+    let x = (c as usize - 32) % 16;
+    let y = (c as usize - 32) / 16;
+    (x, y * 13)
+}
+
+fn blit_big_char(x0: i32, y0: i32, color: u8, c: char, font_src: &[u8]) {
+    let mut glyph = [0b111_000_11u8; 8 * 13];
+    let (glyph_x, glyph_y) = char_to_offset(c);
+    for y in 0..13 {
+        let data_row = font_src[(y + glyph_y) * 16 + glyph_x];
+        if data_row & 0b1000_0000 == 0b1000_0000 {
+            glyph[y * 8 + 0] = color.clone();
+        }
+        if data_row & 0b0100_0000 == 0b0100_0000 {
+            glyph[y * 8 + 1] = color.clone();
+        }
+        if data_row & 0b0010_0000 == 0b0010_0000 {
+            glyph[y * 8 + 2] = color.clone();
+        }
+        if data_row & 0b0001_0000 == 0b0001_0000 {
+            glyph[y * 8 + 3] = color.clone();
+        }
+        if data_row & 0b0000_1000 == 0b0000_1000 {
+            glyph[y * 8 + 4] = color.clone();
+        }
+        if data_row & 0b0000_0100 == 0b0000_0100 {
+            glyph[y * 8 + 5] = color.clone();
+        }
+        if data_row & 0b0000_0010 == 0b0000_0010 {
+            glyph[y * 8 + 6] = color.clone();
+        }
+        if data_row & 0b0000_0001 == 0b0000_0001 {
+            glyph[y * 8 + 7] = color.clone();
+        }
+    }
+    blit(x0, y0, 8, 13, &glyph);
+}
+
+pub fn blit_normal_char(x0: i32, y0: i32, color: u8, c: char) {
     let mut glyph = [0b111_000_11u8; 5 * 8];
-    // let (glyph_x, glyph_y) = char_to_offset(c);
-    // for y in 0..13 {
-    //     let data_row = FONT[(y + glyph_y) * 16 + glyph_x];
-    //     if data_row & 0b1000_0000 == 0b1000_0000 {
-    //         glyph[y * 8 + 0] = color.clone();
-    //     }
-    //     if data_row & 0b0100_0000 == 0b0100_0000 {
-    //         glyph[y * 8 + 1] = color.clone();
-    //     }
-    //     if data_row & 0b0010_0000 == 0b0010_0000 {
-    //         glyph[y * 8 + 2] = color.clone();
-    //     }
-    //     if data_row & 0b0001_0000 == 0b0001_0000 {
-    //         glyph[y * 8 + 3] = color.clone();
-    //     }
-    //     if data_row & 0b0000_1000 == 0b0000_1000 {
-    //         glyph[y * 8 + 4] = color.clone();
-    //     }
-    //     if data_row & 0b0000_0100 == 0b0000_0100 {
-    //         glyph[y * 8 + 5] = color.clone();
-    //     }
-    //     if data_row & 0b0000_0010 == 0b0000_0010 {
-    //         glyph[y * 8 + 6] = color.clone();
-    //     }
-    //     if data_row & 0b0000_0001 == 0b0000_0001 {
-    //         glyph[y * 8 + 7] = color.clone();
-    //     }
-    // }
     unsafe {
         let glyph_raw = FONT[c as usize - 32];
         for x in 0..5 {
@@ -344,16 +376,20 @@ pub fn v_dithered_line(x0: i32, y0: i32, h: usize, color: u8) {
     }
 }
 
-pub fn bottom_dialog_box(text: &str) {
+pub fn bottom_dialog_box(text: &str, style: FontStyle) {
+    let (x, y) = match style {
+        FontStyle::Normal => (5, 128 - 19 + 4),
+        _ => (4, 128 - 19 + 4 - 2),
+    };
     fill_rect(0, 128 - (4 + 4 + 13), 128, 4 + 4 + 13, 0b111_111_11);
     fancy_border(0, 128 + 1 - (4 + 4 + 13), 128, 4 + 4 + 13 - 2);
-    blit_str(5, 128 - 19 + 4, 0b000_000_11, text)
+    blit_str(x, y, 0b000_000_11, text, style)
 }
 
 pub fn fs_dialog_box(text: &str) {
     fill_rect(0, 0, 128, 128, 0b111_111_11);
     fancy_border(0, 0, 128, 128);
-    blit_str(5, 5, 0b000_000_11, text)
+    blit_str(5, 5, 0b000_000_11, text, FontStyle::Normal)
 }
 
 fn fancy_border(x0: i32, y0: i32, w: usize, h: usize) {
