@@ -182,18 +182,18 @@ fn blit_normal_str(x0: i32, y0: i32, color: u8, text: &str) {
         match c {
             '\\' => match char_iter.next() {
                 Some('c') => {
-                    let r_char = char_iter.next().unwrap();
-                    let g_char = char_iter.next().unwrap();
-                    let b_char = char_iter.next().unwrap();
+                    let r_char = char_iter.next().unwrap_or('0');
+                    let g_char = char_iter.next().unwrap_or('0');
+                    let b_char = char_iter.next().unwrap_or('0');
                     let r_value = r_char as u8 - 48;
                     let g_value = g_char as u8 - 48;
                     let b_value = b_char as u8 - 48;
                     color = (r_value << 5) ^ (g_value << 2) ^ b_value;
                 }
                 Some('b') => {
-                    let r_char = char_iter.next().unwrap();
-                    let g_char = char_iter.next().unwrap();
-                    let b_char = char_iter.next().unwrap();
+                    let r_char = char_iter.next().unwrap_or('0');
+                    let g_char = char_iter.next().unwrap_or('0');
+                    let b_char = char_iter.next().unwrap_or('0');
                     let r_value = r_char as u8 - 48;
                     let g_value = g_char as u8 - 48;
                     let b_value = b_char as u8 - 48;
