@@ -104,21 +104,6 @@ pub fn init_font() {
                 let nyckle = nyckles[i];
                 let char_to_mutate = char_row_num * 16 + i;
                 unsafe {
-                    // if nyckle & 0b0001_0000 == 0b0001_0000 {
-                    //     FONT[char_to_mutate][0] ^= 0b1000_0000 >> char_pix_num;
-                    // }
-                    // if nyckle & 0b0000_1000 == 0b0000_1000 {
-                    //     FONT[char_to_mutate][1] ^= 0b1000_0000 >> char_pix_num;
-                    // }
-                    // if nyckle & 0b0000_0100 == 0b0000_0100 {
-                    //     FONT[char_to_mutate][2] ^= 0b1000_0000 >> char_pix_num;
-                    // }
-                    // if nyckle & 0b0000_0010 == 0b0000_0010 {
-                    //     FONT[char_to_mutate][3] ^= 0b1000_0000 >> char_pix_num;
-                    // }
-                    // if nyckle & 0b0000_0001 == 0b0000_0001 {
-                    //     FONT[char_to_mutate][4] ^= 0b1000_0000 >> char_pix_num;
-                    // }
                     FONT[char_to_mutate][0] ^= ((nyckle & 0b0001_0000) << 3) >> char_pix_num;
                     FONT[char_to_mutate][1] ^= ((nyckle & 0b0000_1000) << 4) >> char_pix_num;
                     FONT[char_to_mutate][2] ^= ((nyckle & 0b0000_0100) << 5) >> char_pix_num;
@@ -188,16 +173,44 @@ pub fn blit_str(x0: i32, y0: i32, color: u8, text: &str, style: FontStyle) {
 }
 
 fn blit_normal_str(x0: i32, y0: i32, color: u8, text: &str) {
+    let mut color = color;
+    let mut bg_color = ALPHA_MASK;
     let mut x = x0;
     let mut y = y0;
-    for c in text.chars() {
+    let mut char_iter = text.chars().into_iter();
+    while let Some(c) = char_iter.next() {
         match c {
+            '\\' => match char_iter.next() {
+                Some('c') => {
+                    let r_char = char_iter.next().unwrap();
+                    let g_char = char_iter.next().unwrap();
+                    let b_char = char_iter.next().unwrap();
+                    let r_value = r_char as u8 - 48;
+                    let g_value = g_char as u8 - 48;
+                    let b_value = b_char as u8 - 48;
+                    color = (r_value << 5) ^ (g_value << 2) ^ b_value;
+                }
+                Some('b') => {
+                    let r_char = char_iter.next().unwrap();
+                    let g_char = char_iter.next().unwrap();
+                    let b_char = char_iter.next().unwrap();
+                    let r_value = r_char as u8 - 48;
+                    let g_value = g_char as u8 - 48;
+                    let b_value = b_char as u8 - 48;
+                    bg_color = (r_value << 5) ^ (g_value << 2) ^ b_value;
+                }
+                Some(other_char) => {
+                    blit_normal_char(x, y, color, other_char, bg_color);
+                    x += 5;
+                }
+                None => {}
+            },
             '\n' => {
                 y += 8;
                 x = x0;
             }
             _ => {
-                blit_normal_char(x, y, color, c);
+                blit_normal_char(x, y, color, c, bg_color);
                 x += 5;
             }
         }
@@ -260,8 +273,8 @@ fn blit_big_char(x0: i32, y0: i32, color: u8, c: char, font_src: &[u8]) {
     blit(x0, y0, 8, 13, &glyph);
 }
 
-pub fn blit_normal_char(x0: i32, y0: i32, color: u8, c: char) {
-    let mut glyph = [0b111_000_11u8; 5 * 8];
+pub fn blit_normal_char(x0: i32, y0: i32, color: u8, c: char, bg_color: u8) {
+    let mut glyph = [bg_color; 5 * 8];
     unsafe {
         let glyph_raw = FONT[c as usize - 32];
         for x in 0..5 {
@@ -381,7 +394,7 @@ pub fn bottom_dialog_box(text: &str, style: FontStyle) {
         FontStyle::Normal => (5, 128 - 19 + 4),
         _ => (4, 128 - 19 + 4 - 2),
     };
-    fill_rect(0, 128 - (4 + 4 + 13), 128, 4 + 4 + 13, 0b111_111_11);
+    fill_rect(0, 128 + 1 - (4 + 4 + 13), 128, 4 + 4 + 13 - 2, 0b111_111_11);
     fancy_border(0, 128 + 1 - (4 + 4 + 13), 128, 4 + 4 + 13 - 2);
     blit_str(x, y, 0b000_000_11, text, style)
 }
@@ -398,7 +411,7 @@ pub fn fs_dialog_box(title: &str, text: &str) {
 fn fancy_border(x0: i32, y0: i32, w: usize, h: usize) {
     let hard_color = 0b000_000_10;
     let color = 0b000_000_11;
-    let soft_color = 0b010_010_11;
+    let soft_color = 0b101_101_11;
 
     // pipes
     h_solid_line(x0, y0, w, color);

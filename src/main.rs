@@ -1,5 +1,6 @@
 #![no_std]
 #![no_main]
+#![feature(iter_advance_by)]
 
 extern crate cortex_m;
 extern crate cortex_m_rt;
@@ -19,8 +20,6 @@ use embedded_graphics::{
     pixelcolor::Rgb565,
     prelude::{DrawTarget, RgbColor},
 };
-
-use embedded_hal::digital::v2::InputPin;
 
 use waveshare_rp2040_lcd_0_96::{
     entry,
@@ -107,7 +106,10 @@ fn main_loop(system: &mut System) -> ! {
             false => {
                 render::blit(32, 32, 32, 24, &img_bytes_332);
                 render::blit(crab_x, crab_y, 32, 24, &img_bytes_332);
-                render::bottom_dialog_box("DIALOG! so smol, so cute", render::FontStyle::Normal);
+                render::bottom_dialog_box(
+                    "DIALOG\\b700!\\b703 so \\c700smol\\c003\\\\ so cute",
+                    render::FontStyle::Normal,
+                );
             }
         }
 
