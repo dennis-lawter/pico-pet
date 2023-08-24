@@ -20,8 +20,8 @@ use waveshare_rp2040_lcd_0_96::{
 
 use st7735_lcd::{Orientation, ST7735};
 
-const LCD_WIDTH: u32 = 128;
-const LCD_HEIGHT: u32 = 128;
+pub const LCD_WIDTH: usize = 128;
+pub const LCD_HEIGHT: usize = 128;
 
 static mut HEAP: [u8; 1024] = [0; 1024];
 
@@ -78,8 +78,8 @@ impl System {
             &mut pac.RESETS,
         );
 
-        // disable backlight ASAP to hide artifacts
-        let mut lcd_bl = pins
+        // disable backlight ASAP to hide boot artifacts
+        let lcd_bl = pins
             .gpio13
             .into_push_pull_output_in_state(hal::gpio::PinState::Low);
 
@@ -110,7 +110,15 @@ impl System {
             &embedded_hal::spi::MODE_0,
         );
 
-        let mut display = ST7735::new(spi, lcd_dc, lcd_rst, false, false, LCD_WIDTH, LCD_HEIGHT);
+        let mut display = ST7735::new(
+            spi,
+            lcd_dc,
+            lcd_rst,
+            false,
+            false,
+            LCD_WIDTH as u32,
+            LCD_HEIGHT as u32,
+        );
 
         display.init(&mut delay).unwrap();
         display.set_orientation(&Orientation::Portrait).unwrap();
@@ -128,8 +136,6 @@ impl System {
             core::ptr::write(ppb_ptr, ppb);
             core::ptr::write(fifo_ptr, fifo);
         }
-
-        lcd_bl.set_high().unwrap();
 
         Self {
             display,
@@ -160,6 +166,13 @@ impl System {
 
     pub fn key3_pressed(&self) -> bool {
         self.key3.is_low().unwrap()
+    }
+
+    pub fn set_backlight(&mut self, on: bool) {
+        match on {
+            true => self.lcd_bl.set_high().unwrap(),
+            false => self.lcd_bl.set_low().unwrap(),
+        }
     }
 }
 

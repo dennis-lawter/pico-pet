@@ -34,13 +34,13 @@ impl SpriteFactory {
         )
     }
 
-    pub fn new_urchin_sprite() -> Sprite<'static> {
+    pub fn new_corro_sprite() -> Sprite<'static> {
         Sprite::new(
             0,
             0,
             Self::URCHIN_DIMENSIONS.0,
             Self::URCHIN_DIMENSIONS.1,
-            include_bytes!("../rgb332/urchin.png.data"),
+            include_bytes!("../rgb332/corro.png.data"),
         )
     }
 }

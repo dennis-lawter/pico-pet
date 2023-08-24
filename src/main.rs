@@ -33,6 +33,7 @@ use panic_halt as _;
 
 mod font;
 mod render;
+mod rgb_converter;
 mod sprite;
 mod system;
 mod text_writer;
@@ -74,9 +75,14 @@ fn main_loop(system: &mut System) -> ! {
     let mut ferris = SpriteFactory::new_ferris_sprite();
     ferris.x = 32;
     ferris.y = 32;
-    let mut urchin = SpriteFactory::new_urchin_sprite();
-    urchin.x = 64;
-    urchin.y = 64;
+    let mut corro = SpriteFactory::new_corro_sprite();
+    corro.x = 64;
+    corro.y = 64;
+
+    // clear the LCD
+    render::flood(0b000_000_00);
+    render::draw(&mut system.display);
+    system.set_backlight(true);
 
     let mut in_menu = false;
     loop {
@@ -93,7 +99,7 @@ fn main_loop(system: &mut System) -> ! {
                 text_writer::full_dialog_box(title, menu_body);
             }
             false => {
-                urchin.draw();
+                corro.draw();
                 ferris.draw();
 
                 let text = "DIALOG\\b700!\\b703 so \\c700smol\\c003\\\\ so cute";
