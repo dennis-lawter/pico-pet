@@ -13,16 +13,17 @@ impl<'a> Sprite<'a> {
         Sprite { x, y, w, h, data }
     }
 
-    pub fn draw(&self) {
-        render::blit(self.x, self.y, self.w, self.h, self.data)
+    pub fn draw(&self, frame: usize) {
+        let offset = frame * self.w * self.h;
+        render::blit_from_offset(self.x, self.y, offset, self.w, self.h, self.data)
     }
 }
 
 pub struct SpriteFactory;
 
 impl SpriteFactory {
-    const FERRIS_DIMENSIONS: (usize, usize) = (32, 24);
-    const URCHIN_DIMENSIONS: (usize, usize) = (36, 24);
+    const FERRIS_DIMENSIONS: (usize, usize) = (40, 24);
+    const CORRO_DIMENSIONS: (usize, usize) = (36, 24);
 
     pub fn new_ferris_sprite() -> Sprite<'static> {
         Sprite::new(
@@ -38,8 +39,8 @@ impl SpriteFactory {
         Sprite::new(
             0,
             0,
-            Self::URCHIN_DIMENSIONS.0,
-            Self::URCHIN_DIMENSIONS.1,
+            Self::CORRO_DIMENSIONS.0,
+            Self::CORRO_DIMENSIONS.1,
             include_bytes!("../rgb332/corro.png.data"),
         )
     }

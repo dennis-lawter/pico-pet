@@ -78,6 +78,7 @@ fn main_loop(system: &mut System) -> ! {
     let mut corro = SpriteFactory::new_corro_sprite();
     corro.x = 64;
     corro.y = 64;
+    let mut frame_count = 0;
 
     // clear the LCD
     render::flood(0b000_000_00);
@@ -86,6 +87,7 @@ fn main_loop(system: &mut System) -> ! {
 
     let mut in_menu = false;
     loop {
+        frame_count += 1;
         render::flood(0b000_000_00);
 
         match in_menu {
@@ -99,8 +101,8 @@ fn main_loop(system: &mut System) -> ! {
                 text_writer::full_dialog_box(title, menu_body);
             }
             false => {
-                corro.draw();
-                ferris.draw();
+                corro.draw(0);
+                ferris.draw((frame_count / 20) % 2);
 
                 let text = "DIALOG\\b700!\\b703 so \\c700smol\\c003\\\\ so cute";
                 text_writer::bottom_dialog_box(text);
