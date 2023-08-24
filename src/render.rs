@@ -36,6 +36,8 @@ const BIG_FONT_ITALIC: &[u8; 1248] = include_bytes!("../assets/font_8x13_italic.
 
 static mut FONT: [[u8; 5]; 96] = [[0; 5]; 96];
 
+// TODO: remove unused fonts
+#[allow(dead_code)]
 pub enum FontStyle {
     Normal,
     Big,

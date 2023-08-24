@@ -21,6 +21,7 @@ use embedded_graphics::{
     prelude::{DrawTarget, RgbColor},
 };
 
+use sprite::SpriteFactory;
 use waveshare_rp2040_lcd_0_96::{
     entry,
     hal::{
@@ -34,6 +35,7 @@ use waveshare_rp2040_lcd_0_96::{
 use panic_halt as _;
 
 mod render;
+mod sprite;
 mod system;
 use system::System;
 
@@ -76,12 +78,16 @@ fn side_loop(sys_freq: u32) -> ! {
 
 fn main_loop(system: &mut System) -> ! {
     let mut frame_count = 0;
-    let img_bytes_332 = include_bytes!("../rgb332/scaledferris.png.data").clone();
+
+    let mut ferris = SpriteFactory::new_ferris_sprite();
+    ferris.x = 32;
+    ferris.y = 32;
+    let mut urchin = SpriteFactory::new_urchin_sprite();
+    urchin.x = 64;
+    urchin.y = 64;
 
     let fifo = unsafe { &mut *system.fifo_ptr };
 
-    let mut crab_x = 16;
-    let mut crab_y = 16;
     let mut in_menu = false;
     loop {
         let input = fifo.read();
@@ -104,8 +110,8 @@ fn main_loop(system: &mut System) -> ! {
                 );
             }
             false => {
-                render::blit(32, 32, 32, 24, &img_bytes_332);
-                render::blit(crab_x, crab_y, 32, 24, &img_bytes_332);
+                urchin.draw();
+                ferris.draw();
                 render::bottom_dialog_box(
                     "DIALOG\\b700!\\b703 so \\c700smol\\c003\\\\ so cute",
                     render::FontStyle::Normal,
@@ -126,16 +132,16 @@ fn main_loop(system: &mut System) -> ! {
                     in_menu = true;
                 } else {
                     if system.key0_pressed() {
-                        crab_x -= 1;
+                        ferris.x -= 1;
                     }
                     if system.key1_pressed() {
-                        crab_y += 1;
+                        ferris.y += 1;
                     }
                     if system.key2_pressed() {
-                        crab_y -= 1;
+                        ferris.y -= 1;
                     }
                     if system.key3_pressed() {
-                        crab_x += 1;
+                        ferris.x += 1;
                     }
                 }
             }

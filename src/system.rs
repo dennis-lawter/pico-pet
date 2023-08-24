@@ -25,19 +25,28 @@ const LCD_HEIGHT: u32 = 128;
 
 static mut HEAP: [u8; 1024] = [0; 1024];
 
+type DisplaySdi = hal::Spi<hal::spi::Enabled, pac::SPI1, 8>;
+type DisplayDc = hal::gpio::Pin<hal::gpio::bank0::Gpio8, hal::gpio::Output<hal::gpio::PushPull>>;
+type DisplayRst = hal::gpio::Pin<hal::gpio::bank0::Gpio12, hal::gpio::Output<hal::gpio::PushPull>>;
+
+pub type Lcd = ST7735<DisplaySdi, DisplayDc, DisplayRst>;
+
+type LcdBlPin = hal::gpio::Pin<hal::gpio::bank0::Gpio13, hal::gpio::Output<hal::gpio::PushPull>>;
+
+type Key0Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio15, hal::gpio::Input<hal::gpio::PullUp>>;
+type Key1Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio17, hal::gpio::Input<hal::gpio::PullUp>>;
+type Key2Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio2, hal::gpio::Input<hal::gpio::PullUp>>;
+type Key3Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio3, hal::gpio::Input<hal::gpio::PullUp>>;
+
 pub struct System {
-    pub display: ST7735<
-        hal::Spi<hal::spi::Enabled, pac::SPI1, 8>,
-        hal::gpio::Pin<hal::gpio::bank0::Gpio8, hal::gpio::Output<hal::gpio::PushPull>>,
-        hal::gpio::Pin<hal::gpio::bank0::Gpio12, hal::gpio::Output<hal::gpio::PushPull>>,
-    >,
+    pub display: Lcd,
     pub sys_freq: u32,
-    pub lcd_bl: hal::gpio::Pin<hal::gpio::bank0::Gpio13, hal::gpio::Output<hal::gpio::PushPull>>,
+    pub lcd_bl: LcdBlPin,
     pub delay: Delay,
-    pub key0: hal::gpio::Pin<hal::gpio::bank0::Gpio15, hal::gpio::Input<hal::gpio::PullUp>>,
-    pub key1: hal::gpio::Pin<hal::gpio::bank0::Gpio17, hal::gpio::Input<hal::gpio::PullUp>>,
-    pub key2: hal::gpio::Pin<hal::gpio::bank0::Gpio2, hal::gpio::Input<hal::gpio::PullUp>>,
-    pub key3: hal::gpio::Pin<hal::gpio::bank0::Gpio3, hal::gpio::Input<hal::gpio::PullUp>>,
+    pub key0: Key0Pin,
+    pub key1: Key1Pin,
+    pub key2: Key2Pin,
+    pub key3: Key3Pin,
     pub psm_ptr: *mut PSM,
     pub ppb_ptr: *mut PPB,
     pub fifo_ptr: *mut SioFifo,
