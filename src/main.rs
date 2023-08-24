@@ -24,28 +24,27 @@ use embedded_graphics::{
 use sprite::SpriteFactory;
 use waveshare_rp2040_lcd_0_96::{
     entry,
-    hal::{
-        multicore::{Multicore, Stack},
-        Sio,
-    },
+    hal::multicore::{Multicore, Stack},
     pac,
 };
 
 #[allow(unused_imports)]
 use panic_halt as _;
 
+mod font;
 mod render;
 mod sprite;
 mod system;
+mod text_writer;
 use system::System;
 
 #[entry]
 fn main() -> ! {
     let mut system = System::new();
     system.display.clear(Rgb565::BLACK).debugless_unwrap();
-    render::init_font();
 
-    // spawn thread
+    text_writer::init_singleton_fonts();
+
     unsafe {
         let mut mc = Multicore::new(
             &mut *system.psm_ptr,
@@ -63,22 +62,15 @@ fn main() -> ! {
 
 static mut CORE1_STACK: Stack<4096> = Stack::new();
 fn side_loop(sys_freq: u32) -> ! {
-    let pac = unsafe { pac::Peripherals::steal() };
     let core = unsafe { pac::CorePeripherals::steal() };
 
-    let mut sio = Sio::new(pac.SIO);
     let mut delay = cortex_m::delay::Delay::new(core.SYST, sys_freq);
-    let mut i = 0u32;
     loop {
-        i += 1;
         delay.delay_ms(1000);
-        sio.fifo.write(i);
     }
 }
 
 fn main_loop(system: &mut System) -> ! {
-    let mut frame_count = 0;
-
     let mut ferris = SpriteFactory::new_ferris_sprite();
     ferris.x = 32;
     ferris.y = 32;
@@ -86,36 +78,26 @@ fn main_loop(system: &mut System) -> ! {
     urchin.x = 64;
     urchin.y = 64;
 
-    let fifo = unsafe { &mut *system.fifo_ptr };
-
     let mut in_menu = false;
     loop {
-        let input = fifo.read();
-        frame_count = match input {
-            Some(new_frame_count) => new_frame_count,
-            None => frame_count,
-        };
-
         render::flood(0b000_000_00);
 
         match in_menu {
             true => {
-                render::fs_dialog_box(
-                    "MENU",
-                    r#"[#] brightness
+                let title = "MENU";
+                let menu_body = r#"[#] brightness
 [ ] sound
 [ ] clock
 [ ] sleep time
-[ ] RESET !!!"#,
-                );
+[ ] RESET !!!"#;
+                text_writer::full_dialog_box(title, menu_body);
             }
             false => {
                 urchin.draw();
                 ferris.draw();
-                render::bottom_dialog_box(
-                    "DIALOG\\b700!\\b703 so \\c700smol\\c003\\\\ so cute",
-                    render::FontStyle::Normal,
-                );
+
+                let text = "DIALOG\\b700!\\b703 so \\c700smol\\c003\\\\ so cute";
+                text_writer::bottom_dialog_box(text);
             }
         }
 
@@ -128,7 +110,7 @@ fn main_loop(system: &mut System) -> ! {
                 }
             }
             false => {
-                if system.key0_pressed() && system.key3_pressed() {
+                if system.key2_pressed() && system.key3_pressed() {
                     in_menu = true;
                 } else {
                     if system.key0_pressed() {

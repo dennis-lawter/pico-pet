@@ -28,13 +28,7 @@ const RGB_332_TO_RGB_565: [u16; 256] = [
     0xffe0, 0xffea, 0xfff5, 0xffff,
 ];
 
-const ALPHA_MASK: u8 = 0b11100011;
-
-const BIG_FONT: &[u8; 1248] = include_bytes!("../assets/font_8x13.data");
-const BIG_FONT_BOLD: &[u8; 1248] = include_bytes!("../assets/font_8x13_bold.data");
-const BIG_FONT_ITALIC: &[u8; 1248] = include_bytes!("../assets/font_8x13_italic.data");
-
-static mut FONT: [[u8; 5]; 96] = [[0; 5]; 96];
+pub const ALPHA_MASK: u8 = 0b11100011;
 
 // TODO: remove unused fonts
 #[allow(dead_code)]
@@ -43,78 +37,6 @@ pub enum FontStyle {
     Big,
     BigBold,
     BigItalic,
-}
-
-pub fn init_font() {
-    let raw = include_bytes!("../assets/font_5x8.data");
-    for char_row_num in 0..6 {
-        for char_pix_num in 0..8 {
-            let raw_y = (char_row_num * 8 + char_pix_num) * 10;
-            let row: [u8; 10] = [
-                raw[raw_y + 0],
-                raw[raw_y + 1],
-                raw[raw_y + 2],
-                raw[raw_y + 3],
-                raw[raw_y + 4],
-                raw[raw_y + 5],
-                raw[raw_y + 6],
-                raw[raw_y + 7],
-                raw[raw_y + 8],
-                raw[raw_y + 9],
-            ];
-
-            // each row of the source image contains 80 pixels
-            // store every 5 pixels into a "nyckle" to be assembled later
-
-            let first_nyckle = (row[0] & 0b1111_1000) >> 3;
-            let second_nyckle = ((row[0] & 0b0000_0111) << 2) ^ ((row[1] & 0b1100_0000) >> 6);
-            let third_nyckle = (row[1] & 0b0011_1110) >> 1;
-            let fourth_nyckle = ((row[1] & 0b0000_0001) << 4) ^ ((row[2] & 0b1111_0000) >> 4);
-            let fifth_nyckle = ((row[2] & 0b0000_1111) << 1) ^ ((row[3] & 0b1000_0000) >> 7);
-            let sixth_nyckle = (row[3] & 0b0111_1100) >> 2;
-            let seventh_nyckle = ((row[3] & 0b0000_0011) << 3) ^ ((row[4] & 0b1110_0000) >> 5);
-            let eigth_nyckle = row[4] & 0b001_1111;
-            let ninth_nyckle = (row[5] & 0b1111_1000) >> 3;
-            let tenth_nyckle = ((row[5] & 0b0000_0111) << 2) ^ ((row[6] & 0b1100_0000) >> 6);
-            let eleventh_nyckle = (row[6] & 0b0011_1110) >> 1;
-            let twelfth_nyckle = ((row[6] & 0b0000_0001) << 4) ^ ((row[7] & 0b1111_0000) >> 4);
-            let thirteenth_nyckle = ((row[7] & 0b0000_1111) << 1) ^ ((row[8] & 0b1000_0000) >> 7);
-            let fourteenth_nyckle = (row[8] & 0b0111_1100) >> 2;
-            let fifteenth_nyckle = ((row[8] & 0b0000_0011) << 3) ^ ((row[9] & 0b1110_0000) >> 5);
-            let sixteenth_nyckle = row[9] & 0b001_1111;
-
-            let nyckles: [u8; 16] = [
-                first_nyckle,
-                second_nyckle,
-                third_nyckle,
-                fourth_nyckle,
-                fifth_nyckle,
-                sixth_nyckle,
-                seventh_nyckle,
-                eigth_nyckle,
-                ninth_nyckle,
-                tenth_nyckle,
-                eleventh_nyckle,
-                twelfth_nyckle,
-                thirteenth_nyckle,
-                fourteenth_nyckle,
-                fifteenth_nyckle,
-                sixteenth_nyckle,
-            ];
-
-            for i in 0..16 {
-                let nyckle = nyckles[i];
-                let char_to_mutate = char_row_num * 16 + i;
-                unsafe {
-                    FONT[char_to_mutate][0] ^= ((nyckle & 0b0001_0000) << 3) >> char_pix_num;
-                    FONT[char_to_mutate][1] ^= ((nyckle & 0b0000_1000) << 4) >> char_pix_num;
-                    FONT[char_to_mutate][2] ^= ((nyckle & 0b0000_0100) << 5) >> char_pix_num;
-                    FONT[char_to_mutate][3] ^= ((nyckle & 0b0000_0010) << 6) >> char_pix_num;
-                    FONT[char_to_mutate][4] ^= ((nyckle & 0b0000_0001) << 7) >> char_pix_num;
-                }
-            }
-        }
-    }
 }
 
 pub fn draw(
@@ -163,151 +85,6 @@ pub fn flood(color: u8) {
     unsafe {
         BUFFER = [mapped_color; 128 * 128];
     }
-}
-
-pub fn blit_str(x0: i32, y0: i32, color: u8, text: &str, style: FontStyle) {
-    match style {
-        FontStyle::Normal => blit_normal_str(x0, y0, color, text),
-        FontStyle::Big => blit_big_str(x0, y0, color, text, BIG_FONT),
-        FontStyle::BigBold => blit_big_str(x0, y0, color, text, BIG_FONT_BOLD),
-        FontStyle::BigItalic => blit_big_str(x0, y0, color, text, BIG_FONT_ITALIC),
-    }
-}
-
-fn blit_normal_str(x0: i32, y0: i32, color: u8, text: &str) {
-    let mut color = color;
-    let mut bg_color = ALPHA_MASK;
-    let mut x = x0;
-    let mut y = y0;
-    let mut char_iter = text.chars().into_iter();
-    while let Some(c) = char_iter.next() {
-        match c {
-            '\\' => match char_iter.next() {
-                Some('c') => {
-                    let r_char = char_iter.next().unwrap_or('0');
-                    let g_char = char_iter.next().unwrap_or('0');
-                    let b_char = char_iter.next().unwrap_or('0');
-                    let r_value = r_char as u8 - 48;
-                    let g_value = g_char as u8 - 48;
-                    let b_value = b_char as u8 - 48;
-                    color = (r_value << 5) ^ (g_value << 2) ^ b_value;
-                }
-                Some('b') => {
-                    let r_char = char_iter.next().unwrap_or('0');
-                    let g_char = char_iter.next().unwrap_or('0');
-                    let b_char = char_iter.next().unwrap_or('0');
-                    let r_value = r_char as u8 - 48;
-                    let g_value = g_char as u8 - 48;
-                    let b_value = b_char as u8 - 48;
-                    bg_color = (r_value << 5) ^ (g_value << 2) ^ b_value;
-                }
-                Some(other_char) => {
-                    blit_normal_char(x, y, color, other_char, bg_color);
-                    x += 5;
-                }
-                None => {}
-            },
-            '\n' => {
-                y += 8;
-                x = x0;
-            }
-            _ => {
-                blit_normal_char(x, y, color, c, bg_color);
-                x += 5;
-            }
-        }
-    }
-}
-
-fn blit_big_str(x0: i32, y0: i32, color: u8, text: &str, font_src: &[u8]) {
-    let mut x = x0;
-    let mut y = y0;
-    for c in text.chars() {
-        match c {
-            '\n' => {
-                y += 13;
-                x = x0;
-            }
-            _ => {
-                blit_big_char(x, y, color, c, font_src);
-                x += 8;
-            }
-        }
-    }
-}
-
-fn char_to_offset(c: char) -> (usize, usize) {
-    let x = (c as usize - 32) % 16;
-    let y = (c as usize - 32) / 16;
-    (x, y * 13)
-}
-
-fn blit_big_char(x0: i32, y0: i32, color: u8, c: char, font_src: &[u8]) {
-    let mut glyph = [0b111_000_11u8; 8 * 13];
-    let (glyph_x, glyph_y) = char_to_offset(c);
-    for y in 0..13 {
-        let data_row = font_src[(y + glyph_y) * 16 + glyph_x];
-        if data_row & 0b1000_0000 == 0b1000_0000 {
-            glyph[y * 8 + 0] = color.clone();
-        }
-        if data_row & 0b0100_0000 == 0b0100_0000 {
-            glyph[y * 8 + 1] = color.clone();
-        }
-        if data_row & 0b0010_0000 == 0b0010_0000 {
-            glyph[y * 8 + 2] = color.clone();
-        }
-        if data_row & 0b0001_0000 == 0b0001_0000 {
-            glyph[y * 8 + 3] = color.clone();
-        }
-        if data_row & 0b0000_1000 == 0b0000_1000 {
-            glyph[y * 8 + 4] = color.clone();
-        }
-        if data_row & 0b0000_0100 == 0b0000_0100 {
-            glyph[y * 8 + 5] = color.clone();
-        }
-        if data_row & 0b0000_0010 == 0b0000_0010 {
-            glyph[y * 8 + 6] = color.clone();
-        }
-        if data_row & 0b0000_0001 == 0b0000_0001 {
-            glyph[y * 8 + 7] = color.clone();
-        }
-    }
-    blit(x0, y0, 8, 13, &glyph);
-}
-
-pub fn blit_normal_char(x0: i32, y0: i32, color: u8, c: char, bg_color: u8) {
-    let mut glyph = [bg_color; 5 * 8];
-    unsafe {
-        let glyph_raw = FONT[c as usize - 32];
-        for x in 0..5 {
-            let vert_slice = glyph_raw[x];
-            if vert_slice & 0b1000_0000 == 0b1000_0000 {
-                glyph[(0 * 5) + x] = color.clone();
-            }
-            if vert_slice & 0b0100_0000 == 0b0100_0000 {
-                glyph[(1 * 5) + x] = color.clone();
-            }
-            if vert_slice & 0b0010_0000 == 0b0010_0000 {
-                glyph[(2 * 5) + x] = color.clone();
-            }
-            if vert_slice & 0b0001_0000 == 0b0001_0000 {
-                glyph[(3 * 5) + x] = color.clone();
-            }
-            if vert_slice & 0b0000_1000 == 0b0000_1000 {
-                glyph[(4 * 5) + x] = color.clone();
-            }
-            if vert_slice & 0b0000_0100 == 0b0000_0100 {
-                glyph[(5 * 5) + x] = color.clone();
-            }
-            if vert_slice & 0b0000_0010 == 0b0000_0010 {
-                glyph[(6 * 5) + x] = color.clone();
-            }
-            if vert_slice & 0b0000_0001 == 0b0000_0001 {
-                glyph[(7 * 5) + x] = color.clone();
-            }
-        }
-    }
-    blit(x0, y0, 5, 8, &glyph);
 }
 
 pub fn fill_rect(x0: i32, y0: i32, w: usize, h: usize, color: u8) {
@@ -391,26 +168,7 @@ pub fn v_dithered_line(x0: i32, y0: i32, h: usize, color: u8) {
     }
 }
 
-pub fn bottom_dialog_box(text: &str, style: FontStyle) {
-    let (x, y) = match style {
-        FontStyle::Normal => (5, 128 - 19 + 4),
-        _ => (4, 128 - 19 + 4 - 2),
-    };
-    fill_rect(0, 128 + 1 - (4 + 4 + 13), 128, 4 + 4 + 13 - 2, 0b111_111_11);
-    fancy_border(0, 128 + 1 - (4 + 4 + 13), 128, 4 + 4 + 13 - 2);
-    blit_str(x, y, 0b000_000_11, text, style)
-}
-
-pub fn fs_dialog_box(title: &str, text: &str) {
-    fill_rect(0, 0, 128, 128, 0b111_111_11);
-    fancy_border(0, 0, 128, 128);
-    let title_width = 8 * title.len() as i32;
-    let title_x = 64 - (title_width / 2);
-    blit_str(title_x, 5, 0b000_000_00, title, FontStyle::BigBold);
-    blit_str(5, 18, 0b000_000_11, text, FontStyle::Normal)
-}
-
-fn fancy_border(x0: i32, y0: i32, w: usize, h: usize) {
+pub fn fancy_border(x0: i32, y0: i32, w: usize, h: usize) {
     let hard_color = 0b000_000_10;
     let color = 0b000_000_11;
     let soft_color = 0b101_101_11;
