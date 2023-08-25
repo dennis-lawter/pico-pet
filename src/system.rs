@@ -20,6 +20,8 @@ use waveshare_rp2040_lcd_0_96::{
 
 use st7735_lcd::{Orientation, ST7735};
 
+use crate::setting_value::Setting;
+
 pub const LCD_WIDTH: usize = 128;
 pub const LCD_HEIGHT: usize = 128;
 
@@ -169,25 +171,30 @@ impl System {
         self.key3.is_low().unwrap()
     }
 
+    /// LOG SCALE TO 65535 BY 24 STEPS, DROP LOWEST 8
+    /// fn main() {
+    ///     const M: f64 = 65535.0;
+    ///     const TOTAL_VALUES: usize = 24;
+    ///     const NEEDED_VALUES: usize = 16;
+    ///     let r = M.powf(1.0 / (TOTAL_VALUES as f64 - 1.0));
+    ///     let mut values = Vec::with_capacity(TOTAL_VALUES);
+    ///     for i in 0..TOTAL_VALUES {
+    ///         values.push((r.powf(i as f64) + 0.5) as u32);
+    ///     }
+    ///     let values: Vec<_> = values.into_iter().rev().take(NEEDED_VALUES).collect();
+    ///     println!("{:?}", values);
+    /// }
     const BRIGHTNESS_LUT: [u16; 16] = [
         47, 77, 124, 201, 326, 528, 855, 1384, 2242, 3631, 5880, 9524, 15425, 24983, 40463, 65535,
     ];
 
-    pub fn set_backlight(&mut self, brightness: u8) {
-        let effective_brightness = Self::BRIGHTNESS_LUT[brightness as usize];
+    pub fn set_backlight(&mut self, brightness: &Setting) {
+        let effective_brightness = Self::BRIGHTNESS_LUT[brightness.get_value() as usize];
         unsafe {
             self.backlight_channel_ptr
                 .as_mut()
                 .unwrap()
                 .set_duty(effective_brightness)
         }
-    }
-}
-
-impl Drop for System {
-    fn drop(&mut self) {
-        unsafe { core::ptr::drop_in_place(self.psm_ptr) };
-        unsafe { core::ptr::drop_in_place(self.ppb_ptr) };
-        unsafe { core::ptr::drop_in_place(self.fifo_ptr) };
     }
 }
