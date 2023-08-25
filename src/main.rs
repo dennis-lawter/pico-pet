@@ -15,6 +15,8 @@ extern crate panic_halt;
 extern crate st7735_lcd;
 extern crate waveshare_rp2040_lcd_0_96;
 
+use core::cmp::{max, min};
+
 use debugless_unwrap::*;
 use embedded_graphics::{
     pixelcolor::Rgb565,
@@ -37,7 +39,7 @@ mod rgb_converter;
 mod sprite;
 mod system;
 mod text_writer;
-use system::System;
+use system::{System, LCD_BL_MAX, LCD_BL_MIN};
 
 #[entry]
 fn main() -> ! {
@@ -71,6 +73,35 @@ fn side_loop(sys_freq: u32) -> ! {
     }
 }
 
+const SETTING_BAR_MAX: u8 = 21;
+
+fn generate_bar(value: u8) -> &'static str {
+    // Ensure the value is within valid range
+    let value = if value > SETTING_BAR_MAX {
+        SETTING_BAR_MAX
+    } else {
+        value
+    };
+
+    // Creating a static mutable array as buffer
+    static mut BUFFER: [u8; SETTING_BAR_MAX as usize + 2] = [b' '; SETTING_BAR_MAX as usize + 2];
+
+    unsafe {
+        BUFFER[0] = b'[';
+        BUFFER[SETTING_BAR_MAX as usize + 1] = b']';
+        for i in 1..=SETTING_BAR_MAX {
+            if i <= value {
+                BUFFER[i as usize] = b'#';
+            } else {
+                BUFFER[i as usize] = b'_';
+            }
+        }
+
+        // Convert to &str
+        core::str::from_utf8_unchecked(&BUFFER)
+    }
+}
+
 fn main_loop(system: &mut System) -> ! {
     let mut ferris = SpriteFactory::new_ferris_sprite();
     ferris.x = 32;
@@ -83,7 +114,8 @@ fn main_loop(system: &mut System) -> ! {
     // clear the LCD
     render::flood(0b000_000_00);
     render::draw(&mut system.display);
-    system.set_backlight(true);
+    let mut brightness: u8 = 20;
+    let mut key_repeat_slowdown_timer = 0;
 
     let mut in_menu = false;
     loop {
@@ -92,12 +124,8 @@ fn main_loop(system: &mut System) -> ! {
 
         match in_menu {
             true => {
-                let title = "MENU";
-                let menu_body = r#"[#] brightness
-[ ] sound
-[ ] clock
-[ ] sleep time
-[ ] RESET !!!"#;
+                let title = "BRIGHTNESS";
+                let menu_body = generate_bar(brightness);
                 text_writer::full_dialog_box(title, menu_body);
             }
             false => {
@@ -109,12 +137,34 @@ fn main_loop(system: &mut System) -> ! {
             }
         }
 
+        system.set_backlight(brightness);
         render::draw(&mut system.display);
 
         match in_menu {
             true => {
                 if system.key0_pressed() {
                     in_menu = false;
+                }
+                if system.key1_pressed() && !system.key2_pressed() {
+                    if key_repeat_slowdown_timer == 0 {
+                        key_repeat_slowdown_timer = 5;
+                        if brightness > 0 {
+                            brightness -= 1;
+                        }
+                    } else {
+                        key_repeat_slowdown_timer -= 1;
+                    }
+                } else if system.key2_pressed() && !system.key1_pressed() {
+                    if key_repeat_slowdown_timer == 0 {
+                        key_repeat_slowdown_timer = 5;
+                        if brightness < SETTING_BAR_MAX {
+                            brightness += 1;
+                        }
+                    } else {
+                        key_repeat_slowdown_timer -= 1;
+                    }
+                } else {
+                    key_repeat_slowdown_timer = 0;
                 }
             }
             false => {

@@ -1,6 +1,6 @@
 use cortex_m::delay::Delay;
 
-use embedded_hal::digital::v2::{InputPin, OutputPin};
+use embedded_hal::{digital::v2::InputPin, PwmPin};
 use fugit::RateExtU32;
 
 use waveshare_rp2040_lcd_0_96::{
@@ -31,17 +31,20 @@ type DisplayRst = hal::gpio::Pin<hal::gpio::bank0::Gpio12, hal::gpio::Output<hal
 
 pub type Lcd = ST7735<DisplaySdi, DisplayDc, DisplayRst>;
 
-type LcdBlPin = hal::gpio::Pin<hal::gpio::bank0::Gpio13, hal::gpio::Output<hal::gpio::PushPull>>;
+type LcdBlPinChannel = hal::pwm::Channel<hal::pwm::Pwm6, hal::pwm::FreeRunning, hal::pwm::B>;
 
 type Key0Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio15, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key1Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio17, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key2Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio2, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key3Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio3, hal::gpio::Input<hal::gpio::PullUp>>;
 
+pub const LCD_BL_MIN: u16 = 0;
+pub const LCD_BL_MAX: u16 = 65_535;
+
 pub struct System {
     pub display: Lcd,
     pub sys_freq: u32,
-    pub lcd_bl: LcdBlPin,
+    pub backlight_channel_ptr: *mut LcdBlPinChannel,
     pub delay: Delay,
     pub key0: Key0Pin,
     pub key1: Key1Pin,
@@ -79,10 +82,21 @@ impl System {
         );
 
         // disable backlight ASAP to hide boot artifacts
-        let lcd_bl = pins
-            .gpio13
-            .into_push_pull_output_in_state(hal::gpio::PinState::Low);
+        // let lcd_bl = pins.gpio13.into_mode();
+        // Init PWMs
+        let mut pwm_slices: hal::pwm::Slices = hal::pwm::Slices::new(pac.PWM, &mut pac.RESETS);
 
+        // Configure PWM4
+        let pwm = &mut pwm_slices.pwm6;
+        pwm.set_ph_correct();
+        pwm.enable();
+
+        // Output channel B on PWM6 to GPIO 13
+        let backlight_channel_ptr = &mut pwm.channel_b as *mut LcdBlPinChannel;
+        unsafe {
+            (*backlight_channel_ptr).output_to(pins.gpio13);
+            (*backlight_channel_ptr).set_duty(LCD_BL_MIN);
+        }
         let key0 = pins.gpio15.into_pull_up_input();
         let key1 = pins.gpio17.into_pull_up_input();
         let key2 = pins.gpio2.into_pull_up_input();
@@ -131,16 +145,19 @@ impl System {
         let psm_ptr: *mut PSM = unsafe { &mut *(&mut HEAP as *mut _ as *mut PSM) };
         let ppb_ptr: *mut PPB = unsafe { &mut *(&mut HEAP as *mut _ as *mut PPB) };
         let fifo_ptr: *mut SioFifo = unsafe { &mut *(&mut HEAP as *mut _ as *mut SioFifo) };
+        // let backlight_channel_ptr: *mut LcdBlPinChannel =
+        //     unsafe { &mut *(&mut HEAP as *mut _ as *mut LcdBlPinChannel) };
         unsafe {
             core::ptr::write(psm_ptr, psm);
             core::ptr::write(ppb_ptr, ppb);
             core::ptr::write(fifo_ptr, fifo);
+            // core::ptr::write(backlight_channel_ptr, backlight_channel);
         }
 
         Self {
             display,
             sys_freq,
-            lcd_bl,
+            backlight_channel_ptr,
             delay,
             key0,
             key1,
@@ -168,10 +185,18 @@ impl System {
         self.key3.is_low().unwrap()
     }
 
-    pub fn set_backlight(&mut self, on: bool) {
-        match on {
-            true => self.lcd_bl.set_high().unwrap(),
-            false => self.lcd_bl.set_low().unwrap(),
+    const BRIGHTNESS_LUT: [u16; 22] = [
+        45, 64, 91, 128, 181, 256, 362, 512, 724, 1024, 1448, 2048, 2896, 4096, 5793, 8192, 11585,
+        16384, 23170, 32768, 46341, 65535,
+    ];
+
+    pub fn set_backlight(&mut self, brightness: u8) {
+        let effective_brightness = Self::BRIGHTNESS_LUT[brightness as usize];
+        unsafe {
+            self.backlight_channel_ptr
+                .as_mut()
+                .unwrap()
+                .set_duty(effective_brightness)
         }
     }
 }
