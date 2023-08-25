@@ -23,8 +23,6 @@ use st7735_lcd::{Orientation, ST7735};
 pub const LCD_WIDTH: usize = 128;
 pub const LCD_HEIGHT: usize = 128;
 
-static mut HEAP: [u8; 1024] = [0; 1024];
-
 type DisplaySdi = hal::Spi<hal::spi::Enabled, pac::SPI1, 8>;
 type DisplayDc = hal::gpio::Pin<hal::gpio::bank0::Gpio8, hal::gpio::Output<hal::gpio::PushPull>>;
 type DisplayRst = hal::gpio::Pin<hal::gpio::bank0::Gpio12, hal::gpio::Output<hal::gpio::PushPull>>;
@@ -37,9 +35,6 @@ type Key0Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio15, hal::gpio::Input<hal::gp
 type Key1Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio17, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key2Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio2, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key3Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio3, hal::gpio::Input<hal::gpio::PullUp>>;
-
-pub const LCD_BL_MIN: u16 = 0;
-pub const LCD_BL_MAX: u16 = 65_535;
 
 pub struct System {
     pub display: Lcd,
@@ -73,7 +68,7 @@ impl System {
         .ok()
         .unwrap();
 
-        let sio = Sio::new(pac.SIO);
+        let mut sio = Sio::new(pac.SIO);
         let pins = Pins::new(
             pac.IO_BANK0,
             pac.PADS_BANK0,
@@ -95,7 +90,7 @@ impl System {
         let backlight_channel_ptr = &mut pwm.channel_b as *mut LcdBlPinChannel;
         unsafe {
             (*backlight_channel_ptr).output_to(pins.gpio13);
-            (*backlight_channel_ptr).set_duty(LCD_BL_MIN);
+            (*backlight_channel_ptr).set_duty(0);
         }
         let key0 = pins.gpio15.into_pull_up_input();
         let key1 = pins.gpio17.into_pull_up_input();
@@ -139,20 +134,9 @@ impl System {
 
         display.set_offset(2, 1);
 
-        let psm: PSM = pac.PSM;
-        let ppb: PPB = pac.PPB;
-        let fifo: SioFifo = sio.fifo;
-        let psm_ptr: *mut PSM = unsafe { &mut *(&mut HEAP as *mut _ as *mut PSM) };
-        let ppb_ptr: *mut PPB = unsafe { &mut *(&mut HEAP as *mut _ as *mut PPB) };
-        let fifo_ptr: *mut SioFifo = unsafe { &mut *(&mut HEAP as *mut _ as *mut SioFifo) };
-        // let backlight_channel_ptr: *mut LcdBlPinChannel =
-        //     unsafe { &mut *(&mut HEAP as *mut _ as *mut LcdBlPinChannel) };
-        unsafe {
-            core::ptr::write(psm_ptr, psm);
-            core::ptr::write(ppb_ptr, ppb);
-            core::ptr::write(fifo_ptr, fifo);
-            // core::ptr::write(backlight_channel_ptr, backlight_channel);
-        }
+        let psm_ptr: *mut PSM = &mut pac.PSM as *mut PSM;
+        let ppb_ptr: *mut PPB = &mut pac.PPB as *mut PPB;
+        let fifo_ptr: *mut SioFifo = &mut sio.fifo as *mut SioFifo;
 
         Self {
             display,

@@ -15,8 +15,6 @@ extern crate panic_halt;
 extern crate st7735_lcd;
 extern crate waveshare_rp2040_lcd_0_96;
 
-use core::cmp::{max, min};
-
 use debugless_unwrap::*;
 use embedded_graphics::{
     pixelcolor::Rgb565,
@@ -39,7 +37,7 @@ mod rgb_converter;
 mod sprite;
 mod system;
 mod text_writer;
-use system::{System, LCD_BL_MAX, LCD_BL_MIN};
+use system::System;
 
 #[entry]
 fn main() -> ! {
