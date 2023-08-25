@@ -78,19 +78,24 @@ impl System {
             &mut pac.RESETS,
         );
 
-        // disable backlight ASAP to hide boot artifacts
-        // let lcd_bl = pins.gpio13.into_mode();
         // Init PWMs
         let mut pwm_slices: hal::pwm::Slices = hal::pwm::Slices::new(pac.PWM, &mut pac.RESETS);
 
-        // Configure PWM4
-        let pwm = &mut pwm_slices.pwm6;
-        pwm.set_ph_correct();
-        pwm.enable();
+        // Configure LCD PWM slice
+        let pwm6 = &mut pwm_slices.pwm6;
+        pwm6.set_ph_correct();
+        // these numbers are around 55hz, aka the note A1
+        // pwm6.set_div_int(255);
+        // pwm6.set_top(4456);
+        pwm6.set_top(65535);
+        pwm6.set_div_int(1);
+        pwm6.set_div_frac(0);
+        pwm6.enable();
 
         // Output channel B on PWM6 to GPIO 13
-        let backlight_channel_ptr = &mut pwm.channel_b as *mut LcdBlPinChannel;
+        let backlight_channel_ptr = &mut pwm6.channel_b as *mut LcdBlPinChannel;
         unsafe {
+            // disable backlight ASAP to hide boot artifacts
             (*backlight_channel_ptr).output_to(pins.gpio13);
             (*backlight_channel_ptr).set_duty(0);
         }

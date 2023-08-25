@@ -4,6 +4,7 @@ use crate::{
 };
 
 static mut SMALL_FONT: Option<Font> = None;
+static mut ICON_FONT: Option<Font> = None;
 static mut BIG_REGULAR_FONT: Option<Font> = None;
 static mut BIG_BOLD_FONT: Option<Font> = None;
 static mut BIG_ITALIC_FONT: Option<Font> = None;
@@ -15,11 +16,13 @@ pub enum FontStyle {
     Big,
     BigBold,
     BigItalic,
+    Icon,
 }
 
 pub fn init_singleton_fonts() {
     unsafe {
         SMALL_FONT = Some(FontFactory::new_small_font());
+        ICON_FONT = Some(FontFactory::new_small_icon_font());
         BIG_REGULAR_FONT = Some(FontFactory::new_big_regular_font());
         BIG_BOLD_FONT = Some(FontFactory::new_big_bold_font());
         BIG_ITALIC_FONT = Some(FontFactory::new_big_italic_font());
@@ -33,6 +36,7 @@ pub fn draw_text(x: i32, y: i32, style: FontStyle, color: u8, text: &str) {
             FontStyle::Big => &BIG_REGULAR_FONT,
             FontStyle::BigBold => &BIG_BOLD_FONT,
             FontStyle::BigItalic => &BIG_ITALIC_FONT,
+            FontStyle::Icon => &ICON_FONT,
         };
         let font: &Font<'_> = &font_opt.as_ref().unwrap();
         font.draw_text(x, y, color, text)

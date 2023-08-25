@@ -31,7 +31,7 @@ impl SpriteFactory {
             0,
             Self::FERRIS_DIMENSIONS.0,
             Self::FERRIS_DIMENSIONS.1,
-            include_bytes!("../rgb332/ferris.png.data"),
+            include_bytes!("../sprite_raw/ferris.png.data"),
         )
     }
 
@@ -41,7 +41,7 @@ impl SpriteFactory {
             0,
             Self::CORRO_DIMENSIONS.0,
             Self::CORRO_DIMENSIONS.1,
-            include_bytes!("../rgb332/corro.png.data"),
+            include_bytes!("../sprite_raw/corro.png.data"),
         )
     }
 }

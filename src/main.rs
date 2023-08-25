@@ -23,6 +23,7 @@ use embedded_graphics::{
 
 use setting_value::Setting;
 use sprite::SpriteFactory;
+use text_writer::FontStyle;
 use waveshare_rp2040_lcd_0_96::{
     entry,
     hal::multicore::{Multicore, Stack},
@@ -97,8 +98,15 @@ fn main_loop(system: &mut System) -> ! {
         match in_menu {
             true => {
                 let title = "BRIGHTNESS";
-                let menu_body = brightness.generate_bar();
+                let menu_body = "";
                 text_writer::full_dialog_box(title, menu_body);
+                text_writer::draw_text(
+                    24,
+                    18,
+                    FontStyle::Icon,
+                    0b000_000_11,
+                    brightness.generate_bar(),
+                );
             }
             false => {
                 corro.draw(0);

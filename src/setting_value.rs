@@ -43,18 +43,22 @@ impl Setting {
     }
 
     pub fn generate_bar(&self) -> &'static str {
-        static mut BUFFER: [u8; SETTING_MAX as usize + 9] = [b' '; SETTING_MAX as usize + 9];
+        static mut BUFFER: [u8; SETTING_MAX as usize + 1] = [b'='; SETTING_MAX as usize + 1];
 
         unsafe {
-            BUFFER[0 + 3] = b'[';
-            BUFFER[SETTING_MAX as usize + 4] = b']';
-            for i in 1..=SETTING_MAX {
-                if i == self.value {
-                    BUFFER[i as usize + 3] = b'#';
+            BUFFER[0] = b'[';
+            BUFFER[SETTING_MAX as usize] = b']';
+            for i in 0..=SETTING_MAX {
+                if i == self.value && i > 0 {
+                    BUFFER[i as usize] = b'4';
                 } else if i < self.value {
-                    BUFFER[i as usize + 3] = b'*';
+                    BUFFER[i as usize] = b'4';
+                } else if i == SETTING_MAX {
+                    BUFFER[i as usize] = b']';
+                } else if i == 0 {
+                    BUFFER[i as usize] = b'[';
                 } else {
-                    BUFFER[i as usize + 3] = b'.';
+                    BUFFER[i as usize] = b'=';
                 }
             }
 
