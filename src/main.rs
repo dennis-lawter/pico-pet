@@ -71,7 +71,7 @@ fn side_loop(sys_freq: u32) -> ! {
     }
 }
 
-const SETTING_BAR_MAX: u8 = 21;
+const SETTING_BAR_MAX: u8 = 15;
 
 fn generate_bar(value: u8) -> &'static str {
     // Ensure the value is within valid range
@@ -82,16 +82,18 @@ fn generate_bar(value: u8) -> &'static str {
     };
 
     // Creating a static mutable array as buffer
-    static mut BUFFER: [u8; SETTING_BAR_MAX as usize + 2] = [b' '; SETTING_BAR_MAX as usize + 2];
+    static mut BUFFER: [u8; SETTING_BAR_MAX as usize + 9] = [b' '; SETTING_BAR_MAX as usize + 9];
 
     unsafe {
-        BUFFER[0] = b'[';
-        BUFFER[SETTING_BAR_MAX as usize + 1] = b']';
+        BUFFER[0 + 3] = b'[';
+        BUFFER[SETTING_BAR_MAX as usize + 4] = b']';
         for i in 1..=SETTING_BAR_MAX {
-            if i <= value {
-                BUFFER[i as usize] = b'#';
+            if i == value {
+                BUFFER[i as usize + 3] = b'#';
+            } else if i < value {
+                BUFFER[i as usize + 3] = b'*';
             } else {
-                BUFFER[i as usize] = b'_';
+                BUFFER[i as usize + 3] = b'.';
             }
         }
 
@@ -112,7 +114,7 @@ fn main_loop(system: &mut System) -> ! {
     // clear the LCD
     render::flood(0b000_000_00);
     render::draw(&mut system.display);
-    let mut brightness: u8 = 20;
+    let mut brightness: u8 = SETTING_BAR_MAX;
     let mut key_repeat_slowdown_timer = 0;
 
     let mut in_menu = false;
