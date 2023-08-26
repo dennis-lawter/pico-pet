@@ -32,6 +32,7 @@ type DisplayRst = hal::gpio::Pin<hal::gpio::bank0::Gpio12, hal::gpio::Output<hal
 pub type Lcd = ST7735<DisplaySdi, DisplayDc, DisplayRst>;
 
 type LcdBlPinChannel = hal::pwm::Channel<hal::pwm::Pwm6, hal::pwm::FreeRunning, hal::pwm::B>;
+type BuzzerPinChannel = hal::pwm::Channel<hal::pwm::Pwm0, hal::pwm::FreeRunning, hal::pwm::A>;
 
 type Key0Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio15, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key1Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio17, hal::gpio::Input<hal::gpio::PullUp>>;
@@ -42,6 +43,7 @@ pub struct System {
     pub display: Lcd,
     pub sys_freq: u32,
     pub backlight_channel_ptr: *mut LcdBlPinChannel,
+    pub buzzer_channel_ptr: *mut BuzzerPinChannel,
     pub delay: Delay,
     pub key0: Key0Pin,
     pub key1: Key1Pin,
@@ -92,12 +94,83 @@ impl System {
         pwm6.set_div_frac(0);
         pwm6.enable();
 
+        // Configure buzzer PWM slice
+        let pwm0 = &mut pwm_slices.pwm0;
+        pwm0.set_ph_correct();
+        // pwm0.set_div_int(4);
+        // pwm0.set_div_int(64);
+        // pwm0.set_div_int(255);
+        // pwm0.set_div_frac(0);
+        // pwm0.set_top(4456 * 4 * 4);
+        // pwm0.set_top(65_535 - 15_520);
+        // pwm0.set_top(10702); //   4393 hz
+        // pwm0.set_top(20702); //   4522 hz
+        // pwm0.set_top(30802); //    3531 hz
+        // pwm0.set_top(5702); //   10939 hz
+
+        // pwm0.set_div_int(4);
+        // pwm0.set_div_frac(0);
+        // 4522 hz
+        // pwm0.set_top(65535);
+        // 7838 hz
+        // pwm0.set_top(6_000);
+        // 3842 hz
+        // pwm0.set_top(5_500);
+        // 3144 hz
+        // pwm0.set_top(5_000);
+        // 3919 hz
+        // pwm0.set_top(4_000);
+        // 10422 hz
+        // pwm0.set_top(3000);
+
+        pwm0.set_div_int(2);
+        pwm0.set_div_frac(0);
+
+        // trying to find a note
+        // C 7 = 2093.00
+        // C#7 = 2217.46
+        // D 7 = 2349.32
+        // D#7 = 2489.02
+        // E 7 = 2637.02
+        // F 7 = 2793.83
+        // F#7 = 2959.96
+        // G 7 = 3135.96
+        // G#7 = 3322.44
+        // A 7 = 3520.00
+        // A#7 = 3729.31r
+        // B 7 = 3951.07
+        // C 8 = 4186.01
+
+        pwm0.set_top(11236);
+        // the number at the upper range flickers my frequency finder between the 2 threshholds
+        // 3316 hz =      ? -   9_484   G#7
+        // 3273 hz =  9_485 -   9_609
+        // 3230 hz =  9_610 -   9_738
+        // 3187 hz =  9_739 -   9_871
+        // 3144 hz =  9_872 -  10_007   G 7
+        // 3101 hz = 10_008 -  10_147
+        // 3058 hz = 10_148 -  10_291
+        // 3015 hz = 10_292 -  10_441
+        // 2972 hz = 10_442 -       ?
+        // 2929 hz = 10_596 -       ?
+        // theoretical
+        // 2886 hz = 10_750 -       ?
+        // 2843 hz = 10_908 -       ?
+        // 2800 hz = 11_070 -       ?
+        //      hz =        -       ?
+        //      hz =        -       ?
+        pwm0.enable();
+
         // Output channel B on PWM6 to GPIO 13
         let backlight_channel_ptr = &mut pwm6.channel_b as *mut LcdBlPinChannel;
+        let buzzer_channel_ptr = &mut pwm0.channel_a as *mut BuzzerPinChannel;
         unsafe {
             // disable backlight ASAP to hide boot artifacts
             (*backlight_channel_ptr).output_to(pins.gpio13);
             (*backlight_channel_ptr).set_duty(0);
+
+            (*buzzer_channel_ptr).output_to(pins.gpio0);
+            (*buzzer_channel_ptr).set_duty(512);
         }
         let key0 = pins.gpio15.into_pull_up_input();
         let key1 = pins.gpio17.into_pull_up_input();
@@ -149,6 +222,7 @@ impl System {
             display,
             sys_freq,
             backlight_channel_ptr,
+            buzzer_channel_ptr,
             delay,
             key0,
             key1,
