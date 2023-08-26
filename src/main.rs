@@ -89,6 +89,8 @@ fn main_loop(system: &mut System) -> ! {
     render::flood(0b000_000_00);
     render::draw(&mut system.display);
     let mut key_repeat_slowdown_timer = 0;
+    let mut playing_sound = false;
+    // let mut sound_playing_timer = 0;
 
     let mut in_menu = false;
     loop {
@@ -97,6 +99,10 @@ fn main_loop(system: &mut System) -> ! {
 
         match in_menu {
             true => {
+                if playing_sound {
+                    system.end_tone();
+                    playing_sound = false;
+                }
                 let title = "BRIGHTNESS";
                 let menu_body = "";
                 text_writer::full_dialog_box(title, menu_body);
@@ -111,6 +117,28 @@ fn main_loop(system: &mut System) -> ! {
             false => {
                 corro.draw(0);
                 ferris.draw((frame_count / 20) % 2);
+
+                if playing_sound == false && (frame_count / 20) % 2 == 1 {
+                    // if playing_sound == false && frame_count % 20 == 1 {
+                    playing_sound = true;
+                    if frame_count % 4 == 0 {
+                        system.start_tone(system::Frequency::C4, 512);
+                    } else {
+                        system.start_tone(system::Frequency::A4, 512);
+                    }
+                } else if playing_sound {
+                    system.end_tone();
+                    playing_sound = false;
+                }
+
+                // single tone example instead of the chittering I accidentally made
+                // if playing_sound == false && frame_count % 20 == 0 {
+                //     playing_sound = true;
+                //     system.start_tone(system::Frequency::A4, 512);
+                // } else if playing_sound && frame_count % 20 == 0 {
+                //     system.end_tone();
+                //     playing_sound = false;
+                // }
 
                 let text = "DIALOG\\b700!\\b703 so \\c700smol\\c003\\\\ so cute";
                 text_writer::bottom_dialog_box(text);
