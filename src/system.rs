@@ -1,5 +1,10 @@
 use cortex_m::delay::Delay;
 
+use debugless_unwrap::DebuglessUnwrap;
+use embedded_graphics::{
+    pixelcolor::Rgb565,
+    prelude::{DrawTarget, RgbColor},
+};
 use embedded_hal::{digital::v2::InputPin, PwmPin};
 use fugit::RateExtU32;
 
@@ -163,6 +168,8 @@ impl System {
             let psm_ptr: *mut PSM = &mut pac.PSM as *mut PSM;
             let ppb_ptr: *mut PPB = &mut pac.PPB as *mut PPB;
             let fifo_ptr: *mut SioFifo = &mut sio.fifo as *mut SioFifo;
+
+            display.clear(Rgb565::BLACK).debugless_unwrap();
 
             Self {
                 display,

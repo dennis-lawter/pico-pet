@@ -16,22 +16,13 @@ extern crate st7735_lcd;
 extern crate waveshare_rp2040_lcd_0_96;
 
 mod cores;
-mod font;
-mod render;
-mod rgb_converter;
+mod display;
 mod setting_value;
-mod sprite;
 mod system;
-mod text_writer;
 
 use crate::system::System;
 
-use debugless_unwrap::*;
-use embedded_graphics::{
-    pixelcolor::Rgb565,
-    prelude::{DrawTarget, RgbColor},
-};
-use waveshare_rp2040_lcd_0_96::{entry, hal::multicore::Multicore, pac};
+use waveshare_rp2040_lcd_0_96::{entry, hal::multicore::Multicore};
 
 #[allow(unused_imports)]
 use panic_halt as _;
@@ -39,10 +30,19 @@ use panic_halt as _;
 #[entry]
 fn main() -> ! {
     let mut system = System::new();
-    system.display.clear(Rgb565::BLACK).debugless_unwrap();
 
-    text_writer::init_singleton_fonts();
+    init_globals();
 
+    spawn_secondary_core_worker(&mut system);
+
+    cores::primary_main_loop(&mut system)
+}
+
+fn init_globals() {
+    display::text_writer::init_singleton_fonts();
+}
+
+fn spawn_secondary_core_worker(system: &mut System) {
     unsafe {
         let mut mc = Multicore::new(
             &mut *system.psm_ptr,
@@ -56,6 +56,4 @@ fn main() -> ! {
             cores::secondary_main_loop(sys_freq)
         });
     }
-
-    cores::primary_main_loop(&mut system)
 }

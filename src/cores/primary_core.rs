@@ -1,9 +1,11 @@
 use crate::{
-    render,
+    display::{
+        render,
+        sprite::SpriteFactory,
+        text_writer::{self, FontStyle},
+    },
     setting_value::Setting,
-    sprite::SpriteFactory,
     system::{Frequency, System},
-    text_writer::{self, FontStyle},
 };
 
 pub fn primary_main_loop(system: &mut System) -> ! {
@@ -21,7 +23,7 @@ pub fn primary_main_loop(system: &mut System) -> ! {
     render::flood(0b000_000_00);
     render::draw(&mut system.display);
     let mut key_repeat_slowdown_timer = 0;
-    let mut playing_sound = false;
+    // let mut playing_sound = false;
     // let mut sound_playing_timer = 0;
 
     let note_sequence = [

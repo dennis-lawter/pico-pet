@@ -1,22 +1,13 @@
 use core::cmp::{max, min};
 
 use crate::{
-    rgb_converter::RGB_332_TO_565,
+    display::rgb_converter::RGB_332_TO_565,
     system::{Lcd, LCD_HEIGHT, LCD_WIDTH},
 };
 
 static mut BUFFER: [u16; LCD_WIDTH * LCD_HEIGHT] = [0b00000_111111_00000; 128 * 128];
 
 pub const ALPHA_MASK: u8 = 0b11100011;
-
-// TODO: remove unused fonts
-#[allow(dead_code)]
-pub enum FontStyle {
-    Normal,
-    Big,
-    BigBold,
-    BigItalic,
-}
 
 pub fn draw(display: &mut Lcd) {
     unsafe {

@@ -1,4 +1,4 @@
-use crate::render;
+use super::render;
 
 pub struct Sprite<'a> {
     pub x: i32,
@@ -31,7 +31,7 @@ impl SpriteFactory {
             0,
             Self::FERRIS_DIMENSIONS.0,
             Self::FERRIS_DIMENSIONS.1,
-            include_bytes!("../sprite_raw/ferris.png.data"),
+            include_bytes!("../../sprite_raw/ferris.png.data"),
         )
     }
 
@@ -41,7 +41,7 @@ impl SpriteFactory {
             0,
             Self::CORRO_DIMENSIONS.0,
             Self::CORRO_DIMENSIONS.1,
-            include_bytes!("../sprite_raw/corro.png.data"),
+            include_bytes!("../../sprite_raw/corro.png.data"),
         )
     }
 }
