@@ -45,7 +45,7 @@ type Key1Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio17, hal::gpio::Input<hal::gp
 type Key2Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio2, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key3Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio3, hal::gpio::Input<hal::gpio::PullUp>>;
 
-pub struct System {
+pub struct SystemComponents {
     pub display: Lcd,
     pub sys_freq: u32,
     pub backlight_channel_ptr: *mut LcdBlPinChannel,
@@ -60,7 +60,7 @@ pub struct System {
     pub ppb_ptr: *mut PPB,
     pub fifo_ptr: *mut SioFifo,
 }
-impl System {
+impl SystemComponents {
     pub fn new() -> Self {
         unsafe {
             let mut pac = pac::Peripherals::take().unwrap();

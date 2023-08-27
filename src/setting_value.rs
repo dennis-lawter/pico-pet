@@ -1,7 +1,7 @@
-const SETTING_MAX: u8 = 15;
+pub const SETTING_MAX: u8 = 15;
 
 pub struct Setting {
-    value: u8,
+    pub value: u8,
 }
 #[allow(dead_code)]
 impl Setting {
