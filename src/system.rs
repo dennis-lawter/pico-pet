@@ -42,6 +42,7 @@ type BuzzerPwmSlice = hal::pwm::Slice<hal::pwm::Pwm0, hal::pwm::FreeRunning>;
 
 type Key0Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio15, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key1Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio17, hal::gpio::Input<hal::gpio::PullUp>>;
+type Key1AltPin = hal::gpio::Pin<hal::gpio::bank0::Gpio1, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key2Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio2, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key3Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio3, hal::gpio::Input<hal::gpio::PullUp>>;
 
@@ -54,6 +55,7 @@ pub struct SystemComponents {
     pub delay: Delay,
     pub key0: Key0Pin,
     pub key1: Key1Pin,
+    pub key1_alt: Key1AltPin,
     pub key2: Key2Pin,
     pub key3: Key3Pin,
     pub psm_ptr: *mut PSM,
@@ -125,6 +127,7 @@ impl SystemComponents {
 
             let key0 = pins.gpio15.into_pull_up_input();
             let key1 = pins.gpio17.into_pull_up_input();
+            let key1_alt = pins.gpio1.into_pull_up_input();
             let key2 = pins.gpio2.into_pull_up_input();
             let key3 = pins.gpio3.into_pull_up_input();
 
@@ -180,6 +183,7 @@ impl SystemComponents {
                 delay,
                 key0,
                 key1,
+                key1_alt,
                 key2,
                 key3,
                 psm_ptr,
@@ -194,7 +198,7 @@ impl SystemComponents {
     }
 
     pub fn key1_pressed(&self) -> bool {
-        self.key1.is_low().unwrap()
+        self.key1.is_low().unwrap() || self.key1_alt.is_low().unwrap()
     }
 
     pub fn key2_pressed(&self) -> bool {
@@ -206,7 +210,8 @@ impl SystemComponents {
     }
 
     const BRIGHTNESS_LUT: [u16; 16] = [
-        47, 77, 124, 201, 326, 528, 855, 1384, 2242, 3631, 5880, 9524, 15425, 24983, 40463, 65535,
+        306, 438, 626, 895, 1281, 1831, 2619, 3746, 5357, 7660, 10955, 15667, 22406, 32043, 45825,
+        65535,
     ];
 
     pub fn set_backlight(&mut self, brightness: &Setting) {
@@ -230,6 +235,7 @@ impl SystemComponents {
 }
 
 #[allow(dead_code)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum Frequency {
     C4,
     Cs4,
