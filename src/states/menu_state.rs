@@ -1,17 +1,39 @@
 use crate::{
     display::{
         render,
-        sprite::{Sprite, SpriteFactory},
         text_writer::{self, FontStyle},
     },
     globals,
     setting_value::Setting,
-    system::{Frequency, SystemComponents},
+    system::{Frequency, SystemComponents, LCD_WIDTH},
 };
 
 use super::{AppState, State};
 
 const KEY_REPEAT_FRAMES: u8 = 5;
+
+#[derive(Clone, PartialEq)]
+enum SettingSelected {
+    Brightness,
+    Volume,
+    None,
+}
+impl SettingSelected {
+    fn prev(&self) -> SettingSelected {
+        match self {
+            SettingSelected::Brightness => SettingSelected::Volume,
+            SettingSelected::Volume => SettingSelected::Brightness,
+            SettingSelected::None => SettingSelected::Volume,
+        }
+    }
+    fn next(&self) -> SettingSelected {
+        match self {
+            SettingSelected::Brightness => SettingSelected::Volume,
+            SettingSelected::Volume => SettingSelected::Brightness,
+            SettingSelected::None => SettingSelected::Brightness,
+        }
+    }
+}
 
 pub struct MenuState {
     frame_count: u32,
@@ -19,6 +41,13 @@ pub struct MenuState {
     next_state: Option<AppState>,
     song: [Frequency; 396],
     current_frequency: Frequency,
+    key0_down: bool,
+    key1_down: bool,
+    key2_down: bool,
+    key3_down: bool,
+    setting_selected: SettingSelected,
+    setting_highlighted: SettingSelected,
+    input_enabled: bool,
 }
 impl State for MenuState {
     fn new() -> Self {
@@ -459,10 +488,17 @@ impl State for MenuState {
             next_state: None,
             song,
             current_frequency: Frequency::None,
+            key0_down: false,
+            key1_down: false,
+            key2_down: false,
+            key3_down: false,
+            setting_selected: SettingSelected::None,
+            setting_highlighted: SettingSelected::None,
+            input_enabled: false,
         }
     }
 
-    fn tick(&mut self, system: &mut SystemComponents) {
+    fn tick(&mut self, _system: &mut SystemComponents) {
         self.frame_count += 1;
     }
 
@@ -470,48 +506,130 @@ impl State for MenuState {
         let song_index = (self.frame_count / 2) as usize % self.song.len();
         let indexed_frequency = &self.song[song_index];
         if indexed_frequency != &self.current_frequency {
-            system.start_tone(&self.song[song_index], 512);
+            system.start_tone(&self.song[song_index]);
             self.current_frequency = indexed_frequency.clone();
         }
     }
 
-    fn draw(&mut self, system: &mut SystemComponents) {
+    fn draw(&mut self, _system: &mut SystemComponents) {
         render::flood(0b000_000_00);
 
-        let title = "BRIGHTNESS";
+        let title = "SETTINGS";
         let menu_body = "";
         text_writer::full_dialog_box(title, menu_body);
+
+        text_writer::draw_text_centered(
+            LCD_WIDTH as i32 / 2,
+            18,
+            FontStyle::Small,
+            0b000_000_00,
+            "BRIGHTNESS",
+        );
         text_writer::draw_text(
             24,
-            18,
+            18 + 8,
             FontStyle::Icon,
             0b000_000_11,
-            unsafe { &globals::BRIGHTNESS_SETTING }.generate_bar(),
+            unsafe { &globals::BRIGHTNESS_SETTING }
+                .generate_bar(self.setting_selected == SettingSelected::Brightness),
         );
+
+        text_writer::draw_text_centered(
+            LCD_WIDTH as i32 / 2,
+            18 + 8 * 2,
+            FontStyle::Small,
+            0b000_000_00,
+            "VOLUME",
+        );
+        text_writer::draw_text(
+            24,
+            18 + 8 * 3,
+            FontStyle::Icon,
+            0b000_000_11,
+            unsafe { &globals::VOLUME_SETTING }
+                .generate_bar(self.setting_selected == SettingSelected::Volume),
+        );
+
+        match self.setting_selected {
+            SettingSelected::Brightness => {
+                text_writer::draw_text(10, 18 + 8, FontStyle::Icon, 0b111_000_00, "4}");
+            }
+            SettingSelected::Volume => {
+                text_writer::draw_text(10, 18 + 8 * 3, FontStyle::Icon, 0b111_000_00, "4}");
+            }
+            SettingSelected::None => match self.setting_highlighted {
+                SettingSelected::Brightness => {
+                    text_writer::draw_text(10, 18 + 8, FontStyle::Icon, 0b111_000_00, " >");
+                }
+                SettingSelected::Volume => {
+                    text_writer::draw_text(10, 18 + 8 * 3, FontStyle::Icon, 0b111_000_00, " >");
+                }
+                SettingSelected::None => {}
+            },
+        }
     }
 
     fn swap(&mut self, system: &mut SystemComponents) {
-        system.set_backlight(unsafe { &globals::BRIGHTNESS_SETTING });
+        system.set_backlight();
         render::draw(&mut system.display);
     }
 
     fn input(&mut self, system: &mut SystemComponents) {
-        if system.key0_pressed() {
-            self.next_state = Some(AppState::GamePlay);
-            return;
+        if !self.input_enabled {
+            // release all buttons to enable input
+            if system.key0_pressed()
+                || system.key1_pressed()
+                || system.key2_pressed()
+                || system.key3_pressed()
+            {
+                return;
+            } else {
+                self.input_enabled = true;
+            }
+        }
+        match self.setting_selected {
+            SettingSelected::Brightness => {
+                self.check_for_setting_deselected(system);
+                self.adjust_setting(system, unsafe { &mut globals::BRIGHTNESS_SETTING })
+            }
+            SettingSelected::Volume => {
+                self.check_for_setting_deselected(system);
+                self.adjust_setting(system, unsafe { &mut globals::VOLUME_SETTING })
+            }
+            SettingSelected::None => {
+                if system.key0_pressed() {
+                    self.next_state = Some(AppState::GamePlay);
+                    return;
+                }
+                self.check_for_setting_selected(system);
+                self.check_for_move_highlight(system);
+            }
         }
 
+        self.key0_down = system.key0_pressed();
+        self.key1_down = system.key1_pressed();
+        self.key2_down = system.key2_pressed();
+        self.key3_down = system.key3_pressed();
+    }
+
+    fn next_state(&mut self) -> &Option<super::AppState> {
+        &self.next_state
+    }
+}
+
+impl MenuState {
+    fn adjust_setting(&mut self, system: &mut SystemComponents, setting: &mut Setting) {
         if system.key1_pressed() && !system.key2_pressed() {
             if self.key_repeat_slowdown_timer == 0 {
                 self.key_repeat_slowdown_timer = KEY_REPEAT_FRAMES;
-                unsafe { &mut globals::BRIGHTNESS_SETTING }.dec();
+                setting.dec();
             } else {
                 self.key_repeat_slowdown_timer -= 1;
             }
         } else if system.key2_pressed() && !system.key1_pressed() {
             if self.key_repeat_slowdown_timer == 0 {
                 self.key_repeat_slowdown_timer = 5;
-                unsafe { &mut globals::BRIGHTNESS_SETTING }.inc();
+                setting.inc();
             } else {
                 self.key_repeat_slowdown_timer -= 1;
             }
@@ -520,7 +638,39 @@ impl State for MenuState {
         }
     }
 
-    fn next_state(&mut self) -> &Option<super::AppState> {
-        &self.next_state
+    fn check_for_setting_selected(&mut self, system: &mut SystemComponents) {
+        if self.setting_selected != SettingSelected::None {
+            return;
+        }
+        if self.key3_down && !system.key3_pressed() {
+            self.setting_selected = self.setting_highlighted.clone();
+        }
+    }
+
+    fn check_for_setting_deselected(&mut self, system: &mut SystemComponents) {
+        if self.setting_selected == SettingSelected::None {
+            return;
+        }
+        if self.key0_down && !system.key0_pressed() {
+            self.setting_selected = SettingSelected::None;
+        }
+    }
+
+    fn check_for_move_highlight(&mut self, system: &mut SystemComponents) {
+        if self.setting_selected != SettingSelected::None {
+            return;
+        }
+        if system.key2_pressed() && system.key3_pressed() {
+            return;
+        }
+        if system.key1_pressed() && system.key2_pressed() {
+            return;
+        }
+        if self.key1_down && !system.key1_pressed() {
+            self.setting_highlighted = self.setting_highlighted.next().clone();
+        }
+        if self.key2_down && !system.key2_pressed() {
+            self.setting_highlighted = self.setting_highlighted.prev().clone();
+        }
     }
 }

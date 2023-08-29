@@ -29,7 +29,21 @@ pub fn init_singleton_fonts() {
     }
 }
 
+// TODO: center each line
+pub fn draw_text_centered(x: i32, y: i32, style: FontStyle, color: u8, text: &str) {
+    let font = get_font(style);
+    let (width, _) = font.size.get_glyph_dimensions();
+    let x = x - ((width * text.len()) as i32 / 2);
+    font.draw_text(x, y, color, text);
+}
+
 pub fn draw_text(x: i32, y: i32, style: FontStyle, color: u8, text: &str) {
+    let font = get_font(style);
+
+    font.draw_text(x, y, color, text)
+}
+
+fn get_font(style: FontStyle) -> &'static Font<'static> {
     unsafe {
         let font_opt = match style {
             FontStyle::Small => &SMALL_FONT,
@@ -38,8 +52,7 @@ pub fn draw_text(x: i32, y: i32, style: FontStyle, color: u8, text: &str) {
             FontStyle::BigItalic => &BIG_ITALIC_FONT,
             FontStyle::Icon => &ICON_FONT,
         };
-        let font: &Font<'_> = &font_opt.as_ref().unwrap();
-        font.draw_text(x, y, color, text)
+        &font_opt.as_ref().unwrap()
     }
 }
 

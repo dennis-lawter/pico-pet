@@ -25,7 +25,7 @@ use waveshare_rp2040_lcd_0_96::{
 
 use st7735_lcd::{Orientation, ST7735};
 
-use crate::setting_value::Setting;
+use crate::globals;
 
 pub const LCD_WIDTH: usize = 128;
 pub const LCD_HEIGHT: usize = 128;
@@ -214,23 +214,54 @@ impl SystemComponents {
         65535,
     ];
 
-    pub fn set_backlight(&mut self, brightness: &Setting) {
+    pub fn set_backlight(&mut self) {
+        let brightness = unsafe { &globals::BRIGHTNESS_SETTING };
         let effective_brightness = Self::BRIGHTNESS_LUT[brightness.get_value() as usize];
         unsafe { (*self.backlight_channel_ptr).set_duty(effective_brightness) }
     }
 
-    pub fn start_tone(&mut self, tone: &Frequency, volume: u16) {
+    const VOLUME_LUT: [u16; 16] = [
+        0,
+        0,
+        0,
+        32768 / 128,
+        32768 / 128,
+        32768 / 128,
+        32768 / 64,
+        32768 / 64,
+        32768 / 64,
+        32768 / 32,
+        32768 / 32,
+        32768 / 32,
+        32768 / 16,
+        32768 / 16,
+        32768 / 16,
+        32768,
+    ];
+
+    pub fn start_tone(&mut self, tone: &Frequency) {
+        let volume = unsafe { &globals::VOLUME_SETTING };
+        let tone = if volume.get_value() == 0 {
+            &Frequency::None
+        } else {
+            tone
+        };
         let tone_settings = tone.get_settings();
+        let effective_volume = if tone == &Frequency::None {
+            0
+        } else {
+            Self::VOLUME_LUT[volume.get_value() as usize]
+        };
         unsafe {
             (*self.buzzer_pwm_slice_ptr).set_top(tone_settings.0);
             (*self.buzzer_pwm_slice_ptr).set_div_int(tone_settings.1);
             (*self.buzzer_pwm_slice_ptr).set_div_frac(tone_settings.2);
-            (*self.buzzer_channel_ptr).set_duty(volume);
+            (*self.buzzer_channel_ptr).set_duty(effective_volume);
         }
     }
 
     pub fn end_tone(&mut self) {
-        self.start_tone(&Frequency::None, 0);
+        self.start_tone(&Frequency::None);
     }
 }
 

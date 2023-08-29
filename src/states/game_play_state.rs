@@ -4,8 +4,6 @@ use crate::{
         sprite::{Sprite, SpriteFactory},
         text_writer::{self},
     },
-    globals,
-    setting_value::Setting,
     system::{Frequency, SystemComponents},
 };
 
@@ -35,25 +33,25 @@ impl State for GamePlayState<'static> {
         }
     }
 
-    fn tick(&mut self, system: &mut SystemComponents) {
+    fn tick(&mut self, _system: &mut SystemComponents) {
         self.frame_count += 1;
     }
 
     fn sound(&mut self, system: &mut SystemComponents) {
         if (self.frame_count / 20) % 2 == 1 {
             if self.frame_count % 4 == 0 {
-                system.start_tone(&Frequency::C4, 512);
+                system.start_tone(&Frequency::C4);
             } else if self.frame_count % 4 == 2 {
-                system.start_tone(&Frequency::A4, 512);
+                system.start_tone(&Frequency::A4);
             } else {
-                system.start_tone(&Frequency::None, 0);
+                system.start_tone(&Frequency::None);
             }
         } else {
             system.end_tone();
         }
     }
 
-    fn draw(&mut self, system: &mut SystemComponents) {
+    fn draw(&mut self, _system: &mut SystemComponents) {
         render::flood(0b000_000_00);
 
         self.corro.draw(0);
@@ -64,7 +62,7 @@ impl State for GamePlayState<'static> {
     }
 
     fn swap(&mut self, system: &mut SystemComponents) {
-        system.set_backlight(unsafe { &globals::BRIGHTNESS_SETTING });
+        system.set_backlight();
         render::draw(&mut system.display);
     }
 

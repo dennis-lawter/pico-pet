@@ -13,7 +13,7 @@ impl FontSize {
     const SMALL_FONT_DIMENSIONS: GlyphDimensions = (5, 8);
     const BIG_FONT_DIMENSIONS: GlyphDimensions = (8, 13);
 
-    fn get_glyph_dimensions(&self) -> GlyphDimensions {
+    pub fn get_glyph_dimensions(&self) -> GlyphDimensions {
         match *self {
             FontSize::Size5x8 => Self::SMALL_FONT_DIMENSIONS,
             FontSize::Size8x13 => Self::BIG_FONT_DIMENSIONS,
@@ -22,7 +22,7 @@ impl FontSize {
 }
 
 pub struct Font<'a> {
-    size: FontSize,
+    pub size: FontSize,
     data: &'a [u8],
 }
 
