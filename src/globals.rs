@@ -1,10 +1,10 @@
-use crate::setting_value::{Setting, SETTING_MAX};
+use crate::setting_value::Setting;
 
 pub static mut BRIGHTNESS_SETTING: Setting = Setting {
-    value: SETTING_MAX,
-    step_size: 1,
+    value: 15,
+    max_value: 15,
 };
 pub static mut VOLUME_SETTING: Setting = Setting {
-    value: SETTING_MAX - 9,
-    step_size: 3,
+    value: 2,
+    max_value: 4,
 };

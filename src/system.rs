@@ -220,24 +220,7 @@ impl SystemComponents {
         unsafe { (*self.backlight_channel_ptr).set_duty(effective_brightness) }
     }
 
-    const VOLUME_LUT: [u16; 16] = [
-        0,
-        0,
-        0,
-        32768 / 256,
-        32768 / 256,
-        32768 / 256,
-        32768 / 128,
-        32768 / 128,
-        32768 / 128,
-        32768 / 64,
-        32768 / 64,
-        32768 / 64,
-        32768 / 32,
-        32768 / 32,
-        32768 / 32,
-        32768,
-    ];
+    const VOLUME_LUT: [u16; 6] = [0, 32768 / 256, 32768 / 128, 32768 / 64, 32768 / 32, 32768];
 
     pub fn start_tone(&mut self, tone: &Frequency) {
         let volume = unsafe { &globals::VOLUME_SETTING };
