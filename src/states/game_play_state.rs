@@ -17,13 +17,9 @@ pub struct GamePlayState<'a> {
 }
 impl State for GamePlayState<'static> {
     fn new() -> Self {
-        let mut ferris = SpriteFactory::new_ferris_sprite();
-        ferris.x = 32;
-        ferris.y = 32;
+        let ferris = SpriteFactory::new_ferris_sprite(32, 32);
 
-        let mut corro = SpriteFactory::new_corro_sprite();
-        corro.x = 64;
-        corro.y = 64;
+        let corro = SpriteFactory::new_corro_sprite(64, 64);
 
         Self {
             ferris,
