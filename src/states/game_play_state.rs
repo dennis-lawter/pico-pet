@@ -11,7 +11,7 @@ use super::{AppState, State};
 
 pub struct GamePlayState<'a> {
     ferris: Sprite<'a>,
-    corro: Sprite<'a>,
+    menu_sprite: Sprite<'a>,
     frame_count: u32,
     next_state: Option<AppState>,
 }
@@ -19,11 +19,11 @@ impl State for GamePlayState<'static> {
     fn new() -> Self {
         let ferris = SpriteFactory::new_ferris_sprite(32, 32);
 
-        let corro = SpriteFactory::new_corro_sprite(64, 64);
+        let menu_sprite = SpriteFactory::new_menu_sprite(0, 0);
 
         Self {
             ferris,
-            corro,
+            menu_sprite,
             frame_count: 0,
             next_state: None,
         }
@@ -50,11 +50,28 @@ impl State for GamePlayState<'static> {
     fn draw(&mut self, _system: &mut SystemComponents) {
         render::flood(0b000_000_00);
 
-        self.corro.draw(0);
+        // self.corro.draw(0);
 
         self.ferris.draw(((self.frame_count / 20) % 2) as usize);
+
+        for column in 0..5 {
+            self.menu_sprite.x = column * 24 + 4;
+            self.menu_sprite.y = 0;
+
+            self.menu_sprite.draw(column as usize);
+        }
+        for column in 0..5 {
+            self.menu_sprite.x = column * 24 + 4;
+            self.menu_sprite.y = 128 - 24;
+
+            self.menu_sprite.draw((column + 5) as usize);
+        }
         let text = "DIALOG\\b700!\\b703 so \\c700smol\\c003\\\\ so cute";
         text_writer::bottom_dialog_box(text);
+        // text_writer::bottom_dialog_box(text);
+        // text_writer::bottom_dialog_box(text);
+        // text_writer::bottom_dialog_box(text);
+        // text_writer::bottom_dialog_box(text);
     }
 
     fn swap(&mut self, system: &mut SystemComponents) {

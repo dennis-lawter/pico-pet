@@ -58,12 +58,12 @@ fn get_font(style: FontStyle) -> &'static Font<'static> {
 
 pub fn bottom_dialog_box(text: &str) {
     let box_x = 0;
-    let box_y = 128 + 1 - (4 + 4 + 13);
+    let box_y = 128 + 1 - (4 + 4 + 13) - 24;
     let text_x = 5;
-    let text_y = 128 - 19 + 4;
+    let text_y = 128 - 19 + 4 - 24;
 
-    render::fill_rect(box_x, box_y, 128, 128 - box_y as usize, 0b111_111_11);
-    render::fancy_border(0, box_y, 128, 128 - box_y as usize);
+    render::fill_rect(box_x, box_y, 128, 24, 0b111_111_11);
+    render::fancy_border(0, box_y, 128, 24);
 
     draw_text(text_x, text_y, FontStyle::Small, 0b000_000_11, text)
 }
