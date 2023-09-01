@@ -71,8 +71,6 @@ impl State for GamePlayState<'static> {
     fn draw(&mut self, _system: &mut SystemComponents) {
         render::flood(0b010_010_01);
 
-        // self.corro.draw(0);
-
         self.ferris.draw(((self.frame_count / 20) % 2) as usize);
 
         for column in 0..5 {
@@ -88,15 +86,9 @@ impl State for GamePlayState<'static> {
             self.menu_sprite.draw((column + 5) as usize);
         }
 
-        let sel_x = self.menu_item_selected.to_u8() % 5 * 24 + 5;
-        let sel_y = self.menu_item_selected.to_u8() / 5 * (128 - 24);
+        let sel_x: i32 = self.menu_item_selected as u8 as i32 % 5 * 24 + 5;
+        let sel_y: i32 = self.menu_item_selected as u8 as i32 / 5 * (128 - 24);
         render::fancy_border(sel_x as i32, sel_y as i32, 24, 24);
-        // let text = "DIALOG\\b700!\\b703 so \\c700smol\\c003\\\\ so cute";
-        // text_writer::bottom_dialog_box(text);
-        // text_writer::bottom_dialog_box(text);
-        // text_writer::bottom_dialog_box(text);
-        // text_writer::bottom_dialog_box(text);
-        // text_writer::bottom_dialog_box(text);
     }
 
     fn swap(&mut self, system: &mut SystemComponents) {
@@ -114,21 +106,7 @@ impl State for GamePlayState<'static> {
         }
 
         if !system.key3_pressed() && self.key3_down {
-            match self.menu_item_selected {
-                MenuSelection::Item0 => {}
-                MenuSelection::Item1 => {}
-                MenuSelection::Item2 => {}
-                MenuSelection::Item3 => {}
-                MenuSelection::Item4 => {}
-                MenuSelection::Item5 => {}
-                MenuSelection::Item6 => {}
-                MenuSelection::Item7 => {}
-                MenuSelection::Item8 => {}
-                MenuSelection::Settings => {
-                    self.next_state = Some(AppState::Menu);
-                }
-                _ => {}
-            }
+            self.menu_button_confirmed();
         }
 
         self.key0_down = system.key0_pressed();
@@ -139,5 +117,25 @@ impl State for GamePlayState<'static> {
 
     fn next_state(&mut self) -> &Option<super::AppState> {
         &self.next_state
+    }
+}
+
+impl GamePlayState<'static> {
+    fn menu_button_confirmed(&mut self) {
+        match self.menu_item_selected {
+            MenuSelection::Item0 => {}
+            MenuSelection::Item1 => {}
+            MenuSelection::Item2 => {}
+            MenuSelection::Item3 => {}
+            MenuSelection::Item4 => {}
+            MenuSelection::Item5 => {}
+            MenuSelection::Item6 => {}
+            MenuSelection::Item7 => {}
+            MenuSelection::Item8 => {}
+            MenuSelection::Settings => {
+                self.next_state = Some(AppState::Menu);
+            }
+            _ => {}
+        }
     }
 }
