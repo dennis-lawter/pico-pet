@@ -22,9 +22,9 @@ impl<'a> Sprite<'a> {
 pub struct SpriteFactory;
 
 impl SpriteFactory {
-    const FERRIS_DIMENSIONS: (usize, usize) = (40, 24);
-    const CORRO_DIMENSIONS: (usize, usize) = (36, 24);
-    const MENU_DIMENSIONS: (usize, usize) = (24, 24);
+    pub const FERRIS_DIMENSIONS: (usize, usize) = (40, 24);
+    pub const CORRO_DIMENSIONS: (usize, usize) = (36, 24);
+    pub const MENU_DIMENSIONS: (usize, usize) = (24, 24);
 
     pub fn new_ferris_sprite(x: i32, y: i32) -> Sprite<'static> {
         Sprite::new(
