@@ -243,8 +243,8 @@ pub fn fancy_border(x0: i32, y0: i32, w: usize, h: usize) {
     let x1 = x0 + (w - FANCY_BORDER_THICKNESS) as i32;
     fancy_border_edge(x0, y0, w, FancyBorderEdgeOrientation::Horizontal);
     fancy_border_edge(x0, y1, w, FancyBorderEdgeOrientation::Horizontal);
-    fancy_border_edge(x0, y0, w, FancyBorderEdgeOrientation::Vertical);
-    fancy_border_edge(x1, y0, w, FancyBorderEdgeOrientation::Vertical);
+    fancy_border_edge(x0, y0, h, FancyBorderEdgeOrientation::Vertical);
+    fancy_border_edge(x1, y0, h, FancyBorderEdgeOrientation::Vertical);
 
     let x1 = x0 + w as i32;
     let y1 = y0 + h as i32;
