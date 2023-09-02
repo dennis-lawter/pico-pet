@@ -1,6 +1,6 @@
 #[derive(Clone, Copy, PartialEq)]
 pub enum MenuSelection {
-    Item0 = 0,
+    Feed = 0,
     Item1,
     Item2,
     Item3,
@@ -19,13 +19,13 @@ impl MenuSelection {
     pub fn next(&self) -> MenuSelection {
         let value = (*self as u8).wrapping_add(1);
         if value > Self::MAX_VALUE {
-            return MenuSelection::Item0;
+            return MenuSelection::Feed;
         }
         Self::from_u8(value).unwrap_or(MenuSelection::None)
     }
 
     pub fn prev(&self) -> MenuSelection {
-        let value = if *self == MenuSelection::Item0 {
+        let value = if *self == MenuSelection::Feed {
             Self::MAX_VALUE
         } else {
             (*self as u8).wrapping_sub(1)

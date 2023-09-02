@@ -38,7 +38,7 @@ impl State for GamePlayState<'static> {
             menu_sprite,
             frame_count: 0,
             next_state: None,
-            menu_item_selected: MenuSelection::Item0,
+            menu_item_selected: MenuSelection::Feed,
             menu_select_tone_timer: 0,
             key0_down: false,
             key1_down: false,
@@ -132,7 +132,7 @@ impl State for GamePlayState<'static> {
 impl GamePlayState<'static> {
     fn menu_button_confirmed(&mut self) {
         match self.menu_item_selected {
-            MenuSelection::Item0 => {}
+            MenuSelection::Feed => {}
             MenuSelection::Item1 => {}
             MenuSelection::Item2 => {}
             MenuSelection::Item3 => {}
