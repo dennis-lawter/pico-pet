@@ -18,6 +18,7 @@ pub struct GamePlayState<'a> {
     frame_count: u32,
     next_state: Option<AppState>,
     menu_item_selected: MenuSelection,
+    menu_select_tone_timer: u8,
     key0_down: bool,
     key1_down: bool,
     key2_down: bool,
@@ -38,6 +39,7 @@ impl State for GamePlayState<'static> {
             frame_count: 0,
             next_state: None,
             menu_item_selected: MenuSelection::Item0,
+            menu_select_tone_timer: 0,
             key0_down: false,
             key1_down: false,
             key2_down: false,
@@ -55,16 +57,21 @@ impl State for GamePlayState<'static> {
     }
 
     fn sound(&mut self, system: &mut SystemComponents) {
-        if (self.frame_count / 20) % 2 == 1 {
-            if self.frame_count % 4 == 0 {
-                system.start_tone(&Frequency::C4);
-            } else if self.frame_count % 4 == 2 {
-                system.start_tone(&Frequency::A4);
-            } else {
-                system.start_tone(&Frequency::None);
-            }
+        if self.menu_select_tone_timer > 0 {
+            self.menu_select_tone_timer -= 1;
+            system.start_tone(&Frequency::Ds6);
         } else {
-            system.end_tone();
+            if (self.frame_count / 20) % 2 == 1 {
+                if self.frame_count % 4 == 0 {
+                    system.start_tone(&Frequency::C4);
+                } else if self.frame_count % 4 == 2 {
+                    system.start_tone(&Frequency::A4);
+                } else {
+                    system.start_tone(&Frequency::None);
+                }
+            } else {
+                system.end_tone();
+            }
         }
     }
 
@@ -97,11 +104,13 @@ impl State for GamePlayState<'static> {
     }
 
     fn input(&mut self, system: &mut SystemComponents) {
-        if !system.key1_pressed() && !system.key2_pressed() {
-            if self.key1_down && !self.key2_down {
+        if !(system.key1_pressed() && system.key2_pressed()) {
+            if system.key1_pressed() && !self.key1_down {
                 self.menu_item_selected = self.menu_item_selected.prev();
-            } else if self.key2_down && !self.key1_down {
+                self.menu_select_tone_timer = 3;
+            } else if system.key2_pressed() && !self.key2_down {
                 self.menu_item_selected = self.menu_item_selected.next();
+                self.menu_select_tone_timer = 3;
             }
         }
 
