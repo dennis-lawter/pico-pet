@@ -35,7 +35,7 @@ impl SettingSelected {
     }
 }
 
-pub struct MenuState {
+pub struct SettingsState {
     frame_count: u32,
     key_repeat_slowdown_timer: u8,
     next_state: Option<AppState>,
@@ -49,7 +49,7 @@ pub struct MenuState {
     setting_highlighted: SettingSelected,
     input_enabled: bool,
 }
-impl State for MenuState {
+impl State for SettingsState {
     fn new() -> Self {
         // let mut song_str = "C4q D4q | F4q F4q F4q F4e F4e | F4e F4e F4q C4q D4q | F4q F4q F4q F4e F4e | F4e F4e F4q C4q D4q";
         let song = [
@@ -617,7 +617,7 @@ impl State for MenuState {
     }
 }
 
-impl MenuState {
+impl SettingsState {
     fn adjust_setting(&mut self, system: &mut SystemComponents, setting: &mut Setting) {
         if system.key1_pressed() && !system.key2_pressed() {
             if self.key_repeat_slowdown_timer == 0 {

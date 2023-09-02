@@ -1,12 +1,23 @@
 use crate::system::SystemComponents;
 
 pub mod game_play_state;
-pub mod menu_state;
+pub mod select_food_state;
+pub mod settings_state;
 
 #[derive(Clone)]
 pub enum AppState {
     GamePlay,
-    Menu,
+
+    SelectFood,
+    // AppState1,
+    // AppState2,
+    // AppState3,
+    // AppState4,
+    // AppState5,
+    // AppState6,
+    // AppState7,
+    // AppState8,
+    Settings,
 }
 
 pub trait State {

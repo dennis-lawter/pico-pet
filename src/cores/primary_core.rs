@@ -1,11 +1,15 @@
 use crate::{
-    states::{game_play_state::GamePlayState, menu_state::MenuState, AppState, State},
+    states::{
+        game_play_state::GamePlayState, select_food_state::SelectFoodState,
+        settings_state::SettingsState, AppState, State,
+    },
     system::SystemComponents,
 };
 
 pub fn primary_main_loop(system: &mut SystemComponents) -> ! {
     let mut game_play_state: Option<GamePlayState> = Some(GamePlayState::new());
-    let mut menu_state: Option<MenuState> = None;
+    let mut select_food_state: Option<SelectFoodState> = None;
+    let mut menu_state: Option<SettingsState> = None;
 
     let mut active_state: AppState = AppState::GamePlay;
 
@@ -18,7 +22,14 @@ pub fn primary_main_loop(system: &mut SystemComponents) -> ! {
                 game_play_state.as_mut().unwrap().sound(system);
                 game_play_state.as_mut().unwrap().swap(system);
             }
-            AppState::Menu => {
+            AppState::SelectFood => {
+                select_food_state.as_mut().unwrap().input(system);
+                select_food_state.as_mut().unwrap().tick(system);
+                select_food_state.as_mut().unwrap().draw(system);
+                select_food_state.as_mut().unwrap().sound(system);
+                select_food_state.as_mut().unwrap().swap(system);
+            }
+            AppState::Settings => {
                 menu_state.as_mut().unwrap().input(system);
                 menu_state.as_mut().unwrap().tick(system);
                 menu_state.as_mut().unwrap().draw(system);
@@ -32,7 +43,13 @@ pub fn primary_main_loop(system: &mut SystemComponents) -> ! {
                 let state = game_play_state.as_mut().unwrap();
                 state.next_state()
             }
-            AppState::Menu => {
+
+            AppState::SelectFood => {
+                let state = select_food_state.as_mut().unwrap();
+                state.next_state()
+            }
+
+            AppState::Settings => {
                 let state = menu_state.as_mut().unwrap();
                 state.next_state()
             }
@@ -44,8 +61,13 @@ pub fn primary_main_loop(system: &mut SystemComponents) -> ! {
                     crate::states::AppState::GamePlay => {
                         game_play_state = Some(GamePlayState::new());
                     }
-                    crate::states::AppState::Menu => {
-                        menu_state = Some(MenuState::new());
+
+                    crate::states::AppState::SelectFood => {
+                        select_food_state = Some(SelectFoodState::new());
+                    }
+
+                    crate::states::AppState::Settings => {
+                        menu_state = Some(SettingsState::new());
                     }
                 }
             }
