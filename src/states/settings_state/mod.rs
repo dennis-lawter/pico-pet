@@ -612,7 +612,7 @@ impl State for SettingsState {
         self.key3_down = system.key3_pressed();
     }
 
-    fn next_state(&mut self) -> &Option<super::AppState> {
+    fn next_state(&self) -> &Option<super::AppState> {
         &self.next_state
     }
 }

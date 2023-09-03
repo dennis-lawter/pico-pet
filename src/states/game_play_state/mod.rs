@@ -124,7 +124,7 @@ impl State for GamePlayState<'static> {
         self.key3_down = system.key3_pressed();
     }
 
-    fn next_state(&mut self) -> &Option<super::AppState> {
+    fn next_state(&self) -> &Option<super::AppState> {
         &self.next_state
     }
 }
@@ -135,14 +135,14 @@ impl GamePlayState<'static> {
             MenuSelection::Feed => {
                 self.next_state = Some(AppState::SelectFood);
             }
-            MenuSelection::Item1 => {}
-            MenuSelection::Item2 => {}
-            MenuSelection::Item3 => {}
-            MenuSelection::Item4 => {}
-            MenuSelection::Item5 => {}
-            MenuSelection::Item6 => {}
-            MenuSelection::Item7 => {}
-            MenuSelection::Item8 => {}
+            MenuSelection::Item1 => self.next_state = Some(AppState::AppState1),
+            MenuSelection::Item2 => self.next_state = Some(AppState::AppState2),
+            MenuSelection::Item3 => self.next_state = Some(AppState::AppState3),
+            MenuSelection::Item4 => self.next_state = Some(AppState::AppState4),
+            MenuSelection::Item5 => self.next_state = Some(AppState::AppState5),
+            MenuSelection::Item6 => self.next_state = Some(AppState::AppState6),
+            MenuSelection::Item7 => self.next_state = Some(AppState::AppState7),
+            MenuSelection::Item8 => self.next_state = Some(AppState::AppState8),
             MenuSelection::Settings => {
                 self.next_state = Some(AppState::Settings);
             }

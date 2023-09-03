@@ -2,7 +2,7 @@ use crate::display::{render, text_writer};
 
 use super::{AppState, State};
 
-pub struct SelectFoodState {
+pub struct State4 {
     key0_down: bool,
     key1_down: bool,
     key2_down: bool,
@@ -10,7 +10,7 @@ pub struct SelectFoodState {
     next_state: Option<AppState>,
 }
 
-impl State for SelectFoodState {
+impl State for State4 {
     fn new() -> Self {
         Self {
             key0_down: false,
