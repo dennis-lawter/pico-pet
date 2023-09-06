@@ -5,7 +5,7 @@ use embedded_graphics::{
     pixelcolor::Rgb565,
     prelude::{DrawTarget, RgbColor},
 };
-use embedded_hal::{digital::v2::InputPin, PwmPin};
+use embedded_hal::{digital::v2::InputPin, prelude::*, PwmPin};
 use fugit::RateExtU32;
 
 use waveshare_rp2040_lcd_0_96::{
@@ -37,14 +37,22 @@ type DisplayRst = hal::gpio::Pin<hal::gpio::bank0::Gpio12, hal::gpio::Output<hal
 pub type Lcd = ST7735<DisplaySdi, DisplayDc, DisplayRst>;
 
 type LcdBlPinChannel = hal::pwm::Channel<hal::pwm::Pwm6, hal::pwm::FreeRunning, hal::pwm::B>;
-type BuzzerPinChannel = hal::pwm::Channel<hal::pwm::Pwm0, hal::pwm::FreeRunning, hal::pwm::A>;
-type BuzzerPwmSlice = hal::pwm::Slice<hal::pwm::Pwm0, hal::pwm::FreeRunning>;
+type BuzzerPinChannel = hal::pwm::Channel<hal::pwm::Pwm2, hal::pwm::FreeRunning, hal::pwm::A>;
+type BuzzerPwmSlice = hal::pwm::Slice<hal::pwm::Pwm2, hal::pwm::FreeRunning>;
 
 type Key0Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio15, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key1Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio17, hal::gpio::Input<hal::gpio::PullUp>>;
-type Key1AltPin = hal::gpio::Pin<hal::gpio::bank0::Gpio1, hal::gpio::Input<hal::gpio::PullUp>>;
+type Key1AltPin = hal::gpio::Pin<hal::gpio::bank0::Gpio5, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key2Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio2, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key3Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio3, hal::gpio::Input<hal::gpio::PullUp>>;
+
+type RtcI2c = hal::I2C<
+    pac::I2C0,
+    (
+        hal::gpio::Pin<hal::gpio::bank0::Gpio0, hal::gpio::Function<hal::gpio::I2C>>,
+        hal::gpio::Pin<hal::gpio::bank0::Gpio1, hal::gpio::Function<hal::gpio::I2C>>,
+    ),
+>;
 
 pub struct SystemComponents {
     pub display: Lcd,
@@ -58,10 +66,14 @@ pub struct SystemComponents {
     pub key1_alt: Key1AltPin,
     pub key2: Key2Pin,
     pub key3: Key3Pin,
+    pub rtc: RtcI2c,
     pub psm_ptr: *mut PSM,
     pub ppb_ptr: *mut PPB,
     pub fifo_ptr: *mut SioFifo,
 }
+
+unsafe impl Sync for SystemComponents {}
+
 impl SystemComponents {
     pub fn new() -> Self {
         unsafe {
@@ -106,7 +118,7 @@ impl SystemComponents {
 
             // Configure buzzer PWM slice
             let buzzer_pwm_slice_ptr: *mut BuzzerPwmSlice =
-                &mut pwm_slices.pwm0 as *mut BuzzerPwmSlice;
+                &mut pwm_slices.pwm2 as *mut BuzzerPwmSlice;
 
             // Output channel B on PWM6 to GPIO 13
             let backlight_channel_ptr = &mut pwm6.channel_b as *mut LcdBlPinChannel;
@@ -116,7 +128,7 @@ impl SystemComponents {
 
             let buzzer_channel_ptr =
                 &mut (*buzzer_pwm_slice_ptr).channel_a as *mut BuzzerPinChannel;
-            (*buzzer_channel_ptr).output_to(pins.gpio0);
+            (*buzzer_channel_ptr).output_to(pins.gpio4);
             (*buzzer_channel_ptr).set_duty(0);
 
             (*buzzer_pwm_slice_ptr).set_ph_correct();
@@ -127,7 +139,7 @@ impl SystemComponents {
 
             let key0 = pins.gpio15.into_pull_up_input();
             let key1 = pins.gpio17.into_pull_up_input();
-            let key1_alt = pins.gpio1.into_pull_up_input();
+            let key1_alt = pins.gpio5.into_pull_up_input();
             let key2 = pins.gpio2.into_pull_up_input();
             let key3 = pins.gpio3.into_pull_up_input();
 
@@ -168,6 +180,24 @@ impl SystemComponents {
 
             display.set_offset(2, 1);
 
+            let rtc_sda_pin = pins.gpio0.into_mode::<hal::gpio::FunctionI2C>();
+            let rtc_scl_pin = pins.gpio1.into_mode::<hal::gpio::FunctionI2C>();
+
+            let rtc = hal::I2C::i2c0(
+                pac.I2C0,
+                rtc_sda_pin,
+                rtc_scl_pin,
+                400.kHz(),
+                &mut pac.RESETS,
+                &clocks.system_clock,
+            );
+
+            let x = pac.RTC;
+
+            // let mut buffer = [0u8; 1];
+            // rtc.write_read(0x68, &[0x00], &mut buffer)
+            //     .expect("RTC READ ERR");
+
             let psm_ptr: *mut PSM = &mut pac.PSM as *mut PSM;
             let ppb_ptr: *mut PPB = &mut pac.PPB as *mut PPB;
             let fifo_ptr: *mut SioFifo = &mut sio.fifo as *mut SioFifo;
@@ -186,6 +216,7 @@ impl SystemComponents {
                 key1_alt,
                 key2,
                 key3,
+                rtc,
                 psm_ptr,
                 ppb_ptr,
                 fifo_ptr,
@@ -245,6 +276,29 @@ impl SystemComponents {
 
     pub fn end_tone(&mut self) {
         self.start_tone(&Frequency::None);
+    }
+
+    pub fn read_rtc(&mut self) -> [u8; 1] {
+        let mut buffer = [0u8; 1];
+
+        // match self.rtc.read(0x00, &mut buffer) {
+        //     Ok(_) => {}
+        //     Err(_) => {}
+        // }
+
+        // assert_eq!(false, self.rtc.rx_fifo_empty());
+
+        // self.rtc.read(0x00, &mut buffer).unwrap();
+
+        // self.rtc.write_iter(0x68, [0]).unwrap();
+        // self.rtc
+        //     .write_read(0x68, &[0x00], &mut buffer)
+        //     .expect("RTC READ ERR");
+        // self.rtc.
+
+        self.rtc.write(0x68, &[0]).unwrap();
+
+        buffer
     }
 }
 

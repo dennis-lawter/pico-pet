@@ -570,6 +570,7 @@ impl State for SettingsState {
     }
 
     fn swap(&mut self, system: &mut SystemComponents) {
+        system.read_rtc();
         system.set_backlight();
         render::draw(&mut system.display);
     }
