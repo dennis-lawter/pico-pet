@@ -15,44 +15,17 @@ extern crate panic_halt;
 extern crate st7735_lcd;
 extern crate waveshare_rp2040_lcd_0_96;
 
-mod cores;
-mod display;
-mod globals;
-mod setting_value;
-mod states;
-mod system;
 use cortex_m::delay::Delay;
 
-use debugless_unwrap::DebuglessUnwrap;
-use embedded_graphics::{
-    pixelcolor::Rgb565,
-    prelude::{DrawTarget, RgbColor},
-};
-use embedded_hal::{
-    digital::v2::{InputPin, OutputPin},
-    prelude::_embedded_hal_blocking_i2c_Read,
-    PwmPin,
-};
+use embedded_hal::{digital::v2::OutputPin, prelude::_embedded_hal_blocking_i2c_Read};
 use fugit::RateExtU32;
 
 use waveshare_rp2040_lcd_0_96::{
-    hal::{
-        self,
-        clocks::{init_clocks_and_plls, Clock},
-        gpio::Pins,
-        pac,
-        pio::PIOExt,
-        sio::SioFifo,
-        watchdog::Watchdog,
-        Sio,
-    },
-    pac::{PPB, PSM},
+    hal::{self, pac, Clock},
     XOSC_CRYSTAL_FREQ,
 };
 
-use st7735_lcd::{Orientation, ST7735};
-
-use waveshare_rp2040_lcd_0_96::{entry, hal::multicore::Multicore};
+use waveshare_rp2040_lcd_0_96::entry;
 
 #[allow(unused_imports)]
 use panic_halt as _;
@@ -89,6 +62,9 @@ fn main() -> ! {
         &mut pac.RESETS,
     );
 
+    let sys_freq = clocks.system_clock.freq().to_Hz();
+    let mut timer = Delay::new(core.SYST, sys_freq);
+
     // Configure two pins as being I²C, not GPIO
     let sda_pin = pins.gpio0.into_mode::<hal::gpio::FunctionI2C>();
     let scl_pin = pins.gpio1.into_mode::<hal::gpio::FunctionI2C>();
@@ -106,11 +82,12 @@ fn main() -> ! {
         &clocks.system_clock,
     );
 
-    let sys_freq = clocks.system_clock.freq().to_Hz();
-    let mut timer = Delay::new(core.SYST, sys_freq);
-
     let mut buffer = [0u8; 1];
-    // i2c.read(0x86, &mut buffer).unwrap();
+    match i2c.read(0x86, &mut buffer) {
+        Ok(_) => {}
+        Err(_) => panic!(),
+        // Err(_) => {}
+    }
 
     let mut led_pin = pins.gpio25.into_push_pull_output();
     loop {
