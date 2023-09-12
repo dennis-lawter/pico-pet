@@ -25,28 +25,6 @@ pub struct GamePlayState<'a> {
     key3_down: bool,
 }
 impl State for GamePlayState<'static> {
-    fn new() -> Self {
-        let ferris = SpriteFactory::new_ferris_sprite(
-            (128 - SpriteFactory::FERRIS_DIMENSIONS.0 as i32) / 2,
-            128 - 64,
-        );
-
-        let menu_sprite = SpriteFactory::new_menu_sprite(0, 0);
-
-        Self {
-            ferris,
-            menu_sprite,
-            frame_count: 0,
-            next_state: None,
-            menu_item_selected: MenuSelection::Feed,
-            menu_select_tone_timer: 0,
-            key0_down: false,
-            key1_down: false,
-            key2_down: false,
-            key3_down: false,
-        }
-    }
-
     fn tick(&mut self) {
         self.frame_count += 1;
         if self.frame_count % 80 == 20 || self.frame_count % 80 == 0 {
@@ -127,6 +105,28 @@ impl State for GamePlayState<'static> {
 }
 
 impl GamePlayState<'static> {
+    pub fn new() -> Self {
+        let ferris = SpriteFactory::new_ferris_sprite(
+            (128 - SpriteFactory::FERRIS_DIMENSIONS.0 as i32) / 2,
+            128 - 64,
+        );
+
+        let menu_sprite = SpriteFactory::new_menu_sprite(0, 0);
+
+        Self {
+            ferris,
+            menu_sprite,
+            frame_count: 0,
+            next_state: None,
+            menu_item_selected: MenuSelection::Feed,
+            menu_select_tone_timer: 0,
+            key0_down: false,
+            key1_down: false,
+            key2_down: false,
+            key3_down: false,
+        }
+    }
+
     fn menu_button_confirmed(&mut self) {
         match self.menu_item_selected {
             MenuSelection::Feed => self.next_state = Some(AppState::SelectFood),

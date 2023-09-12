@@ -11,16 +11,6 @@ pub struct SelectFoodState {
 }
 
 impl State for SelectFoodState {
-    fn new() -> Self {
-        Self {
-            key0_down: false,
-            key1_down: false,
-            key2_down: false,
-            key3_down: false,
-            next_state: None,
-        }
-    }
-
     fn input(&mut self) {
         let hardware = crate::globals::get_hardware();
         if !hardware.key0_pressed() && self.key0_down {
@@ -48,5 +38,16 @@ impl State for SelectFoodState {
 
     fn next_state(&self) -> &Option<super::AppState> {
         &self.next_state
+    }
+}
+impl SelectFoodState {
+    pub fn new() -> Self {
+        Self {
+            key0_down: false,
+            key1_down: false,
+            key2_down: false,
+            key3_down: false,
+            next_state: None,
+        }
     }
 }

@@ -37,26 +37,6 @@ pub struct SettingsState {
     new_time_selection: u8,
 }
 impl State for SettingsState {
-    fn new() -> Self {
-        Self {
-            frame_count: 0,
-            key_repeat_slowdown_timer: 0,
-            next_state: None,
-            song: song::SONG,
-            current_frequency: Frequency::None,
-            key0_down: false,
-            key1_down: false,
-            key2_down: false,
-            key3_down: false,
-            setting_selected: SettingSelected::None,
-            setting_highlighted: SettingSelected::None,
-            input_enabled: false,
-            time: None,
-            new_time: None,
-            new_time_selection: 0,
-        }
-    }
-
     fn tick(&mut self) {
         let hardware = crate::globals::get_hardware();
         self.time = Some(hardware.get_time());
@@ -262,25 +242,6 @@ impl State for SettingsState {
                 None => {}
             }
         };
-        // match shown_time {
-        //     Some(time) => {
-        //         let time_str = str_format!(
-        //             fixedstr::str16,
-        //             "{:02}:{:02}:{:02}",
-        //             time.hr,
-        //             time.min,
-        //             time.sec
-        //         );
-        //         text_writer::draw_text_centered(
-        //             LCD_WIDTH as i32 / 2,
-        //             18 + 8 * 5,
-        //             FontStyle::Small,
-        //             0b000_000_00,
-        //             time_str.as_str(),
-        //         );
-        //     }
-        //     None => {}
-        // }
     }
 
     fn input(&mut self) {
@@ -398,6 +359,26 @@ impl State for SettingsState {
 }
 
 impl SettingsState {
+    pub fn new() -> Self {
+        Self {
+            frame_count: 0,
+            key_repeat_slowdown_timer: 0,
+            next_state: None,
+            song: song::SONG,
+            current_frequency: Frequency::None,
+            key0_down: false,
+            key1_down: false,
+            key2_down: false,
+            key3_down: false,
+            setting_selected: SettingSelected::None,
+            setting_highlighted: SettingSelected::None,
+            input_enabled: false,
+            time: None,
+            new_time: None,
+            new_time_selection: 0,
+        }
+    }
+
     fn adjust_setting(&mut self, setting: &mut Setting) {
         let hardware = crate::globals::get_hardware();
         if hardware.key1_pressed() && !hardware.key2_pressed() {

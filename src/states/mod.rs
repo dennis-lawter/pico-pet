@@ -1,14 +1,7 @@
 pub mod game_play_state;
 pub mod select_food_state;
 pub mod settings_state;
-pub mod state_1;
-pub mod state_2;
-pub mod state_3;
-pub mod state_4;
-pub mod state_5;
-pub mod state_6;
-pub mod state_7;
-pub mod state_8;
+pub mod state_nyi;
 
 #[derive(Clone)]
 pub enum AppState {
@@ -25,10 +18,13 @@ pub enum AppState {
     AppState8,
     Settings,
 }
+impl Default for AppState {
+    fn default() -> Self {
+        Self::GamePlay
+    }
+}
 
 pub trait State {
-    fn new() -> Self;
-
     fn input(&mut self);
     fn tick(&mut self);
     fn sound(&mut self);

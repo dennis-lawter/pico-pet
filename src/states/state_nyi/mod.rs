@@ -2,7 +2,7 @@ use crate::display::{render, text_writer};
 
 use super::{AppState, State};
 
-pub struct State8 {
+pub struct StateNyi {
     key0_down: bool,
     key1_down: bool,
     key2_down: bool,
@@ -10,17 +10,7 @@ pub struct State8 {
     next_state: Option<AppState>,
 }
 
-impl State for State8 {
-    fn new() -> Self {
-        Self {
-            key0_down: false,
-            key1_down: false,
-            key2_down: false,
-            key3_down: false,
-            next_state: None,
-        }
-    }
-
+impl State for StateNyi {
     fn input(&mut self) {
         let hardware = crate::globals::get_hardware();
         if !hardware.key0_pressed() && self.key0_down {
@@ -48,5 +38,16 @@ impl State for State8 {
 
     fn next_state(&self) -> &Option<super::AppState> {
         &self.next_state
+    }
+}
+impl StateNyi {
+    pub fn new() -> Self {
+        Self {
+            key0_down: false,
+            key1_down: false,
+            key2_down: false,
+            key3_down: false,
+            next_state: None,
+        }
     }
 }
