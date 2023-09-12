@@ -31,21 +31,21 @@ use panic_halt as _;
 
 #[entry]
 fn main() -> ! {
-    let mut system = HardwareComponents::new();
-
     init_globals();
 
-    spawn_secondary_core_worker(&mut system);
+    spawn_secondary_core_worker();
 
-    cores::primary_main_loop(&mut system)
+    cores::primary_main_loop()
 }
 
 fn init_globals() {
+    unsafe { globals::HARDWARE = Some(HardwareComponents::new()) }
     display::text_writer::init_singleton_fonts();
 }
 
-fn spawn_secondary_core_worker(system: &mut HardwareComponents) {
+fn spawn_secondary_core_worker() {
     unsafe {
+        let system = &mut globals::HARDWARE.as_mut().unwrap();
         let mut mc = Multicore::new(
             &mut *system.psm_ptr,
             &mut *system.ppb_ptr,

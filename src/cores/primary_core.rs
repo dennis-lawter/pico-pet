@@ -8,7 +8,9 @@ use crate::{
     },
 };
 
-pub fn primary_main_loop(system: &mut HardwareComponents) -> ! {
+pub fn primary_main_loop() -> ! {
+    let system = unsafe { &mut crate::globals::HARDWARE.as_mut().unwrap() };
+
     let mut game_play_state: Option<GamePlayState> = Some(GamePlayState::new());
     let mut select_food_state: Option<SelectFoodState> = None;
     let mut state_1: Option<State1> = None;
