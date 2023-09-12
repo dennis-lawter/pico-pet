@@ -1,3 +1,5 @@
+use fixedstr::str_format;
+
 use crate::{
     display::{
         render,
@@ -5,7 +7,7 @@ use crate::{
     },
     globals,
     setting_value::Setting,
-    system::{Frequency, SystemComponents, LCD_WIDTH},
+    system::{Frequency, RealTime, SystemComponents, LCD_HEIGHT, LCD_WIDTH},
 };
 
 use super::{AppState, State};
@@ -48,6 +50,7 @@ pub struct SettingsState {
     setting_selected: SettingSelected,
     setting_highlighted: SettingSelected,
     input_enabled: bool,
+    time: Option<RealTime>,
 }
 impl State for SettingsState {
     fn new() -> Self {
@@ -482,6 +485,7 @@ impl State for SettingsState {
             Frequency::None,
             Frequency::None,
         ];
+
         Self {
             frame_count: 0,
             key_repeat_slowdown_timer: 0,
@@ -495,10 +499,14 @@ impl State for SettingsState {
             setting_selected: SettingSelected::None,
             setting_highlighted: SettingSelected::None,
             input_enabled: false,
+            time: None,
         }
     }
 
-    fn tick(&mut self, _system: &mut SystemComponents) {
+    fn tick(&mut self, system: &mut SystemComponents) {
+        // TODO: needs to be cached!!
+        self.time = Some(system.get_time());
+
         self.frame_count += 1;
     }
 
@@ -566,6 +574,26 @@ impl State for SettingsState {
                 }
                 SettingSelected::None => {}
             },
+        }
+
+        match &self.time {
+            Some(time) => {
+                let time_str = str_format!(
+                    fixedstr::str16,
+                    "{:02}:{:02}:{:02}",
+                    time.hr,
+                    time.min,
+                    time.sec
+                );
+                text_writer::draw_text_centered(
+                    LCD_WIDTH as i32 / 2,
+                    LCD_HEIGHT as i32 - 16,
+                    FontStyle::Small,
+                    0b000_000_00,
+                    time_str.as_str(),
+                );
+            }
+            None => {}
         }
     }
 

@@ -5,7 +5,11 @@ use embedded_graphics::{
     pixelcolor::Rgb565,
     prelude::{DrawTarget, RgbColor},
 };
-use embedded_hal::{digital::v2::InputPin, PwmPin};
+use embedded_hal::{
+    digital::v2::InputPin,
+    prelude::{_embedded_hal_blocking_i2c_Read, _embedded_hal_blocking_i2c_Write},
+    PwmPin,
+};
 use fugit::RateExtU32;
 
 use waveshare_rp2040_lcd_0_96::{
@@ -42,9 +46,17 @@ type BuzzerPwmSlice = hal::pwm::Slice<hal::pwm::Pwm2, hal::pwm::FreeRunning>;
 
 type Key0Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio15, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key1Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio17, hal::gpio::Input<hal::gpio::PullUp>>;
-type Key1AltPin = hal::gpio::Pin<hal::gpio::bank0::Gpio1, hal::gpio::Input<hal::gpio::PullUp>>;
+type Key1AltPin = hal::gpio::Pin<hal::gpio::bank0::Gpio29, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key2Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio2, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key3Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio3, hal::gpio::Input<hal::gpio::PullUp>>;
+
+type I2CBus = hal::I2C<
+    pac::I2C0,
+    (
+        hal::gpio::Pin<hal::gpio::bank0::Gpio0, hal::gpio::Function<hal::gpio::I2C>>,
+        hal::gpio::Pin<hal::gpio::bank0::Gpio1, hal::gpio::Function<hal::gpio::I2C>>,
+    ),
+>;
 
 pub struct SystemComponents {
     pub display: Lcd,
@@ -61,6 +73,7 @@ pub struct SystemComponents {
     pub psm_ptr: *mut PSM,
     pub ppb_ptr: *mut PPB,
     pub fifo_ptr: *mut SioFifo,
+    pub i2c_bus: I2CBus,
 }
 impl SystemComponents {
     pub fn new() -> Self {
@@ -127,7 +140,7 @@ impl SystemComponents {
 
             let key0 = pins.gpio15.into_pull_up_input();
             let key1 = pins.gpio17.into_pull_up_input();
-            let key1_alt = pins.gpio1.into_pull_up_input();
+            let key1_alt = pins.gpio29.into_pull_up_input();
             let key2 = pins.gpio2.into_pull_up_input();
             let key3 = pins.gpio3.into_pull_up_input();
 
@@ -174,6 +187,22 @@ impl SystemComponents {
 
             display.clear(Rgb565::BLACK).debugless_unwrap();
 
+            let sda_pin = pins.gpio0.into_mode::<hal::gpio::FunctionI2C>();
+            let scl_pin = pins.gpio1.into_mode::<hal::gpio::FunctionI2C>();
+            // let not_an_scl_pin = pins.gpio20.into_function::<hal::gpio::FunctionI2C>();
+
+            // Create the I²C drive, using the two pre-configured pins. This will fail
+            // at compile time if the pins are in the wrong mode, or if this I²C
+            // peripheral isn't available on these pins!
+            let i2c_bus: I2CBus = hal::I2C::i2c0(
+                pac.I2C0,
+                sda_pin,
+                scl_pin, // Try `not_an_scl_pin` here
+                400.kHz(),
+                &mut pac.RESETS,
+                &clocks.system_clock,
+            );
+
             Self {
                 display,
                 sys_freq,
@@ -189,6 +218,7 @@ impl SystemComponents {
                 psm_ptr,
                 ppb_ptr,
                 fifo_ptr,
+                i2c_bus,
             }
         }
     }
@@ -245,6 +275,28 @@ impl SystemComponents {
 
     pub fn end_tone(&mut self) {
         self.start_tone(&Frequency::None);
+    }
+
+    pub fn get_time(&mut self) -> RealTime {
+        let mut buffer = [0u8; 7];
+        self.i2c_bus.write(0x68, &[0x00]).unwrap();
+        self.i2c_bus.read(0x68, &mut buffer).unwrap();
+        let sec = RealTime::bcd_to_dec(buffer[0]);
+        let min = RealTime::bcd_to_dec(buffer[1]);
+        let hr = RealTime::bcd_to_dec(buffer[2]);
+
+        RealTime { sec, min, hr }
+    }
+}
+
+pub struct RealTime {
+    pub sec: u8,
+    pub min: u8,
+    pub hr: u8,
+}
+impl RealTime {
+    fn bcd_to_dec(n: u8) -> u8 {
+        (n / 16) * 10 + (n % 16)
     }
 }
 
