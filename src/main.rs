@@ -66,8 +66,8 @@ fn main() -> ! {
     let mut timer = Delay::new(core.SYST, sys_freq);
 
     // Configure two pins as being I²C, not GPIO
-    let sda_pin = pins.gpio0.into_mode::<hal::gpio::FunctionI2C>();
-    let scl_pin = pins.gpio1.into_mode::<hal::gpio::FunctionI2C>();
+    let sda_pin = pins.gpio20.into_mode::<hal::gpio::FunctionI2C>();
+    let scl_pin = pins.gpio21.into_mode::<hal::gpio::FunctionI2C>();
     // let not_an_scl_pin = pins.gpio20.into_function::<hal::gpio::FunctionI2C>();
 
     // Create the I²C drive, using the two pre-configured pins. This will fail
@@ -83,7 +83,7 @@ fn main() -> ! {
     );
 
     let mut buffer = [0u8; 1];
-    match i2c.read(0x86, &mut buffer) {
+    match i2c.read(0x68, &mut buffer) {
         Ok(_) => {}
         Err(_) => panic!(),
         // Err(_) => {}
