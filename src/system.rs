@@ -287,8 +287,19 @@ impl SystemComponents {
 
         RealTime { sec, min, hr }
     }
+
+    pub fn set_time(&mut self, new_time: &RealTime) {
+        let sec_bcd = RealTime::dec_to_bcd(new_time.sec);
+        let min_bcd = RealTime::dec_to_bcd(new_time.min);
+        let hr_bcd = RealTime::dec_to_bcd(new_time.hr);
+
+        let data = [0x00, sec_bcd, min_bcd, hr_bcd];
+
+        self.i2c_bus.write(0x68, &data).unwrap();
+    }
 }
 
+#[derive(Clone)]
 pub struct RealTime {
     pub sec: u8,
     pub min: u8,
@@ -297,6 +308,9 @@ pub struct RealTime {
 impl RealTime {
     fn bcd_to_dec(n: u8) -> u8 {
         (n / 16) * 10 + (n % 16)
+    }
+    fn dec_to_bcd(n: u8) -> u8 {
+        (n / 10) * 16 + (n % 10)
     }
 }
 

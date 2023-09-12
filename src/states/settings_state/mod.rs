@@ -1,3 +1,6 @@
+mod setting_selected;
+mod song;
+
 use fixedstr::str_format;
 
 use crate::{
@@ -7,35 +10,14 @@ use crate::{
     },
     globals,
     setting_value::Setting,
-    system::{Frequency, RealTime, SystemComponents, LCD_HEIGHT, LCD_WIDTH},
+    system::{Frequency, RealTime, SystemComponents, LCD_WIDTH},
 };
+
+use self::setting_selected::SettingSelected;
 
 use super::{AppState, State};
 
 const KEY_REPEAT_FRAMES: u8 = 5;
-
-#[derive(Clone, PartialEq)]
-enum SettingSelected {
-    Brightness,
-    Volume,
-    None,
-}
-impl SettingSelected {
-    fn prev(&self) -> SettingSelected {
-        match self {
-            SettingSelected::Brightness => SettingSelected::Volume,
-            SettingSelected::Volume => SettingSelected::Brightness,
-            SettingSelected::None => SettingSelected::Volume,
-        }
-    }
-    fn next(&self) -> SettingSelected {
-        match self {
-            SettingSelected::Brightness => SettingSelected::Volume,
-            SettingSelected::Volume => SettingSelected::Brightness,
-            SettingSelected::None => SettingSelected::Brightness,
-        }
-    }
-}
 
 pub struct SettingsState {
     frame_count: u32,
@@ -51,446 +33,16 @@ pub struct SettingsState {
     setting_highlighted: SettingSelected,
     input_enabled: bool,
     time: Option<RealTime>,
+    new_time: Option<RealTime>,
+    new_time_selection: u8,
 }
 impl State for SettingsState {
     fn new() -> Self {
-        // let mut song_str = "C4q D4q | F4q F4q F4q F4e F4e | F4e F4e F4q C4q D4q | F4q F4q F4q F4e F4e | F4e F4e F4q C4q D4q";
-        let song = [
-            Frequency::C4, // take
-            Frequency::C4,
-            Frequency::C4,
-            Frequency::C4,
-            Frequency::C4,
-            Frequency::C4,
-            Frequency::C4,
-            Frequency::None,
-            Frequency::C5, // me
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::None,
-            // ===========
-            Frequency::A4, // out
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::None,
-            Frequency::G4, // to
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::None,
-            Frequency::F4, // the
-            Frequency::F4,
-            Frequency::F4,
-            Frequency::None,
-            // ===========
-            Frequency::G4, // ball
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::None,
-            // ===========
-            Frequency::D4, // game
-            Frequency::D4,
-            Frequency::D4,
-            Frequency::D4,
-            Frequency::D4,
-            Frequency::D4,
-            Frequency::D4,
-            Frequency::D4,
-            Frequency::D4,
-            Frequency::D4,
-            Frequency::D4,
-            Frequency::None,
-            // ===========
-            Frequency::C4, // take
-            Frequency::C4,
-            Frequency::C4,
-            Frequency::C4,
-            Frequency::C4,
-            Frequency::C4,
-            Frequency::C4,
-            Frequency::None,
-            Frequency::C5, // me
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::None,
-            // ===========
-            Frequency::A4, // out
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::None,
-            Frequency::G4, // to
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::None,
-            Frequency::F4, // the
-            Frequency::F4,
-            Frequency::F4,
-            Frequency::None,
-            // ===========
-            Frequency::G4, // crowd
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            // ===========
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::None,
-            // ===========
-            Frequency::A4, // buy
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::None,
-            Frequency::A4, // me
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::None,
-            Frequency::A4, // some
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::None,
-            // ===========
-            Frequency::E4, // hot
-            Frequency::E4,
-            Frequency::E4,
-            Frequency::None,
-            Frequency::F4, // dogs
-            Frequency::F4,
-            Frequency::F4,
-            Frequency::None,
-            Frequency::G4, // and
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::None,
-            // ===========
-            Frequency::A4, // crack-
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::None,
-            Frequency::F4, // er
-            Frequency::F4,
-            Frequency::F4,
-            Frequency::None,
-            // ===========
-            Frequency::D4, // jacks
-            Frequency::D4,
-            Frequency::D4,
-            Frequency::D4,
-            Frequency::D4,
-            Frequency::D4,
-            Frequency::D4,
-            Frequency::D4,
-            Frequency::D4,
-            Frequency::D4,
-            Frequency::D4,
-            Frequency::None,
-            // ===========
-            Frequency::A4, // I
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::None,
-            Frequency::A4, // don't
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::None,
-            // ===========
-            Frequency::A4, // care
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::None,
-            Frequency::B4, // if
-            Frequency::B4,
-            Frequency::B4,
-            Frequency::None,
-            Frequency::C5, // I
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::None,
-            // ===========
-            Frequency::D5, // ne-
-            Frequency::D5,
-            Frequency::D5,
-            Frequency::None,
-            Frequency::B4, // ver
-            Frequency::B4,
-            Frequency::B4,
-            Frequency::None,
-            Frequency::A4, // come
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::None,
-            // ===========
-            Frequency::G4, // back
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::None,
-            Frequency::E4, // 'cause
-            Frequency::E4,
-            Frequency::E4,
-            Frequency::None,
-            Frequency::D4, // it's
-            Frequency::D4,
-            Frequency::D4,
-            Frequency::None,
-            // ===========
-            Frequency::C4, // root
-            Frequency::C4,
-            Frequency::C4,
-            Frequency::C4,
-            Frequency::C4,
-            Frequency::C4,
-            Frequency::C4,
-            Frequency::None,
-            Frequency::C5, // root
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::None,
-            // ===========
-            Frequency::A4, // root
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::None,
-            Frequency::G4, // for
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::None,
-            Frequency::F4, // the
-            Frequency::F4,
-            Frequency::F4,
-            Frequency::None,
-            // ===========
-            Frequency::G4, // home
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::None,
-            // ===========
-            Frequency::D4, // team
-            Frequency::D4,
-            Frequency::D4,
-            Frequency::D4,
-            Frequency::D4,
-            Frequency::D4,
-            Frequency::D4,
-            Frequency::None,
-            Frequency::D4, // if
-            Frequency::D4,
-            Frequency::D4,
-            Frequency::None,
-            // ===========
-            Frequency::C4, // they
-            Frequency::C4,
-            Frequency::C4,
-            Frequency::C4,
-            Frequency::C4,
-            Frequency::C4,
-            Frequency::C4,
-            Frequency::None,
-            Frequency::D4, // don't
-            Frequency::D4,
-            Frequency::D4,
-            Frequency::None,
-            // ===========
-            Frequency::E4, // win
-            Frequency::E4,
-            Frequency::E4,
-            Frequency::None,
-            Frequency::F4, // it's
-            Frequency::F4,
-            Frequency::F4,
-            Frequency::None,
-            Frequency::G4, // a
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::None,
-            // ===========
-            Frequency::A4, // shame
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::None,
-            // ===========
-            Frequency::None, // {rest}
-            Frequency::None,
-            Frequency::None,
-            Frequency::None,
-            Frequency::A4, // 'cause
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::None,
-            Frequency::B4, // it's
-            Frequency::B4,
-            Frequency::B4,
-            Frequency::None,
-            // ===========
-            Frequency::C5, // one
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::None,
-            // ===========
-            Frequency::C5, // two
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::None,
-            // ===========
-            Frequency::C5, // three
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::None,
-            Frequency::B4, // strikes
-            Frequency::B4,
-            Frequency::B4,
-            Frequency::None,
-            Frequency::A4, // you're
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::None,
-            // ===========
-            Frequency::G4, // out
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::None,
-            Frequency::Fs4, // at
-            Frequency::Fs4,
-            Frequency::Fs4,
-            Frequency::None,
-            Frequency::G4, // the
-            Frequency::G4,
-            Frequency::G4,
-            Frequency::None,
-            // ===========
-            Frequency::A4, // old
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::A4,
-            Frequency::None,
-            // ===========
-            Frequency::B4, // ball
-            Frequency::B4,
-            Frequency::B4,
-            Frequency::B4,
-            Frequency::B4,
-            Frequency::B4,
-            Frequency::B4,
-            Frequency::B4,
-            Frequency::B4,
-            Frequency::B4,
-            Frequency::B4,
-            Frequency::None,
-            // ===========
-            Frequency::C5, // ga-
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            // ===========
-            Frequency::C5, // -me
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::C5,
-            Frequency::None,
-            // ===========
-            Frequency::None,
-            Frequency::None,
-            Frequency::None,
-            Frequency::None,
-            Frequency::None,
-            Frequency::None,
-            Frequency::None,
-            Frequency::None,
-            Frequency::None,
-            Frequency::None,
-            Frequency::None,
-            Frequency::None,
-        ];
-
         Self {
             frame_count: 0,
             key_repeat_slowdown_timer: 0,
             next_state: None,
-            song,
+            song: song::SONG,
             current_frequency: Frequency::None,
             key0_down: false,
             key1_down: false,
@@ -500,6 +52,8 @@ impl State for SettingsState {
             setting_highlighted: SettingSelected::None,
             input_enabled: false,
             time: None,
+            new_time: None,
+            new_time_selection: 0,
         }
     }
 
@@ -565,6 +119,9 @@ impl State for SettingsState {
             SettingSelected::Volume => {
                 text_writer::draw_text(10, 18 + 8 * 3, FontStyle::Icon, 0b111_000_00, "4}");
             }
+            SettingSelected::Time => {
+                text_writer::draw_text(10, 18 + 8 * 5, FontStyle::Icon, 0b111_000_00, "4}");
+            }
             SettingSelected::None => match self.setting_highlighted {
                 SettingSelected::Brightness => {
                     text_writer::draw_text(10, 18 + 8, FontStyle::Icon, 0b111_000_00, " >");
@@ -572,29 +129,157 @@ impl State for SettingsState {
                 SettingSelected::Volume => {
                     text_writer::draw_text(10, 18 + 8 * 3, FontStyle::Icon, 0b111_000_00, " >");
                 }
+                SettingSelected::Time => {
+                    text_writer::draw_text(10, 18 + 8 * 5, FontStyle::Icon, 0b111_000_00, " >");
+                }
                 SettingSelected::None => {}
             },
         }
 
-        match &self.time {
-            Some(time) => {
-                let time_str = str_format!(
-                    fixedstr::str16,
-                    "{:02}:{:02}:{:02}",
-                    time.hr,
-                    time.min,
-                    time.sec
-                );
-                text_writer::draw_text_centered(
-                    LCD_WIDTH as i32 / 2,
-                    LCD_HEIGHT as i32 - 16,
-                    FontStyle::Small,
-                    0b000_000_00,
-                    time_str.as_str(),
-                );
+        text_writer::draw_text_centered(
+            LCD_WIDTH as i32 / 2,
+            18 + 8 * 4,
+            FontStyle::Small,
+            0b000_000_00,
+            "ADJUST TIME",
+        );
+        if self.setting_selected == SettingSelected::Time {
+            match &self.new_time {
+                Some(time) => match self.new_time_selection {
+                    0 => {
+                        let time_str = str_format!(
+                            fixedstr::str16,
+                            "  :{:02}:{:02}",
+                            // time.hr,
+                            time.min,
+                            time.sec
+                        );
+                        text_writer::draw_text_centered(
+                            LCD_WIDTH as i32 / 2,
+                            18 + 8 * 5,
+                            FontStyle::Small,
+                            0b000_000_00,
+                            time_str.as_str(),
+                        );
+                        let active_time_str = str_format!(
+                            fixedstr::str16,
+                            "{:02}      ",
+                            time.hr,
+                            // time.min,
+                            // time.sec
+                        );
+                        text_writer::draw_text_centered(
+                            LCD_WIDTH as i32 / 2,
+                            18 + 8 * 5 - 1,
+                            FontStyle::Small,
+                            0b000_000_11,
+                            active_time_str.as_str(),
+                        );
+                    }
+                    1 => {
+                        let time_str = str_format!(
+                            fixedstr::str16,
+                            "{:02}:  :{:02}",
+                            time.hr,
+                            // time.min,
+                            time.sec
+                        );
+                        text_writer::draw_text_centered(
+                            LCD_WIDTH as i32 / 2,
+                            18 + 8 * 5,
+                            FontStyle::Small,
+                            0b000_000_00,
+                            time_str.as_str(),
+                        );
+                        let active_time_str = str_format!(
+                            fixedstr::str16,
+                            "   {:02}   ",
+                            // time.hr,
+                            time.min,
+                            // time.sec
+                        );
+                        text_writer::draw_text_centered(
+                            LCD_WIDTH as i32 / 2,
+                            18 + 8 * 5 - 1,
+                            FontStyle::Small,
+                            0b000_000_11,
+                            active_time_str.as_str(),
+                        );
+                    }
+                    2 => {
+                        let time_str = str_format!(
+                            fixedstr::str16,
+                            "{:02}:{:02}:  ",
+                            time.hr,
+                            time.min,
+                            // time.sec
+                        );
+                        text_writer::draw_text_centered(
+                            LCD_WIDTH as i32 / 2,
+                            18 + 8 * 5,
+                            FontStyle::Small,
+                            0b000_000_00,
+                            time_str.as_str(),
+                        );
+                        let active_time_str = str_format!(
+                            fixedstr::str16,
+                            "      {:02}",
+                            // time.hr,
+                            // time.min,
+                            time.sec
+                        );
+                        text_writer::draw_text_centered(
+                            LCD_WIDTH as i32 / 2,
+                            18 + 8 * 5 - 1,
+                            FontStyle::Small,
+                            0b000_000_11,
+                            active_time_str.as_str(),
+                        );
+                    }
+                    _ => {}
+                },
+                None => {}
             }
-            None => {}
-        }
+        } else {
+            match &self.time {
+                Some(time) => {
+                    let time_str = str_format!(
+                        fixedstr::str16,
+                        "{:02}:{:02}:{:02}",
+                        time.hr,
+                        time.min,
+                        time.sec
+                    );
+                    text_writer::draw_text_centered(
+                        LCD_WIDTH as i32 / 2,
+                        18 + 8 * 5,
+                        FontStyle::Small,
+                        0b000_000_00,
+                        time_str.as_str(),
+                    );
+                }
+                None => {}
+            }
+        };
+        // match shown_time {
+        //     Some(time) => {
+        //         let time_str = str_format!(
+        //             fixedstr::str16,
+        //             "{:02}:{:02}:{:02}",
+        //             time.hr,
+        //             time.min,
+        //             time.sec
+        //         );
+        //         text_writer::draw_text_centered(
+        //             LCD_WIDTH as i32 / 2,
+        //             18 + 8 * 5,
+        //             FontStyle::Small,
+        //             0b000_000_00,
+        //             time_str.as_str(),
+        //         );
+        //     }
+        //     None => {}
+        // }
     }
 
     fn swap(&mut self, system: &mut SystemComponents) {
@@ -615,14 +300,85 @@ impl State for SettingsState {
                 self.input_enabled = true;
             }
         }
+
+        self.check_for_setting_deselected(system);
         match self.setting_selected {
             SettingSelected::Brightness => {
-                self.check_for_setting_deselected(system);
                 self.adjust_setting(system, unsafe { &mut globals::BRIGHTNESS_SETTING })
             }
             SettingSelected::Volume => {
-                self.check_for_setting_deselected(system);
                 self.adjust_setting(system, unsafe { &mut globals::VOLUME_SETTING })
+            }
+            SettingSelected::Time => {
+                if self.new_time.is_none() {
+                    self.new_time = self.time.clone();
+                    self.new_time_selection = 0;
+                }
+                let new_time_mut = self.new_time.as_mut().unwrap();
+
+                if !self.key0_down && !self.key1_down && !self.key2_down && !self.key3_down {
+                    if system.key1_pressed() {
+                        match self.new_time_selection {
+                            0 => {
+                                if new_time_mut.hr == 00 {
+                                    new_time_mut.hr = 23;
+                                } else {
+                                    new_time_mut.hr -= 1;
+                                }
+                            }
+                            1 => {
+                                if new_time_mut.min == 00 {
+                                    new_time_mut.min = 59;
+                                } else {
+                                    new_time_mut.min -= 1;
+                                }
+                            }
+                            2 => {
+                                if new_time_mut.sec == 00 {
+                                    new_time_mut.sec = 59;
+                                } else {
+                                    new_time_mut.sec -= 1;
+                                }
+                            }
+                            _ => {}
+                        }
+                    } else if system.key2_pressed() {
+                        match self.new_time_selection {
+                            0 => {
+                                if new_time_mut.hr == 23 {
+                                    new_time_mut.hr = 0;
+                                } else {
+                                    new_time_mut.hr += 1;
+                                }
+                            }
+                            1 => {
+                                if new_time_mut.min == 59 {
+                                    new_time_mut.min = 0;
+                                } else {
+                                    new_time_mut.min += 1;
+                                }
+                            }
+                            2 => {
+                                if new_time_mut.sec == 59 {
+                                    new_time_mut.sec = 0;
+                                } else {
+                                    new_time_mut.sec += 1;
+                                }
+                            }
+                            _ => {}
+                        }
+                    }
+                } else if !self.key0_down && !self.key1_down && !self.key2_down && self.key3_down {
+                    if !system.key3_pressed() {
+                        self.new_time_selection += 1;
+                        if self.new_time_selection == 3 {
+                            self.setting_selected = SettingSelected::None;
+                            self.new_time_selection = 0;
+                            system.set_time(self.new_time.as_mut().unwrap());
+                            self.new_time = None;
+                        }
+                    }
+                }
             }
             SettingSelected::None => {
                 if system.key0_pressed() {
@@ -680,6 +436,7 @@ impl SettingsState {
             return;
         }
         if self.key0_down && !system.key0_pressed() {
+            self.new_time = None;
             self.setting_selected = SettingSelected::None;
         }
     }
@@ -694,10 +451,10 @@ impl SettingsState {
         if system.key1_pressed() && system.key2_pressed() {
             return;
         }
-        if self.key1_down && !system.key1_pressed() {
+        if self.key2_down && !system.key2_pressed() {
             self.setting_highlighted = self.setting_highlighted.next().clone();
         }
-        if self.key2_down && !system.key2_pressed() {
+        if self.key1_down && !system.key1_pressed() {
             self.setting_highlighted = self.setting_highlighted.prev().clone();
         }
     }
