@@ -5,7 +5,7 @@ use crate::{
         render,
         sprite::{Sprite, SpriteFactory},
     },
-    system::{Frequency, SystemComponents},
+    hardware::{Frequency, HardwareComponents},
 };
 
 use self::menu_selection::MenuSelection;
@@ -47,7 +47,7 @@ impl State for GamePlayState<'static> {
         }
     }
 
-    fn tick(&mut self, _system: &mut SystemComponents) {
+    fn tick(&mut self, _system: &mut HardwareComponents) {
         self.frame_count += 1;
         if self.frame_count % 80 == 20 || self.frame_count % 80 == 0 {
             self.ferris.x -= 8;
@@ -56,7 +56,7 @@ impl State for GamePlayState<'static> {
         }
     }
 
-    fn sound(&mut self, system: &mut SystemComponents) {
+    fn sound(&mut self, system: &mut HardwareComponents) {
         if self.menu_select_tone_timer > 0 {
             self.menu_select_tone_timer -= 1;
             system.start_tone(&Frequency::Ds6);
@@ -75,7 +75,7 @@ impl State for GamePlayState<'static> {
         }
     }
 
-    fn draw(&mut self, _system: &mut SystemComponents) {
+    fn draw(&mut self, _system: &mut HardwareComponents) {
         render::flood(0b010_010_01);
 
         self.ferris.draw(((self.frame_count / 20) % 2) as usize);
@@ -98,12 +98,12 @@ impl State for GamePlayState<'static> {
         render::fancy_border(sel_x as i32, sel_y as i32, 24, 24);
     }
 
-    fn swap(&mut self, system: &mut SystemComponents) {
+    fn swap(&mut self, system: &mut HardwareComponents) {
         system.set_backlight();
         render::draw(&mut system.display);
     }
 
-    fn input(&mut self, system: &mut SystemComponents) {
+    fn input(&mut self, system: &mut HardwareComponents) {
         if !(system.key1_pressed() && system.key2_pressed()) {
             if system.key1_pressed() && !self.key1_down {
                 self.menu_item_selected = self.menu_item_selected.prev();

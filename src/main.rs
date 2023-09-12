@@ -18,11 +18,11 @@ extern crate waveshare_rp2040_lcd_0_96;
 mod cores;
 mod display;
 mod globals;
+mod hardware;
 mod setting_value;
 mod states;
-mod system;
 
-use crate::system::SystemComponents;
+use crate::hardware::HardwareComponents;
 
 use waveshare_rp2040_lcd_0_96::{entry, hal::multicore::Multicore};
 
@@ -31,7 +31,7 @@ use panic_halt as _;
 
 #[entry]
 fn main() -> ! {
-    let mut system = SystemComponents::new();
+    let mut system = HardwareComponents::new();
 
     init_globals();
 
@@ -44,7 +44,7 @@ fn init_globals() {
     display::text_writer::init_singleton_fonts();
 }
 
-fn spawn_secondary_core_worker(system: &mut SystemComponents) {
+fn spawn_secondary_core_worker(system: &mut HardwareComponents) {
     unsafe {
         let mut mc = Multicore::new(
             &mut *system.psm_ptr,

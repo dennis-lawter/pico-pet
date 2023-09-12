@@ -1,4 +1,4 @@
-use crate::system::Frequency;
+use crate::hardware::Frequency;
 
 // let mut song_str = "C4q D4q | F4q F4q F4q F4e F4e | F4e F4e F4q C4q D4q | F4q F4q F4q F4e F4e | F4e F4e F4q C4q D4q";
 pub const SONG: [Frequency; 396] = [

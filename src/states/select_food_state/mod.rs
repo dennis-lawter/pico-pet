@@ -21,7 +21,7 @@ impl State for SelectFoodState {
         }
     }
 
-    fn input(&mut self, system: &mut crate::system::SystemComponents) {
+    fn input(&mut self, system: &mut crate::hardware::HardwareComponents) {
         if !system.key0_pressed() && self.key0_down {
             self.next_state = Some(AppState::GamePlay);
         }
@@ -31,20 +31,20 @@ impl State for SelectFoodState {
         self.key3_down = system.key3_pressed();
     }
 
-    fn tick(&mut self, _system: &mut crate::system::SystemComponents) {
+    fn tick(&mut self, _system: &mut crate::hardware::HardwareComponents) {
         //
     }
 
-    fn sound(&mut self, system: &mut crate::system::SystemComponents) {
+    fn sound(&mut self, system: &mut crate::hardware::HardwareComponents) {
         system.end_tone();
     }
 
-    fn draw(&mut self, _system: &mut crate::system::SystemComponents) {
+    fn draw(&mut self, _system: &mut crate::hardware::HardwareComponents) {
         render::flood(0b000_000_00);
         text_writer::full_dialog_box("NOT IMPL", "todo!()");
     }
 
-    fn swap(&mut self, system: &mut crate::system::SystemComponents) {
+    fn swap(&mut self, system: &mut crate::hardware::HardwareComponents) {
         render::draw(&mut system.display);
     }
 

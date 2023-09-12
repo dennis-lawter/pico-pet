@@ -9,8 +9,8 @@ use crate::{
         text_writer::{self, FontStyle},
     },
     globals,
+    hardware::{Frequency, HardwareComponents, RealTime, LCD_WIDTH},
     setting_value::Setting,
-    system::{Frequency, RealTime, SystemComponents, LCD_WIDTH},
 };
 
 use self::setting_selected::SettingSelected;
@@ -57,14 +57,14 @@ impl State for SettingsState {
         }
     }
 
-    fn tick(&mut self, system: &mut SystemComponents) {
+    fn tick(&mut self, system: &mut HardwareComponents) {
         // TODO: needs to be cached!!
         self.time = Some(system.get_time());
 
         self.frame_count += 1;
     }
 
-    fn sound(&mut self, system: &mut SystemComponents) {
+    fn sound(&mut self, system: &mut HardwareComponents) {
         let song_index = (self.frame_count / 2) as usize % self.song.len();
         let indexed_frequency = &self.song[song_index];
         if indexed_frequency != &self.current_frequency {
@@ -73,7 +73,7 @@ impl State for SettingsState {
         }
     }
 
-    fn draw(&mut self, _system: &mut SystemComponents) {
+    fn draw(&mut self, _system: &mut HardwareComponents) {
         render::flood(0b000_000_00);
 
         let title = "SETTINGS";
@@ -282,12 +282,12 @@ impl State for SettingsState {
         // }
     }
 
-    fn swap(&mut self, system: &mut SystemComponents) {
+    fn swap(&mut self, system: &mut HardwareComponents) {
         system.set_backlight();
         render::draw(&mut system.display);
     }
 
-    fn input(&mut self, system: &mut SystemComponents) {
+    fn input(&mut self, system: &mut HardwareComponents) {
         if !self.input_enabled {
             // release all buttons to enable input
             if system.key0_pressed()
@@ -402,7 +402,7 @@ impl State for SettingsState {
 }
 
 impl SettingsState {
-    fn adjust_setting(&mut self, system: &mut SystemComponents, setting: &mut Setting) {
+    fn adjust_setting(&mut self, system: &mut HardwareComponents, setting: &mut Setting) {
         if system.key1_pressed() && !system.key2_pressed() {
             if self.key_repeat_slowdown_timer == 0 {
                 self.key_repeat_slowdown_timer = KEY_REPEAT_FRAMES;
@@ -422,7 +422,7 @@ impl SettingsState {
         }
     }
 
-    fn check_for_setting_selected(&mut self, system: &mut SystemComponents) {
+    fn check_for_setting_selected(&mut self, system: &mut HardwareComponents) {
         if self.setting_selected != SettingSelected::None {
             return;
         }
@@ -431,7 +431,7 @@ impl SettingsState {
         }
     }
 
-    fn check_for_setting_deselected(&mut self, system: &mut SystemComponents) {
+    fn check_for_setting_deselected(&mut self, system: &mut HardwareComponents) {
         if self.setting_selected == SettingSelected::None {
             return;
         }
@@ -441,7 +441,7 @@ impl SettingsState {
         }
     }
 
-    fn check_for_move_highlight(&mut self, system: &mut SystemComponents) {
+    fn check_for_move_highlight(&mut self, system: &mut HardwareComponents) {
         if self.setting_selected != SettingSelected::None {
             return;
         }

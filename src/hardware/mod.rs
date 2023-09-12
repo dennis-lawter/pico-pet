@@ -58,7 +58,7 @@ type I2CBus = hal::I2C<
     ),
 >;
 
-pub struct SystemComponents {
+pub struct HardwareComponents {
     pub display: Lcd,
     pub sys_freq: u32,
     pub backlight_channel_ptr: *mut LcdBlPinChannel,
@@ -75,7 +75,7 @@ pub struct SystemComponents {
     pub fifo_ptr: *mut SioFifo,
     pub i2c_bus: I2CBus,
 }
-impl SystemComponents {
+impl HardwareComponents {
     pub fn new() -> Self {
         unsafe {
             let mut pac = pac::Peripherals::take().unwrap();

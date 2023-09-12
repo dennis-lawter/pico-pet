@@ -1,4 +1,4 @@
-use crate::system::SystemComponents;
+use crate::hardware::HardwareComponents;
 
 pub mod game_play_state;
 pub mod select_food_state;
@@ -31,11 +31,11 @@ pub enum AppState {
 pub trait State {
     fn new() -> Self;
 
-    fn input(&mut self, system: &mut SystemComponents);
-    fn tick(&mut self, system: &mut SystemComponents);
-    fn sound(&mut self, system: &mut SystemComponents);
-    fn draw(&mut self, system: &mut SystemComponents);
-    fn swap(&mut self, system: &mut SystemComponents);
+    fn input(&mut self, system: &mut HardwareComponents);
+    fn tick(&mut self, system: &mut HardwareComponents);
+    fn sound(&mut self, system: &mut HardwareComponents);
+    fn draw(&mut self, system: &mut HardwareComponents);
+    fn swap(&mut self, system: &mut HardwareComponents);
 
     fn next_state(&self) -> &Option<AppState>;
 }

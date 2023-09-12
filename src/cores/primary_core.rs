@@ -1,14 +1,14 @@
 use crate::{
+    hardware::HardwareComponents,
     states::{
         game_play_state::GamePlayState, select_food_state::SelectFoodState,
         settings_state::SettingsState, state_1::State1, state_2::State2, state_3::State3,
         state_4::State4, state_5::State5, state_6::State6, state_7::State7, state_8::State8,
         AppState, State,
     },
-    system::SystemComponents,
 };
 
-pub fn primary_main_loop(system: &mut SystemComponents) -> ! {
+pub fn primary_main_loop(system: &mut HardwareComponents) -> ! {
     let mut game_play_state: Option<GamePlayState> = Some(GamePlayState::new());
     let mut select_food_state: Option<SelectFoodState> = None;
     let mut state_1: Option<State1> = None;
