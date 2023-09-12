@@ -9,7 +9,7 @@ use crate::{
         text_writer::{self, FontStyle},
     },
     globals,
-    hardware::{Frequency, HardwareComponents, RealTime, LCD_WIDTH},
+    hardware::{Frequency, RealTime, LCD_WIDTH},
     setting_value::Setting,
 };
 
@@ -57,23 +57,24 @@ impl State for SettingsState {
         }
     }
 
-    fn tick(&mut self, system: &mut HardwareComponents) {
-        // TODO: needs to be cached!!
-        self.time = Some(system.get_time());
+    fn tick(&mut self) {
+        let hardware = crate::globals::get_hardware();
+        self.time = Some(hardware.get_time());
 
         self.frame_count += 1;
     }
 
-    fn sound(&mut self, system: &mut HardwareComponents) {
+    fn sound(&mut self) {
+        let hardware = crate::globals::get_hardware();
         let song_index = (self.frame_count / 2) as usize % self.song.len();
         let indexed_frequency = &self.song[song_index];
         if indexed_frequency != &self.current_frequency {
-            system.start_tone(&self.song[song_index]);
+            hardware.start_tone(&self.song[song_index]);
             self.current_frequency = indexed_frequency.clone();
         }
     }
 
-    fn draw(&mut self, _system: &mut HardwareComponents) {
+    fn draw(&mut self) {
         render::flood(0b000_000_00);
 
         let title = "SETTINGS";
@@ -282,18 +283,15 @@ impl State for SettingsState {
         // }
     }
 
-    fn swap(&mut self, system: &mut HardwareComponents) {
-        system.set_backlight();
-        render::draw(&mut system.display);
-    }
+    fn input(&mut self) {
+        let hardware = crate::globals::get_hardware();
 
-    fn input(&mut self, system: &mut HardwareComponents) {
         if !self.input_enabled {
             // release all buttons to enable input
-            if system.key0_pressed()
-                || system.key1_pressed()
-                || system.key2_pressed()
-                || system.key3_pressed()
+            if hardware.key0_pressed()
+                || hardware.key1_pressed()
+                || hardware.key2_pressed()
+                || hardware.key3_pressed()
             {
                 return;
             } else {
@@ -301,14 +299,12 @@ impl State for SettingsState {
             }
         }
 
-        self.check_for_setting_deselected(system);
+        self.check_for_setting_deselected();
         match self.setting_selected {
             SettingSelected::Brightness => {
-                self.adjust_setting(system, unsafe { &mut globals::BRIGHTNESS_SETTING })
+                self.adjust_setting(unsafe { &mut globals::BRIGHTNESS_SETTING })
             }
-            SettingSelected::Volume => {
-                self.adjust_setting(system, unsafe { &mut globals::VOLUME_SETTING })
-            }
+            SettingSelected::Volume => self.adjust_setting(unsafe { &mut globals::VOLUME_SETTING }),
             SettingSelected::Time => {
                 if self.new_time.is_none() {
                     self.new_time = self.time.clone();
@@ -317,7 +313,7 @@ impl State for SettingsState {
                 let new_time_mut = self.new_time.as_mut().unwrap();
 
                 if !self.key0_down && !self.key1_down && !self.key2_down && !self.key3_down {
-                    if system.key1_pressed() {
+                    if hardware.key1_pressed() {
                         match self.new_time_selection {
                             0 => {
                                 if new_time_mut.hr == 00 {
@@ -342,7 +338,7 @@ impl State for SettingsState {
                             }
                             _ => {}
                         }
-                    } else if system.key2_pressed() {
+                    } else if hardware.key2_pressed() {
                         match self.new_time_selection {
                             0 => {
                                 if new_time_mut.hr == 23 {
@@ -369,31 +365,31 @@ impl State for SettingsState {
                         }
                     }
                 } else if !self.key0_down && !self.key1_down && !self.key2_down && self.key3_down {
-                    if !system.key3_pressed() {
+                    if !hardware.key3_pressed() {
                         self.new_time_selection += 1;
                         if self.new_time_selection == 3 {
                             self.setting_selected = SettingSelected::None;
                             self.new_time_selection = 0;
-                            system.set_time(self.new_time.as_mut().unwrap());
+                            hardware.set_time(self.new_time.as_mut().unwrap());
                             self.new_time = None;
                         }
                     }
                 }
             }
             SettingSelected::None => {
-                if system.key0_pressed() {
+                if hardware.key0_pressed() {
                     self.next_state = Some(AppState::GamePlay);
                     return;
                 }
-                self.check_for_setting_selected(system);
-                self.check_for_move_highlight(system);
+                self.check_for_setting_selected();
+                self.check_for_move_highlight();
             }
         }
 
-        self.key0_down = system.key0_pressed();
-        self.key1_down = system.key1_pressed();
-        self.key2_down = system.key2_pressed();
-        self.key3_down = system.key3_pressed();
+        self.key0_down = hardware.key0_pressed();
+        self.key1_down = hardware.key1_pressed();
+        self.key2_down = hardware.key2_pressed();
+        self.key3_down = hardware.key3_pressed();
     }
 
     fn next_state(&self) -> &Option<super::AppState> {
@@ -402,15 +398,16 @@ impl State for SettingsState {
 }
 
 impl SettingsState {
-    fn adjust_setting(&mut self, system: &mut HardwareComponents, setting: &mut Setting) {
-        if system.key1_pressed() && !system.key2_pressed() {
+    fn adjust_setting(&mut self, setting: &mut Setting) {
+        let hardware = crate::globals::get_hardware();
+        if hardware.key1_pressed() && !hardware.key2_pressed() {
             if self.key_repeat_slowdown_timer == 0 {
                 self.key_repeat_slowdown_timer = KEY_REPEAT_FRAMES;
                 setting.dec();
             } else {
                 self.key_repeat_slowdown_timer -= 1;
             }
-        } else if system.key2_pressed() && !system.key1_pressed() {
+        } else if hardware.key2_pressed() && !hardware.key1_pressed() {
             if self.key_repeat_slowdown_timer == 0 {
                 self.key_repeat_slowdown_timer = 5;
                 setting.inc();
@@ -422,39 +419,42 @@ impl SettingsState {
         }
     }
 
-    fn check_for_setting_selected(&mut self, system: &mut HardwareComponents) {
+    fn check_for_setting_selected(&mut self) {
+        let hardware = crate::globals::get_hardware();
         if self.setting_selected != SettingSelected::None {
             return;
         }
-        if self.key3_down && !system.key3_pressed() {
+        if self.key3_down && !hardware.key3_pressed() {
             self.setting_selected = self.setting_highlighted.clone();
         }
     }
 
-    fn check_for_setting_deselected(&mut self, system: &mut HardwareComponents) {
+    fn check_for_setting_deselected(&mut self) {
+        let hardware = crate::globals::get_hardware();
         if self.setting_selected == SettingSelected::None {
             return;
         }
-        if self.key0_down && !system.key0_pressed() {
+        if self.key0_down && !hardware.key0_pressed() {
             self.new_time = None;
             self.setting_selected = SettingSelected::None;
         }
     }
 
-    fn check_for_move_highlight(&mut self, system: &mut HardwareComponents) {
+    fn check_for_move_highlight(&mut self) {
+        let hardware = crate::globals::get_hardware();
         if self.setting_selected != SettingSelected::None {
             return;
         }
-        if system.key2_pressed() && system.key3_pressed() {
+        if hardware.key2_pressed() && hardware.key3_pressed() {
             return;
         }
-        if system.key1_pressed() && system.key2_pressed() {
+        if hardware.key1_pressed() && hardware.key2_pressed() {
             return;
         }
-        if self.key2_down && !system.key2_pressed() {
+        if self.key2_down && !hardware.key2_pressed() {
             self.setting_highlighted = self.setting_highlighted.next().clone();
         }
-        if self.key1_down && !system.key1_pressed() {
+        if self.key1_down && !hardware.key1_pressed() {
             self.setting_highlighted = self.setting_highlighted.prev().clone();
         }
     }

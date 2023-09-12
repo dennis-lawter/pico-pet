@@ -21,31 +21,29 @@ impl State for State1 {
         }
     }
 
-    fn input(&mut self, system: &mut crate::hardware::HardwareComponents) {
-        if !system.key0_pressed() && self.key0_down {
+    fn input(&mut self) {
+        let hardware = crate::globals::get_hardware();
+        if !hardware.key0_pressed() && self.key0_down {
             self.next_state = Some(AppState::GamePlay);
         }
-        self.key0_down = system.key0_pressed();
-        self.key1_down = system.key1_pressed();
-        self.key2_down = system.key2_pressed();
-        self.key3_down = system.key3_pressed();
+        self.key0_down = hardware.key0_pressed();
+        self.key1_down = hardware.key1_pressed();
+        self.key2_down = hardware.key2_pressed();
+        self.key3_down = hardware.key3_pressed();
     }
 
-    fn tick(&mut self, _system: &mut crate::hardware::HardwareComponents) {
+    fn tick(&mut self) {
         //
     }
 
-    fn sound(&mut self, system: &mut crate::hardware::HardwareComponents) {
-        system.end_tone();
+    fn sound(&mut self) {
+        let hardware = crate::globals::get_hardware();
+        hardware.end_tone();
     }
 
-    fn draw(&mut self, _system: &mut crate::hardware::HardwareComponents) {
+    fn draw(&mut self) {
         render::flood(0b000_000_00);
         text_writer::full_dialog_box("NOT IMPL", "todo!()");
-    }
-
-    fn swap(&mut self, system: &mut crate::hardware::HardwareComponents) {
-        render::draw(&mut system.display);
     }
 
     fn next_state(&self) -> &Option<super::AppState> {

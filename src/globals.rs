@@ -9,3 +9,9 @@ pub static mut VOLUME_SETTING: Setting = Setting {
     max_value: 4,
 };
 pub static mut HARDWARE: Option<HardwareComponents> = None;
+pub fn init_hardware() {
+    unsafe { self::HARDWARE = Some(HardwareComponents::new()) }
+}
+pub fn get_hardware() -> &'static mut HardwareComponents {
+    unsafe { self::HARDWARE.as_mut().unwrap() }
+}

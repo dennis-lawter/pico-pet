@@ -5,7 +5,7 @@ use crate::{
         render,
         sprite::{Sprite, SpriteFactory},
     },
-    hardware::{Frequency, HardwareComponents},
+    hardware::Frequency,
 };
 
 use self::menu_selection::MenuSelection;
@@ -47,7 +47,7 @@ impl State for GamePlayState<'static> {
         }
     }
 
-    fn tick(&mut self, _system: &mut HardwareComponents) {
+    fn tick(&mut self) {
         self.frame_count += 1;
         if self.frame_count % 80 == 20 || self.frame_count % 80 == 0 {
             self.ferris.x -= 8;
@@ -56,26 +56,27 @@ impl State for GamePlayState<'static> {
         }
     }
 
-    fn sound(&mut self, system: &mut HardwareComponents) {
+    fn sound(&mut self) {
+        let hardware = crate::globals::get_hardware();
         if self.menu_select_tone_timer > 0 {
             self.menu_select_tone_timer -= 1;
-            system.start_tone(&Frequency::Ds6);
+            hardware.start_tone(&Frequency::Ds6);
         } else {
             if (self.frame_count / 20) % 2 == 1 {
                 if self.frame_count % 4 == 0 {
-                    system.start_tone(&Frequency::C4);
+                    hardware.start_tone(&Frequency::C4);
                 } else if self.frame_count % 4 == 2 {
-                    system.start_tone(&Frequency::A4);
+                    hardware.start_tone(&Frequency::A4);
                 } else {
-                    system.start_tone(&Frequency::None);
+                    hardware.start_tone(&Frequency::None);
                 }
             } else {
-                system.end_tone();
+                hardware.end_tone();
             }
         }
     }
 
-    fn draw(&mut self, _system: &mut HardwareComponents) {
+    fn draw(&mut self) {
         render::flood(0b010_010_01);
 
         self.ferris.draw(((self.frame_count / 20) % 2) as usize);
@@ -98,30 +99,26 @@ impl State for GamePlayState<'static> {
         render::fancy_border(sel_x as i32, sel_y as i32, 24, 24);
     }
 
-    fn swap(&mut self, system: &mut HardwareComponents) {
-        system.set_backlight();
-        render::draw(&mut system.display);
-    }
-
-    fn input(&mut self, system: &mut HardwareComponents) {
-        if !(system.key1_pressed() && system.key2_pressed()) {
-            if system.key1_pressed() && !self.key1_down {
+    fn input(&mut self) {
+        let hardware = crate::globals::get_hardware();
+        if !(hardware.key1_pressed() && hardware.key2_pressed()) {
+            if hardware.key1_pressed() && !self.key1_down {
                 self.menu_item_selected = self.menu_item_selected.prev();
                 self.menu_select_tone_timer = 3;
-            } else if system.key2_pressed() && !self.key2_down {
+            } else if hardware.key2_pressed() && !self.key2_down {
                 self.menu_item_selected = self.menu_item_selected.next();
                 self.menu_select_tone_timer = 3;
             }
         }
 
-        if !system.key3_pressed() && self.key3_down {
+        if !hardware.key3_pressed() && self.key3_down {
             self.menu_button_confirmed();
         }
 
-        self.key0_down = system.key0_pressed();
-        self.key1_down = system.key1_pressed();
-        self.key2_down = system.key2_pressed();
-        self.key3_down = system.key3_pressed();
+        self.key0_down = hardware.key0_pressed();
+        self.key1_down = hardware.key1_pressed();
+        self.key2_down = hardware.key2_pressed();
+        self.key3_down = hardware.key3_pressed();
     }
 
     fn next_state(&self) -> &Option<super::AppState> {

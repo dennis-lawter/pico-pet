@@ -22,8 +22,6 @@ mod hardware;
 mod setting_value;
 mod states;
 
-use crate::hardware::HardwareComponents;
-
 use waveshare_rp2040_lcd_0_96::{entry, hal::multicore::Multicore};
 
 #[allow(unused_imports)]
@@ -39,21 +37,21 @@ fn main() -> ! {
 }
 
 fn init_globals() {
-    unsafe { globals::HARDWARE = Some(HardwareComponents::new()) }
+    globals::init_hardware();
     display::text_writer::init_singleton_fonts();
 }
 
 fn spawn_secondary_core_worker() {
     unsafe {
-        let system = &mut globals::HARDWARE.as_mut().unwrap();
+        let hardware = globals::get_hardware();
         let mut mc = Multicore::new(
-            &mut *system.psm_ptr,
-            &mut *system.ppb_ptr,
-            &mut *system.fifo_ptr,
+            &mut *hardware.psm_ptr,
+            &mut *hardware.ppb_ptr,
+            &mut *hardware.fifo_ptr,
         );
         let cores = &mut mc.cores();
         let core1 = &mut cores[1];
-        let sys_freq = system.sys_freq;
+        let sys_freq = hardware.sys_freq;
         let _test = core1.spawn(&mut cores::secondary_core::CORE1_STACK.mem, move || {
             cores::secondary_main_loop(sys_freq)
         });
