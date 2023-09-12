@@ -37,8 +37,8 @@ type DisplayRst = hal::gpio::Pin<hal::gpio::bank0::Gpio12, hal::gpio::Output<hal
 pub type Lcd = ST7735<DisplaySdi, DisplayDc, DisplayRst>;
 
 type LcdBlPinChannel = hal::pwm::Channel<hal::pwm::Pwm6, hal::pwm::FreeRunning, hal::pwm::B>;
-type BuzzerPinChannel = hal::pwm::Channel<hal::pwm::Pwm0, hal::pwm::FreeRunning, hal::pwm::A>;
-type BuzzerPwmSlice = hal::pwm::Slice<hal::pwm::Pwm0, hal::pwm::FreeRunning>;
+type BuzzerPinChannel = hal::pwm::Channel<hal::pwm::Pwm2, hal::pwm::FreeRunning, hal::pwm::A>;
+type BuzzerPwmSlice = hal::pwm::Slice<hal::pwm::Pwm2, hal::pwm::FreeRunning>;
 
 type Key0Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio15, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key1Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio17, hal::gpio::Input<hal::gpio::PullUp>>;
@@ -106,7 +106,7 @@ impl SystemComponents {
 
             // Configure buzzer PWM slice
             let buzzer_pwm_slice_ptr: *mut BuzzerPwmSlice =
-                &mut pwm_slices.pwm0 as *mut BuzzerPwmSlice;
+                &mut pwm_slices.pwm2 as *mut BuzzerPwmSlice;
 
             // Output channel B on PWM6 to GPIO 13
             let backlight_channel_ptr = &mut pwm6.channel_b as *mut LcdBlPinChannel;
@@ -116,7 +116,7 @@ impl SystemComponents {
 
             let buzzer_channel_ptr =
                 &mut (*buzzer_pwm_slice_ptr).channel_a as *mut BuzzerPinChannel;
-            (*buzzer_channel_ptr).output_to(pins.gpio0);
+            (*buzzer_channel_ptr).output_to(pins.gpio4);
             (*buzzer_channel_ptr).set_duty(0);
 
             (*buzzer_pwm_slice_ptr).set_ph_correct();
