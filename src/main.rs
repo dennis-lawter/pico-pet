@@ -38,6 +38,7 @@ fn main() -> ! {
 
 fn init_globals() {
     globals::init_hardware();
+    globals::init_input();
     display::text_writer::init_singleton_fonts();
 }
 

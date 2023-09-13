@@ -8,6 +8,8 @@ pub fn primary_main_loop() -> ! {
     state_manager.active_state = AppState::GamePlay;
 
     loop {
+        let input = crate::globals::get_input();
+        input.update();
         state_manager.update_and_draw();
 
         swap();
