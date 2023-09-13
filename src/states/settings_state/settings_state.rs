@@ -1,6 +1,7 @@
 use fixedstr::str_format;
 
 use crate::hardware::audio::AudioFrequency;
+use crate::hardware::input::KeyNames;
 use crate::hardware::rtc::RealTime;
 use crate::states::{AppState, State};
 use crate::{
@@ -16,18 +17,11 @@ use crate::{
 use super::setting_selected::SettingSelected;
 use super::song;
 
-const KEY_REPEAT_FRAMES: u8 = 5;
-
 pub struct SettingsState {
     frame_count: u32,
-    key_repeat_slowdown_timer: u8,
     next_state: Option<AppState>,
     song: [AudioFrequency; 396],
     current_frequency: AudioFrequency,
-    key0_down: bool,
-    key1_down: bool,
-    key2_down: bool,
-    key3_down: bool,
     setting_selected: SettingSelected,
     setting_highlighted: SettingSelected,
     input_enabled: bool,
@@ -244,14 +238,15 @@ impl State for SettingsState {
     }
 
     fn input(&mut self) {
+        let input = crate::globals::get_input();
         let hardware = crate::globals::get_hardware();
 
         if !self.input_enabled {
             // release all buttons to enable input
-            if hardware.key0_pressed()
-                || hardware.key1_pressed()
-                || hardware.key2_pressed()
-                || hardware.key3_pressed()
+            if input.get_state(&KeyNames::Back).is_down
+                || input.get_state(&KeyNames::Left).is_down
+                || input.get_state(&KeyNames::Right).is_down
+                || input.get_state(&KeyNames::Confirm).is_down
             {
                 return;
             } else {
@@ -259,7 +254,10 @@ impl State for SettingsState {
             }
         }
 
-        self.check_for_setting_deselected();
+        if self.check_for_setting_deselected() {
+            return; // our action this frame will be to deselect, prevents auto-exit menu
+        }
+
         match self.setting_selected {
             SettingSelected::Brightness => {
                 self.adjust_setting(unsafe { &mut globals::BRIGHTNESS_SETTING })
@@ -272,72 +270,68 @@ impl State for SettingsState {
                 }
                 let new_time_mut = self.new_time.as_mut().unwrap();
 
-                if !self.key0_down && !self.key1_down && !self.key2_down && !self.key3_down {
-                    if hardware.key1_pressed() {
-                        match self.new_time_selection {
-                            0 => {
-                                if new_time_mut.hr == 00 {
-                                    new_time_mut.hr = 23;
-                                } else {
-                                    new_time_mut.hr -= 1;
-                                }
+                if input.get_state(&KeyNames::Left).just_pressed {
+                    match self.new_time_selection {
+                        0 => {
+                            if new_time_mut.hr == 00 {
+                                new_time_mut.hr = 23;
+                            } else {
+                                new_time_mut.hr -= 1;
                             }
-                            1 => {
-                                if new_time_mut.min == 00 {
-                                    new_time_mut.min = 59;
-                                } else {
-                                    new_time_mut.min -= 1;
-                                }
-                            }
-                            2 => {
-                                if new_time_mut.sec == 00 {
-                                    new_time_mut.sec = 59;
-                                } else {
-                                    new_time_mut.sec -= 1;
-                                }
-                            }
-                            _ => {}
                         }
-                    } else if hardware.key2_pressed() {
-                        match self.new_time_selection {
-                            0 => {
-                                if new_time_mut.hr == 23 {
-                                    new_time_mut.hr = 0;
-                                } else {
-                                    new_time_mut.hr += 1;
-                                }
+                        1 => {
+                            if new_time_mut.min == 00 {
+                                new_time_mut.min = 59;
+                            } else {
+                                new_time_mut.min -= 1;
                             }
-                            1 => {
-                                if new_time_mut.min == 59 {
-                                    new_time_mut.min = 0;
-                                } else {
-                                    new_time_mut.min += 1;
-                                }
-                            }
-                            2 => {
-                                if new_time_mut.sec == 59 {
-                                    new_time_mut.sec = 0;
-                                } else {
-                                    new_time_mut.sec += 1;
-                                }
-                            }
-                            _ => {}
                         }
+                        2 => {
+                            if new_time_mut.sec == 00 {
+                                new_time_mut.sec = 59;
+                            } else {
+                                new_time_mut.sec -= 1;
+                            }
+                        }
+                        _ => {}
                     }
-                } else if !self.key0_down && !self.key1_down && !self.key2_down && self.key3_down {
-                    if !hardware.key3_pressed() {
-                        self.new_time_selection += 1;
-                        if self.new_time_selection == 3 {
-                            self.setting_selected = SettingSelected::None;
-                            self.new_time_selection = 0;
-                            hardware.set_time(self.new_time.as_mut().unwrap());
-                            self.new_time = None;
+                } else if input.get_state(&KeyNames::Right).just_pressed {
+                    match self.new_time_selection {
+                        0 => {
+                            if new_time_mut.hr == 23 {
+                                new_time_mut.hr = 0;
+                            } else {
+                                new_time_mut.hr += 1;
+                            }
                         }
+                        1 => {
+                            if new_time_mut.min == 59 {
+                                new_time_mut.min = 0;
+                            } else {
+                                new_time_mut.min += 1;
+                            }
+                        }
+                        2 => {
+                            if new_time_mut.sec == 59 {
+                                new_time_mut.sec = 0;
+                            } else {
+                                new_time_mut.sec += 1;
+                            }
+                        }
+                        _ => {}
+                    }
+                } else if input.get_state(&KeyNames::Confirm).just_released {
+                    self.new_time_selection += 1;
+                    if self.new_time_selection == 3 {
+                        self.setting_selected = SettingSelected::None;
+                        self.new_time_selection = 0;
+                        hardware.set_time(self.new_time.as_mut().unwrap());
+                        self.new_time = None;
                     }
                 }
             }
             SettingSelected::None => {
-                if hardware.key0_pressed() {
+                if input.get_state(&KeyNames::Back).just_released {
                     self.next_state = Some(AppState::GamePlay);
                     return;
                 }
@@ -345,11 +339,6 @@ impl State for SettingsState {
                 self.check_for_move_highlight();
             }
         }
-
-        self.key0_down = hardware.key0_pressed();
-        self.key1_down = hardware.key1_pressed();
-        self.key2_down = hardware.key2_pressed();
-        self.key3_down = hardware.key3_pressed();
     }
 
     fn next_state(&self) -> &Option<AppState> {
@@ -361,14 +350,9 @@ impl SettingsState {
     pub fn new() -> Self {
         Self {
             frame_count: 0,
-            key_repeat_slowdown_timer: 0,
             next_state: None,
             song: song::BALL_GAME,
             current_frequency: AudioFrequency::None,
-            key0_down: false,
-            key1_down: false,
-            key2_down: false,
-            key3_down: false,
             setting_selected: SettingSelected::None,
             setting_highlighted: SettingSelected::None,
             input_enabled: false,
@@ -379,62 +363,59 @@ impl SettingsState {
     }
 
     fn adjust_setting(&mut self, setting: &mut Setting) {
-        let hardware = crate::globals::get_hardware();
-        if hardware.key1_pressed() && !hardware.key2_pressed() {
-            if self.key_repeat_slowdown_timer == 0 {
-                self.key_repeat_slowdown_timer = KEY_REPEAT_FRAMES;
-                setting.dec();
-            } else {
-                self.key_repeat_slowdown_timer -= 1;
-            }
-        } else if hardware.key2_pressed() && !hardware.key1_pressed() {
-            if self.key_repeat_slowdown_timer == 0 {
-                self.key_repeat_slowdown_timer = 5;
-                setting.inc();
-            } else {
-                self.key_repeat_slowdown_timer -= 1;
-            }
-        } else {
-            self.key_repeat_slowdown_timer = 0;
+        let input = crate::globals::get_input();
+
+        if input.get_state(&KeyNames::Left).is_down && input.get_state(&KeyNames::Right).is_down {
+            return;
+        }
+
+        if input.get_state(&KeyNames::Left).key_repeat_triggered {
+            setting.dec();
+        } else if input.get_state(&KeyNames::Right).key_repeat_triggered {
+            setting.inc();
         }
     }
 
     fn check_for_setting_selected(&mut self) {
-        let hardware = crate::globals::get_hardware();
+        let input = crate::globals::get_input();
+
         if self.setting_selected != SettingSelected::None {
             return;
         }
-        if self.key3_down && !hardware.key3_pressed() {
+
+        if input.get_state(&KeyNames::Confirm).just_released {
             self.setting_selected = self.setting_highlighted.clone();
         }
     }
 
-    fn check_for_setting_deselected(&mut self) {
-        let hardware = crate::globals::get_hardware();
-        if self.setting_selected == SettingSelected::None {
-            return;
-        }
-        if self.key0_down && !hardware.key0_pressed() {
+    fn check_for_setting_deselected(&mut self) -> bool {
+        let input = crate::globals::get_input();
+
+        if self.setting_selected != SettingSelected::None
+            && input.get_state(&KeyNames::Back).just_released
+        {
             self.new_time = None;
             self.setting_selected = SettingSelected::None;
+
+            true
+        } else {
+            false
         }
     }
 
     fn check_for_move_highlight(&mut self) {
-        let hardware = crate::globals::get_hardware();
+        let input = crate::globals::get_input();
+
         if self.setting_selected != SettingSelected::None {
             return;
         }
-        if hardware.key2_pressed() && hardware.key3_pressed() {
+        if input.get_state(&KeyNames::Left).is_down && input.get_state(&KeyNames::Right).is_down {
             return;
         }
-        if hardware.key1_pressed() && hardware.key2_pressed() {
-            return;
-        }
-        if self.key2_down && !hardware.key2_pressed() {
+
+        if input.get_state(&KeyNames::Right).just_pressed {
             self.setting_highlighted = self.setting_highlighted.next().clone();
-        }
-        if self.key1_down && !hardware.key1_pressed() {
+        } else if input.get_state(&KeyNames::Left).just_pressed {
             self.setting_highlighted = self.setting_highlighted.prev().clone();
         }
     }
