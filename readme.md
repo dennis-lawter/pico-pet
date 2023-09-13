@@ -76,7 +76,7 @@ graph LR
 
 
 
-    subgraph RTC
+    subgraph RTC_NVM
         RTC_SDA
         RTC_SCL
     end

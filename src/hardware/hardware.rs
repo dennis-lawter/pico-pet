@@ -283,6 +283,7 @@ impl HardwareComponents {
         let mut buffer = [0u8; 7];
         self.i2c_bus.write(0x68, &[0x00]).unwrap();
         self.i2c_bus.read(0x68, &mut buffer).unwrap();
+
         let sec = RealTime::bcd_to_dec(buffer[0]);
         let min = RealTime::bcd_to_dec(buffer[1]);
         let hr = RealTime::bcd_to_dec(buffer[2]);
@@ -298,5 +299,39 @@ impl HardwareComponents {
         let data = [0x00, sec_bcd, min_bcd, hr_bcd];
 
         self.i2c_bus.write(0x68, &data).unwrap();
+    }
+
+    fn page_to_address(page: u16) -> [u8; 2] {
+        [
+            ((page & 0xFF00) >> 5) as u8, // MSB
+            ((page & 0xFF) << 3) as u8,   // LSB
+        ]
+    }
+
+    pub fn get_nvm_page(&mut self, page: u16) -> [u8; 8] {
+        let mut buffer = [0u8; 8];
+
+        let address = Self::page_to_address(page);
+
+        self.i2c_bus.write(0x57, &address).unwrap();
+        self.i2c_bus.read(0x57, &mut buffer).unwrap();
+
+        buffer
+    }
+
+    pub fn write_nvm_page(&mut self, page: u16, data: &[u8; 8]) {
+        let address = Self::page_to_address(page);
+
+        // We need to send address and data together in one write operation.
+        // Therefore, creating a buffer that holds both address and data.
+        let mut buffer = [0u8; 10];
+        buffer[0] = address[0];
+        buffer[1] = address[1];
+        buffer[2..].copy_from_slice(data);
+
+        self.i2c_bus.write(0x57, &buffer).unwrap();
+
+        // wait for the EEPROM to complete its write
+        self.delay.delay_ms(5);
     }
 }

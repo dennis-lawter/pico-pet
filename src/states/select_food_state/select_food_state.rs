@@ -9,6 +9,8 @@ pub struct SelectFoodState {
     key2_down: bool,
     key3_down: bool,
     next_state: Option<AppState>,
+    frame_count: usize,
+    last_page_seen: u16,
 }
 
 impl State for SelectFoodState {
@@ -24,7 +26,7 @@ impl State for SelectFoodState {
     }
 
     fn tick(&mut self) {
-        //
+        self.frame_count += 1;
     }
 
     fn sound(&mut self) {
@@ -35,6 +37,57 @@ impl State for SelectFoodState {
     fn draw(&mut self) {
         render::flood(0b000_000_00);
         text_writer::full_dialog_box("NOT IMPL", "todo!()");
+
+        // DEBUGGING
+        let hardware = crate::globals::get_hardware();
+
+        let page = ((self.frame_count / 20) % 512) as u16;
+        if page != self.last_page_seen {
+            // write on the page change
+            // let buffer = [
+            //     ((page << 3) & 0xFF) as u8,
+            //     ((page << 3) & 0xFF) as u8 + 1,
+            //     ((page << 3) & 0xFF) as u8 + 2,
+            //     ((page << 3) & 0xFF) as u8 + 3,
+            //     ((page << 3) & 0xFF) as u8 + 4,
+            //     ((page << 3) & 0xFF) as u8 + 5,
+            //     ((page << 3) & 0xFF) as u8 + 6,
+            //     ((page << 3) & 0xFF) as u8 + 7,
+            // ];
+            // hardware.write_nvm_page(page, &buffer);
+
+            self.last_page_seen = page;
+        }
+        let page_str = fixedstr::str_format!(fixedstr::str32, "page {:#06x}", page);
+        text_writer::draw_text(
+            6,
+            32,
+            text_writer::FontStyle::Small,
+            0b000_101_00,
+            page_str.as_str(),
+        );
+
+        // read
+        let page = hardware.get_nvm_page(page);
+        let page_str = fixedstr::str_format!(
+            fixedstr::str32,
+            "{:02x} {:02x} {:02x} {:02x} {:02x} {:02x} {:02x} {:02x}",
+            page[0],
+            page[1],
+            page[2],
+            page[3],
+            page[4],
+            page[5],
+            page[6],
+            page[7]
+        );
+        text_writer::draw_text(
+            6,
+            32 + 8,
+            text_writer::FontStyle::Small,
+            0b000_000_00,
+            page_str.as_str(),
+        );
     }
 
     fn next_state(&self) -> &Option<AppState> {
@@ -49,6 +102,8 @@ impl SelectFoodState {
             key2_down: false,
             key3_down: false,
             next_state: None,
+            frame_count: 0,
+            last_page_seen: 511,
         }
     }
 }
