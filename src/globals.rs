@@ -1,4 +1,4 @@
-use crate::{hardware::HardwareComponents, setting_value::Setting};
+use crate::{hardware::hardware::HardwareComponents, setting_value::Setting};
 
 pub static mut BRIGHTNESS_SETTING: Setting = Setting {
     value: 15,

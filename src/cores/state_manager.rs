@@ -8,7 +8,7 @@ pub struct StateManager<'a> {
     pub game_play_state: Option<GamePlayState<'a>>,
     pub select_food_state: Option<SelectFoodState>,
     pub state_nyi: Option<StateNyi>,
-    pub menu_state: Option<SettingsState>,
+    pub settings_state: Option<SettingsState>,
 
     pub active_state: AppState,
 }
@@ -17,7 +17,7 @@ impl StateManager<'static> {
         match self.active_state {
             AppState::GamePlay => self.game_play_state.as_mut().unwrap(),
             AppState::SelectFood => self.select_food_state.as_mut().unwrap(),
-            AppState::Settings => self.menu_state.as_mut().unwrap(),
+            AppState::Settings => self.settings_state.as_mut().unwrap(),
             _ => self.state_nyi.as_mut().unwrap(),
         }
     }
@@ -38,11 +38,11 @@ impl StateManager<'static> {
                 self.game_play_state = None;
                 self.select_food_state = None;
                 self.state_nyi = None;
-                self.menu_state = None;
+                self.settings_state = None;
                 match next_state {
                     AppState::GamePlay => self.game_play_state = Some(GamePlayState::new()),
                     AppState::SelectFood => self.select_food_state = Some(SelectFoodState::new()),
-                    AppState::Settings => self.menu_state = Some(SettingsState::new()),
+                    AppState::Settings => self.settings_state = Some(SettingsState::new()),
                     _ => self.state_nyi = Some(StateNyi::new()),
                 }
             }
