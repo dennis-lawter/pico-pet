@@ -1,5 +1,19 @@
 # Pico Pet
 
+## NVM Utilization
+The NVM (Non-Volatile Memory) module offers 4KiB arranged in 512 pages of 8 bytes each.
+
+Permanent storage must be serializable to a specified number of pages, and write to an assigned page address.
+
+Pages are addressed from hexidecimal 0x000 to 0x1ff.
+
+| Page Start | Page End | Module |
+| --- | --- | --- |
+| 000 | 000 | Settings |
+<!-- proposed ranges for future NVM structs -->
+<!--| 001 | 00f | Current Pet |-->
+<!--| 010 | 01f | Inventory |-->
+
 ## Pin Out
 
 ```mermaid
