@@ -1,27 +1,27 @@
-pub mod parity;
+pub mod header;
 pub mod settings;
 
-pub use self::parity::NvmParity;
+pub use self::header::NvmHeader;
 pub use self::settings::NvmSettings;
 
 pub const NVM_BLANK: u8 = 0xff;
 pub const NUM_PAGES_IN_USE: u16 = 2;
 
 pub struct Nvm {
-    pub parity: NvmParity,
+    pub parity: NvmHeader,
     pub settings: NvmSettings,
 }
 impl Default for Nvm {
     fn default() -> Self {
         Self {
-            parity: NvmParity::default(),
+            parity: NvmHeader::default(),
             settings: NvmSettings::default(),
         }
     }
 }
 impl Nvm {
     pub fn load_or_write_default() -> Self {
-        match NvmParity::try_load() {
+        match NvmHeader::try_load() {
             Some(parity) => {
                 let new_nvm = Self {
                     parity,

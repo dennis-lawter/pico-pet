@@ -4,10 +4,10 @@ const NVM_PARITY_PAGE: u16 = 0x000;
 
 const NVM_SENTINEL: u8 = 0x69;
 
-pub struct NvmParity {
+pub struct NvmHeader {
     pub data: [u8; 8],
 }
-impl Default for NvmParity {
+impl Default for NvmHeader {
     fn default() -> Self {
         Self {
             data: [
@@ -23,7 +23,7 @@ impl Default for NvmParity {
         }
     }
 }
-impl NvmParity {
+impl NvmHeader {
     pub fn try_load() -> Option<Self> {
         let hardware = crate::globals::get_hardware();
         let data = hardware.get_nvm_page(NVM_PARITY_PAGE);
