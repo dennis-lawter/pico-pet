@@ -116,6 +116,14 @@ pub fn v_solid_line(x0: i32, y0: i32, h: usize, color: u8) {
     fill_rect(x0, y0, 1, h, color)
 }
 
+pub fn solid_line_rect(x0: i32, y0: i32, w: usize, h: usize, color: u8) {
+    h_solid_line(x0, y0, w, color);
+    h_solid_line(x0, y0 + h as i32 - 1, w, color);
+
+    v_solid_line(x0, y0, h, color);
+    v_solid_line(x0 + w as i32 - 1, y0, h, color);
+}
+
 pub fn h_dithered_line(x0: i32, y0: i32, w: usize, color: u8) {
     if y0 < 0 || y0 >= LCD_HEIGHT as i32 {
         return;

@@ -6,6 +6,12 @@ pub struct Setting {
     pub max_value: u8,
 }
 
+const EMPTY_LEFT_BRACKET: u8 = b'[';
+const EMPTY_RIGHT_BRACKET: u8 = b']';
+const SLIDER_ACTIVE: u8 = b'5';
+const BAR_FILLED: u8 = b'4';
+const BAR_EMPTY: u8 = b'=';
+
 impl Setting {
     pub fn get_value(&self) -> u8 {
         self.value
@@ -20,33 +26,43 @@ impl Setting {
     }
 
     pub fn generate_bar(&self, active: bool) -> &'static str {
-        static mut BUFFER: [u8; SETTING_BAR_SIZE + 1] = [b'='; SETTING_BAR_SIZE + 1];
+        static mut BUFFER: [u8; SETTING_BAR_SIZE + 1] = [BAR_EMPTY; SETTING_BAR_SIZE + 1];
 
         let value_out_of_15 = (((self.value as u32) * 15) / (self.max_value as u32)) as usize;
 
         unsafe {
             BUFFER[0] = if self.value == 0 {
                 if active {
-                    b'5'
+                    SLIDER_ACTIVE
                 } else {
-                    b'['
+                    EMPTY_LEFT_BRACKET
                 }
             } else {
-                b'4'
+                BAR_FILLED
+            };
+            BUFFER[SETTING_BAR_SIZE] = if self.value == self.max_value {
+                if active {
+                    SLIDER_ACTIVE
+                } else {
+                    BAR_FILLED
+                }
+            } else {
+                EMPTY_RIGHT_BRACKET
             };
 
-            BUFFER[SETTING_BAR_SIZE] = b']';
             for i in 1..SETTING_BAR_SIZE {
                 BUFFER[i] = match i.cmp(&value_out_of_15) {
-                    core::cmp::Ordering::Less => b'4',
+                    core::cmp::Ordering::Less => BAR_FILLED,
                     core::cmp::Ordering::Equal => {
                         if active {
-                            b'5'
+                            SLIDER_ACTIVE
+                        } else if self.value == self.max_value {
+                            BAR_FILLED
                         } else {
-                            b'4'
+                            BAR_EMPTY
                         }
                     }
-                    _ => b'=',
+                    _ => BAR_EMPTY,
                 };
             }
 

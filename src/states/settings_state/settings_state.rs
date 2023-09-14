@@ -17,6 +17,8 @@ use crate::{
 use super::setting_selected::SettingSelected;
 use super::song;
 
+const FRAMES_TO_RESET: u8 = 5 * 16 - 2;
+
 pub struct SettingsState {
     frame_count: u32,
     next_state: Option<AppState>,
@@ -28,6 +30,8 @@ pub struct SettingsState {
     time: Option<RealTime>,
     new_time: Option<RealTime>,
     new_time_selection: u8,
+
+    frames_reset_button_held: u8,
 }
 impl State for SettingsState {
     fn tick(&mut self) {
@@ -54,6 +58,233 @@ impl State for SettingsState {
         let menu_body = "";
         text_writer::full_dialog_box(title, menu_body);
 
+        self.display_cursor();
+
+        self.display_brightness_setting();
+
+        self.display_volume_setting();
+
+        self.display_time_adjustment_setting();
+
+        self.display_reset_setting();
+    }
+
+    fn input(&mut self) {
+        let input = crate::globals::get_input();
+
+        if !self.input_enabled {
+            // release all buttons to enable input
+            if input.get_state(&KeyNames::Back).is_down
+                || input.get_state(&KeyNames::Left).is_down
+                || input.get_state(&KeyNames::Right).is_down
+                || input.get_state(&KeyNames::Confirm).is_down
+            {
+                return;
+            } else {
+                self.input_enabled = true;
+            }
+        }
+
+        if self.check_for_setting_deselected() {
+            return; // our action this frame will be to deselect, prevents auto-exit menu
+        }
+
+        match self.setting_selected {
+            SettingSelected::Brightness => {
+                self.adjust_setting(unsafe { &mut globals::BRIGHTNESS_SETTING });
+            }
+            SettingSelected::Volume => {
+                self.adjust_setting(unsafe { &mut globals::VOLUME_SETTING });
+            }
+            SettingSelected::Time => {
+                self.adjust_time();
+            }
+            SettingSelected::Reset => {
+                self.process_reset();
+            }
+            SettingSelected::None => {
+                if input.get_state(&KeyNames::Back).just_released {
+                    self.next_state = Some(AppState::GamePlay);
+                    return;
+                }
+                self.check_for_setting_selected();
+                self.check_for_move_highlight();
+            }
+        }
+    }
+
+    fn next_state(&self) -> &Option<AppState> {
+        &self.next_state
+    }
+}
+
+impl SettingsState {
+    pub fn new() -> Self {
+        Self {
+            frame_count: 0,
+            next_state: None,
+            song: song::BALL_GAME,
+            current_frequency: AudioFrequency::None,
+            setting_selected: SettingSelected::None,
+            setting_highlighted: SettingSelected::None,
+            input_enabled: false,
+            time: None,
+            new_time: None,
+            new_time_selection: 0,
+            frames_reset_button_held: 0,
+        }
+    }
+
+    fn adjust_setting(&mut self, setting: &mut Setting) {
+        let input = crate::globals::get_input();
+
+        if input.get_state(&KeyNames::Left).is_down && input.get_state(&KeyNames::Right).is_down {
+            return;
+        }
+
+        if input.get_state(&KeyNames::Left).key_repeat_triggered {
+            setting.dec();
+        } else if input.get_state(&KeyNames::Right).key_repeat_triggered {
+            setting.inc();
+        }
+    }
+
+    fn check_for_setting_selected(&mut self) {
+        let input = crate::globals::get_input();
+
+        if self.setting_selected != SettingSelected::None {
+            return;
+        }
+
+        if input.get_state(&KeyNames::Confirm).just_released {
+            self.setting_selected = self.setting_highlighted.clone();
+        }
+    }
+
+    fn check_for_setting_deselected(&mut self) -> bool {
+        let input = crate::globals::get_input();
+
+        if self.setting_selected != SettingSelected::None
+            && input.get_state(&KeyNames::Back).just_released
+        {
+            self.new_time = None;
+            self.setting_selected = SettingSelected::None;
+
+            true
+        } else {
+            false
+        }
+    }
+
+    fn check_for_move_highlight(&mut self) {
+        let input = crate::globals::get_input();
+
+        if self.setting_selected != SettingSelected::None {
+            return;
+        }
+        if input.get_state(&KeyNames::Left).is_down && input.get_state(&KeyNames::Right).is_down {
+            return;
+        }
+
+        if input.get_state(&KeyNames::Right).just_pressed {
+            self.setting_highlighted = self.setting_highlighted.next().clone();
+        } else if input.get_state(&KeyNames::Left).just_pressed {
+            self.setting_highlighted = self.setting_highlighted.prev().clone();
+        }
+    }
+
+    fn adjust_time(&mut self) {
+        let input = crate::globals::get_input();
+        let hardware = crate::globals::get_hardware();
+
+        if self.new_time.is_none() {
+            self.new_time = self.time.clone();
+            self.new_time_selection = 0;
+        }
+        let new_time_mut = self.new_time.as_mut().unwrap();
+
+        if input.get_state(&KeyNames::Left).just_pressed {
+            match self.new_time_selection {
+                0 => {
+                    if new_time_mut.hr == 00 {
+                        new_time_mut.hr = 23;
+                    } else {
+                        new_time_mut.hr -= 1;
+                    }
+                }
+                1 => {
+                    if new_time_mut.min == 00 {
+                        new_time_mut.min = 59;
+                    } else {
+                        new_time_mut.min -= 1;
+                    }
+                }
+                2 => {
+                    if new_time_mut.sec == 00 {
+                        new_time_mut.sec = 59;
+                    } else {
+                        new_time_mut.sec -= 1;
+                    }
+                }
+                _ => {}
+            }
+        } else if input.get_state(&KeyNames::Right).just_pressed {
+            match self.new_time_selection {
+                0 => {
+                    if new_time_mut.hr == 23 {
+                        new_time_mut.hr = 0;
+                    } else {
+                        new_time_mut.hr += 1;
+                    }
+                }
+                1 => {
+                    if new_time_mut.min == 59 {
+                        new_time_mut.min = 0;
+                    } else {
+                        new_time_mut.min += 1;
+                    }
+                }
+                2 => {
+                    if new_time_mut.sec == 59 {
+                        new_time_mut.sec = 0;
+                    } else {
+                        new_time_mut.sec += 1;
+                    }
+                }
+                _ => {}
+            }
+        } else if input.get_state(&KeyNames::Confirm).just_released {
+            self.new_time_selection += 1;
+            if self.new_time_selection == 3 {
+                self.setting_selected = SettingSelected::None;
+                self.new_time_selection = 0;
+                hardware.set_time(self.new_time.as_mut().unwrap());
+                self.new_time = None;
+            }
+        }
+    }
+
+    fn setting_to_y_offset(setting: &SettingSelected) -> i32 {
+        match setting {
+            SettingSelected::Brightness => 1,
+            SettingSelected::Volume => 3,
+            SettingSelected::Time => 5,
+            SettingSelected::Reset => 7,
+            SettingSelected::None => -4, // hide cursor far above screen
+        }
+    }
+
+    fn display_cursor(&self) {
+        let (icon, setting) = match self.setting_selected {
+            SettingSelected::None => (" >", &self.setting_highlighted),
+            _ => ("4}", &self.setting_selected),
+        };
+
+        let y_offset = Self::setting_to_y_offset(setting);
+        text_writer::draw_text(10, 18 + 8 * y_offset, FontStyle::Icon, 0b111_000_00, icon);
+    }
+
+    fn display_brightness_setting(&self) {
         text_writer::draw_text_centered(
             LCD_WIDTH as i32 / 2,
             18,
@@ -69,7 +300,9 @@ impl State for SettingsState {
             unsafe { &globals::BRIGHTNESS_SETTING }
                 .generate_bar(self.setting_selected == SettingSelected::Brightness),
         );
+    }
 
+    fn display_volume_setting(&self) {
         text_writer::draw_text_centered(
             LCD_WIDTH as i32 / 2,
             18 + 8 * 2,
@@ -85,31 +318,9 @@ impl State for SettingsState {
             unsafe { &globals::VOLUME_SETTING }
                 .generate_bar(self.setting_selected == SettingSelected::Volume),
         );
+    }
 
-        match self.setting_selected {
-            SettingSelected::Brightness => {
-                text_writer::draw_text(10, 18 + 8, FontStyle::Icon, 0b111_000_00, "4}");
-            }
-            SettingSelected::Volume => {
-                text_writer::draw_text(10, 18 + 8 * 3, FontStyle::Icon, 0b111_000_00, "4}");
-            }
-            SettingSelected::Time => {
-                text_writer::draw_text(10, 18 + 8 * 5, FontStyle::Icon, 0b111_000_00, "4}");
-            }
-            SettingSelected::None => match self.setting_highlighted {
-                SettingSelected::Brightness => {
-                    text_writer::draw_text(10, 18 + 8, FontStyle::Icon, 0b111_000_00, " >");
-                }
-                SettingSelected::Volume => {
-                    text_writer::draw_text(10, 18 + 8 * 3, FontStyle::Icon, 0b111_000_00, " >");
-                }
-                SettingSelected::Time => {
-                    text_writer::draw_text(10, 18 + 8 * 5, FontStyle::Icon, 0b111_000_00, " >");
-                }
-                SettingSelected::None => {}
-            },
-        }
-
+    fn display_time_adjustment_setting(&self) {
         text_writer::draw_text_centered(
             LCD_WIDTH as i32 / 2,
             18 + 8 * 4,
@@ -237,186 +448,43 @@ impl State for SettingsState {
         };
     }
 
-    fn input(&mut self) {
-        let input = crate::globals::get_input();
-        let hardware = crate::globals::get_hardware();
+    fn display_reset_setting(&self) {
+        text_writer::draw_text_centered(
+            LCD_WIDTH as i32 / 2,
+            18 + 8 * 6,
+            FontStyle::Small,
+            0b110_000_00,
+            "RESET (HOLD CONFIRM)",
+        );
 
-        if !self.input_enabled {
-            // release all buttons to enable input
-            if input.get_state(&KeyNames::Back).is_down
-                || input.get_state(&KeyNames::Left).is_down
-                || input.get_state(&KeyNames::Right).is_down
-                || input.get_state(&KeyNames::Confirm).is_down
-            {
-                return;
+        crate::display::render::solid_line_rect(
+            LCD_WIDTH as i32 / 2 - (5 * 8),
+            18 + 8 * 7,
+            5 * 16,
+            8,
+            0b110_000_00,
+        );
+
+        crate::display::render::fill_rect(
+            LCD_WIDTH as i32 / 2 - (5 * 8) + 1,
+            18 + 8 * 7 + 1,
+            self.frames_reset_button_held as usize,
+            6,
+            0b001_000_00,
+        );
+    }
+
+    fn process_reset(&mut self) {
+        let input = crate::globals::get_input();
+
+        if input.get_state(&KeyNames::Confirm).is_down {
+            if self.frames_reset_button_held < FRAMES_TO_RESET {
+                self.frames_reset_button_held += 1;
             } else {
-                self.input_enabled = true;
+                panic!(); // debug
             }
-        }
-
-        if self.check_for_setting_deselected() {
-            return; // our action this frame will be to deselect, prevents auto-exit menu
-        }
-
-        match self.setting_selected {
-            SettingSelected::Brightness => {
-                self.adjust_setting(unsafe { &mut globals::BRIGHTNESS_SETTING })
-            }
-            SettingSelected::Volume => self.adjust_setting(unsafe { &mut globals::VOLUME_SETTING }),
-            SettingSelected::Time => {
-                if self.new_time.is_none() {
-                    self.new_time = self.time.clone();
-                    self.new_time_selection = 0;
-                }
-                let new_time_mut = self.new_time.as_mut().unwrap();
-
-                if input.get_state(&KeyNames::Left).just_pressed {
-                    match self.new_time_selection {
-                        0 => {
-                            if new_time_mut.hr == 00 {
-                                new_time_mut.hr = 23;
-                            } else {
-                                new_time_mut.hr -= 1;
-                            }
-                        }
-                        1 => {
-                            if new_time_mut.min == 00 {
-                                new_time_mut.min = 59;
-                            } else {
-                                new_time_mut.min -= 1;
-                            }
-                        }
-                        2 => {
-                            if new_time_mut.sec == 00 {
-                                new_time_mut.sec = 59;
-                            } else {
-                                new_time_mut.sec -= 1;
-                            }
-                        }
-                        _ => {}
-                    }
-                } else if input.get_state(&KeyNames::Right).just_pressed {
-                    match self.new_time_selection {
-                        0 => {
-                            if new_time_mut.hr == 23 {
-                                new_time_mut.hr = 0;
-                            } else {
-                                new_time_mut.hr += 1;
-                            }
-                        }
-                        1 => {
-                            if new_time_mut.min == 59 {
-                                new_time_mut.min = 0;
-                            } else {
-                                new_time_mut.min += 1;
-                            }
-                        }
-                        2 => {
-                            if new_time_mut.sec == 59 {
-                                new_time_mut.sec = 0;
-                            } else {
-                                new_time_mut.sec += 1;
-                            }
-                        }
-                        _ => {}
-                    }
-                } else if input.get_state(&KeyNames::Confirm).just_released {
-                    self.new_time_selection += 1;
-                    if self.new_time_selection == 3 {
-                        self.setting_selected = SettingSelected::None;
-                        self.new_time_selection = 0;
-                        hardware.set_time(self.new_time.as_mut().unwrap());
-                        self.new_time = None;
-                    }
-                }
-            }
-            SettingSelected::None => {
-                if input.get_state(&KeyNames::Back).just_released {
-                    self.next_state = Some(AppState::GamePlay);
-                    return;
-                }
-                self.check_for_setting_selected();
-                self.check_for_move_highlight();
-            }
-        }
-    }
-
-    fn next_state(&self) -> &Option<AppState> {
-        &self.next_state
-    }
-}
-
-impl SettingsState {
-    pub fn new() -> Self {
-        Self {
-            frame_count: 0,
-            next_state: None,
-            song: song::BALL_GAME,
-            current_frequency: AudioFrequency::None,
-            setting_selected: SettingSelected::None,
-            setting_highlighted: SettingSelected::None,
-            input_enabled: false,
-            time: None,
-            new_time: None,
-            new_time_selection: 0,
-        }
-    }
-
-    fn adjust_setting(&mut self, setting: &mut Setting) {
-        let input = crate::globals::get_input();
-
-        if input.get_state(&KeyNames::Left).is_down && input.get_state(&KeyNames::Right).is_down {
-            return;
-        }
-
-        if input.get_state(&KeyNames::Left).key_repeat_triggered {
-            setting.dec();
-        } else if input.get_state(&KeyNames::Right).key_repeat_triggered {
-            setting.inc();
-        }
-    }
-
-    fn check_for_setting_selected(&mut self) {
-        let input = crate::globals::get_input();
-
-        if self.setting_selected != SettingSelected::None {
-            return;
-        }
-
-        if input.get_state(&KeyNames::Confirm).just_released {
-            self.setting_selected = self.setting_highlighted.clone();
-        }
-    }
-
-    fn check_for_setting_deselected(&mut self) -> bool {
-        let input = crate::globals::get_input();
-
-        if self.setting_selected != SettingSelected::None
-            && input.get_state(&KeyNames::Back).just_released
-        {
-            self.new_time = None;
-            self.setting_selected = SettingSelected::None;
-
-            true
         } else {
-            false
-        }
-    }
-
-    fn check_for_move_highlight(&mut self) {
-        let input = crate::globals::get_input();
-
-        if self.setting_selected != SettingSelected::None {
-            return;
-        }
-        if input.get_state(&KeyNames::Left).is_down && input.get_state(&KeyNames::Right).is_down {
-            return;
-        }
-
-        if input.get_state(&KeyNames::Right).just_pressed {
-            self.setting_highlighted = self.setting_highlighted.next().clone();
-        } else if input.get_state(&KeyNames::Left).just_pressed {
-            self.setting_highlighted = self.setting_highlighted.prev().clone();
+            self.frames_reset_button_held = 0;
         }
     }
 }
