@@ -1,6 +1,8 @@
 #![no_std]
 #![no_main]
 #![feature(iter_advance_by)]
+// TODO: remove dead_code
+#![allow(dead_code)]
 
 extern crate cortex_m;
 extern crate cortex_m_rt;
@@ -19,6 +21,7 @@ mod cores;
 mod display;
 mod globals;
 mod hardware;
+mod nvm;
 mod setting_value;
 mod states;
 
@@ -42,6 +45,7 @@ fn main() -> ! {
 fn init_globals() {
     globals::init_hardware();
     globals::init_input();
+    globals::init_nvm();
     display::text_writer::init_singleton_fonts();
 }
 
@@ -99,4 +103,32 @@ fn panic(_info: &core::panic::PanicInfo) -> ! {
         // if reset fails, just sleep
         cortex_m::asm::wfi();
     }
+}
+
+fn reboot() -> ! {
+    if unsafe { globals::HARDWARE.is_none() } {
+        loop {
+            rom_data::reset_to_usb_boot(0, 0);
+            // if reset fails, just sleep
+            cortex_m::asm::wfi();
+        }
+    }
+    let hardware = globals::get_hardware();
+    display::render::flood(0b010_010_11);
+    unsafe {
+        embedded_hal::PwmPin::set_duty(&mut (*hardware.backlight_channel_ptr), 32767);
+        hardware.end_tone();
+    }
+    display::text_writer::draw_text_centered(
+        64,
+        128 - 15,
+        display::text_writer::FontStyle::Small,
+        0b111_111_11,
+        "Rebooting...",
+    );
+
+    display::render::draw(&mut hardware.display);
+
+    hardware.delay.delay_ms(5_000);
+    cortex_m::peripheral::SCB::sys_reset()
 }

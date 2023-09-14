@@ -334,12 +334,4 @@ impl HardwareComponents {
         // wait for the EEPROM to complete its write
         self.delay.delay_ms(5);
     }
-
-    /// this function will complete in around 5 seconds!
-    pub fn blank_full_nvm(&mut self) {
-        let blank_data_buffer = [0xffu8; 8];
-        for page in 0..512 {
-            self.write_nvm_page(page, &blank_data_buffer);
-        }
-    }
 }
