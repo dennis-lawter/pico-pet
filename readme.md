@@ -9,13 +9,14 @@ Pages are addressed from hexidecimal 0x000 to 0x1ff.
 
 | Page Start | Page End | Module |
 | --- | --- | --- |
-| 000 | 000 | Parity |
+| 000 | 000 | Header |
 | 001 | 001 | Settings |
 <!-- proposed ranges for future NVM structs -->
 <!--| 001 | 00f | Current Pet |-->
 <!--| 010 | 01f | Inventory |-->
 
-|  | **Parity** |
+*note: If the NVM becomes corrupted, changing the const `NVM_SENTINEL` to force a header guard check failure.*
+|  | **Header** |
 | --- | --- |
 | 0 | if set to the sentinel value, then the EEPROM contains a valid save file |
 | 1 |  |
@@ -36,6 +37,7 @@ Pages are addressed from hexidecimal 0x000 to 0x1ff.
 | 5 |  |
 | 6 |  |
 | 7 |  |
+
 
 ## Pin Out
 

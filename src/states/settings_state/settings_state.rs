@@ -167,6 +167,12 @@ impl SettingsState {
         if self.setting_selected != SettingSelected::None
             && input.get_state(&KeyNames::Back).just_released
         {
+            match self.setting_selected {
+                SettingSelected::Brightness | SettingSelected::Volume => {
+                    crate::globals::get_nvm().settings.write();
+                }
+                _ => {}
+            }
             self.new_time = None;
             self.setting_selected = SettingSelected::None;
 
@@ -476,13 +482,15 @@ impl SettingsState {
 
     fn process_reset(&mut self) {
         let input = crate::globals::get_input();
-        let hardware = crate::globals::get_hardware();
+        let nvm = crate::globals::get_nvm();
 
         if input.get_state(&KeyNames::Confirm).is_down {
             if self.frames_reset_button_held < FRAMES_TO_RESET {
                 self.frames_reset_button_held += 1;
             } else {
-                hardware.blank_full_nvm();
+                nvm.erase_all_then_reboot();
+                nvm.settings.apply_to_globals();
+
                 self.frames_reset_button_held = 0;
                 self.setting_selected = SettingSelected::None;
             }

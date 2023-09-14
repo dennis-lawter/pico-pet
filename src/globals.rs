@@ -1,5 +1,6 @@
 use crate::{
     hardware::{hardware::HardwareComponents, input::InputHandler},
+    nvm::Nvm,
     setting_value::Setting,
 };
 
@@ -26,4 +27,12 @@ pub fn init_input() {
 }
 pub fn get_input() -> &'static mut InputHandler {
     unsafe { self::INPUT.as_mut().unwrap() }
+}
+
+pub static mut NVM: Option<Nvm> = None;
+pub fn init_nvm() {
+    unsafe { self::NVM = Some(Nvm::load_or_write_default()) }
+}
+pub fn get_nvm() -> &'static mut Nvm {
+    unsafe { self::NVM.as_mut().unwrap() }
 }
