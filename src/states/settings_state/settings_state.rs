@@ -476,12 +476,15 @@ impl SettingsState {
 
     fn process_reset(&mut self) {
         let input = crate::globals::get_input();
+        let hardware = crate::globals::get_hardware();
 
         if input.get_state(&KeyNames::Confirm).is_down {
             if self.frames_reset_button_held < FRAMES_TO_RESET {
                 self.frames_reset_button_held += 1;
             } else {
-                panic!(); // debug
+                hardware.blank_full_nvm();
+                self.frames_reset_button_held = 0;
+                self.setting_selected = SettingSelected::None;
             }
         } else {
             self.frames_reset_button_held = 0;

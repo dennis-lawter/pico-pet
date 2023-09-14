@@ -9,10 +9,33 @@ Pages are addressed from hexidecimal 0x000 to 0x1ff.
 
 | Page Start | Page End | Module |
 | --- | --- | --- |
-| 000 | 000 | Settings |
+| 000 | 000 | Parity |
+| 001 | 001 | Settings |
 <!-- proposed ranges for future NVM structs -->
 <!--| 001 | 00f | Current Pet |-->
 <!--| 010 | 01f | Inventory |-->
+
+|  | **Parity** |
+| --- | --- |
+| 0 | if set to the sentinel value, then the EEPROM contains a valid save file |
+| 1 |  |
+| 2 |  |
+| 3 |  |
+| 4 |  |
+| 5 |  |
+| 6 |  |
+| 7 |  |
+
+|  | **Settings** |
+| --- | --- |
+| 0 | User brightness | 
+| 1 | User volume |
+| 2 |  |
+| 3 |  |
+| 4 |  |
+| 5 |  |
+| 6 |  |
+| 7 |  |
 
 ## Pin Out
 
