@@ -19,3 +19,7 @@ fixedstr = { version = "0.4.3", default-features = false }
 [[bin]]
 name = "pico-pet"
 path = "src/main.rs"
+
+[profile.release]
+opt-level = 's'
+lto = true
