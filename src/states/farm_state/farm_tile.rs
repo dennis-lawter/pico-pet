@@ -1,8 +1,10 @@
-use crate::display::render;
+use crate::display::{render, sprite::Sprite};
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum FarmTile {
     Soil = 0,
+
+    Tilled,
 
     Sprout,
 
@@ -66,8 +68,18 @@ pub enum FarmTile {
     Scare1,
     Scare2,
 }
+impl Into<usize> for FarmTile {
+    fn into(self) -> usize {
+        self as usize
+    }
+}
 impl FarmTile {
-    pub fn draw(&self, x: i32, y: i32) {
+    pub fn draw(&self, x: i32, y: i32, sprite_sheet: &mut Sprite) {
         render::fill_rect(x, y, 16, 16, 0b010_001_00);
+        if self != &Self::Soil {
+            sprite_sheet.x = x;
+            sprite_sheet.y = y;
+            sprite_sheet.draw((*self) as usize - 1usize);
+        }
     }
 }

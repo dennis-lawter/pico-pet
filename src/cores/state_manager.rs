@@ -9,7 +9,7 @@ pub struct StateManager<'a> {
     pub select_food_state: Option<SelectFoodState>,
     pub state_nyi: Option<StateNyi>,
     pub settings_state: Option<SettingsState>,
-    pub farm_state: Option<FarmState>,
+    pub farm_state: Option<FarmState<'a>>,
 
     pub active_state: AppState,
 }

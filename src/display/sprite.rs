@@ -24,6 +24,7 @@ pub struct SpriteFactory;
 impl SpriteFactory {
     pub const FERRIS_DIMENSIONS: (usize, usize) = (40, 24);
     pub const MENU_DIMENSIONS: (usize, usize) = (24, 24);
+    pub const FARM_DIMENSIONS: (usize, usize) = (16, 16);
 
     pub fn new_ferris_sprite(x: i32, y: i32) -> Sprite<'static> {
         Sprite::new(
@@ -42,6 +43,16 @@ impl SpriteFactory {
             Self::MENU_DIMENSIONS.0,
             Self::MENU_DIMENSIONS.1,
             include_bytes!("../../sprite_raw/menu.data"),
+        )
+    }
+
+    pub fn new_farm_sprite(x: i32, y: i32) -> Sprite<'static> {
+        Sprite::new(
+            x,
+            y,
+            Self::FARM_DIMENSIONS.0,
+            Self::FARM_DIMENSIONS.1,
+            include_bytes!("../../sprite_raw/farm.data"),
         )
     }
 }

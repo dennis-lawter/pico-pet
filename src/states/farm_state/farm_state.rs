@@ -6,14 +6,14 @@ use crate::{
 
 use super::farm_garden::FarmGarden;
 
-pub struct FarmState {
-    farm: FarmGarden,
+pub struct FarmState<'a> {
+    farm: FarmGarden<'a>,
     tile_selected: Option<usize>,
     next_state: Option<AppState>,
     frame_count: usize,
 }
 
-impl State for FarmState {
+impl State for FarmState<'static> {
     fn input(&mut self) {
         let input = crate::globals::get_input();
 
@@ -80,7 +80,7 @@ impl State for FarmState {
     }
 }
 
-impl Default for FarmState {
+impl Default for FarmState<'static> {
     fn default() -> Self {
         Self {
             tile_selected: None,
