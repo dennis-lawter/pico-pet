@@ -9,9 +9,6 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "problemMatcher": [
-                "$rustc"
-            ],
             "presentation": {
                 "reveal": "silent",
                 "revealProblems": "onProblem",
