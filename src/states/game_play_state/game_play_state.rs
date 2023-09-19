@@ -114,7 +114,7 @@ impl GamePlayState<'static> {
     fn menu_button_confirmed(&mut self) {
         match self.menu_item_selected {
             MenuSelection::Feed => self.next_state = Some(AppState::SelectFood),
-            MenuSelection::Item1 => self.next_state = Some(AppState::AppState1),
+            MenuSelection::Item1 => self.next_state = Some(AppState::FarmState),
             MenuSelection::Item2 => self.next_state = Some(AppState::AppState2),
             MenuSelection::Item3 => self.next_state = Some(AppState::AppState3),
             MenuSelection::Item4 => self.next_state = Some(AppState::AppState4),

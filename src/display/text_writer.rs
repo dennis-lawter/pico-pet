@@ -34,13 +34,19 @@ pub fn draw_text_centered(x: i32, y: i32, style: FontStyle, color: u8, text: &st
     let font = get_font(style);
     let (width, _) = font.size.get_glyph_dimensions();
     let x = x - ((width * text.len()) as i32 / 2);
-    font.draw_text(x, y, color, text);
+    font.draw_text(x, y, color, text, false);
 }
 
 pub fn draw_text(x: i32, y: i32, style: FontStyle, color: u8, text: &str) {
     let font = get_font(style);
 
-    font.draw_text(x, y, color, text)
+    font.draw_text(x, y, color, text, false)
+}
+
+pub fn draw_text_wrapped(x: i32, y: i32, style: FontStyle, color: u8, text: &str) {
+    let font = get_font(style);
+
+    font.draw_text(x, y, color, text, true)
 }
 
 fn get_font(style: FontStyle) -> &'static Font<'static> {

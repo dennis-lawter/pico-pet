@@ -148,7 +148,7 @@ graph LR
     end
     Pin4[Pin4 GP2] --> LCD_KEY2
     LCD_KEY2 --> TinyPin2[TinyPin2 GP2]
-    Pin5[PIn5 GP3] --> LCD_KEY3
+    Pin5[Pin5 GP3] --> LCD_KEY3
     LCD_KEY3 --> TinyPin3[TinyPin3 GP3]
     Pin11[Pin11 GP8] --> LCD_DC
     LCD_DC --> TinyPin8[TinyPin8 GP8]

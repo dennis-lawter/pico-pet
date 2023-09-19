@@ -1,6 +1,6 @@
 use core::str::Chars;
 
-use crate::display::render;
+use crate::{display::render, hardware::hardware::LCD_WIDTH};
 
 pub enum FontSize {
     Size5x8,
@@ -38,7 +38,7 @@ impl<'a> Font<'a> {
         (r << 5) ^ (g << 2) ^ b
     }
 
-    pub fn draw_text(&self, x0: i32, y0: i32, color: u8, text: &str) {
+    pub fn draw_text(&self, x0: i32, y0: i32, color: u8, text: &str, wrap: bool) {
         let mut x = x0;
         let mut y = y0;
         let size = &self.size;
@@ -55,6 +55,10 @@ impl<'a> Font<'a> {
                     Some(other_char) => {
                         self.blit_glyph(x, y, other_char, bg_color, fg_color);
                         x += glyph_w as i32;
+                        if wrap && x > (LCD_WIDTH - glyph_w) as i32 {
+                            y += glyph_h as i32;
+                            x = x0;
+                        }
                     }
                     None => {}
                 },
@@ -65,6 +69,10 @@ impl<'a> Font<'a> {
                 _ => {
                     self.blit_glyph(x, y, c, bg_color, fg_color);
                     x += glyph_w as i32;
+                    if wrap && x > (LCD_WIDTH - glyph_w) as i32 {
+                        y += glyph_h as i32;
+                        x = x0;
+                    }
                 }
             }
         }

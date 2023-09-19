@@ -1,3 +1,4 @@
+pub mod farm_state;
 pub mod game_play_state;
 pub mod select_food_state;
 pub mod settings_state;
@@ -8,7 +9,7 @@ pub enum AppState {
     GamePlay,
 
     SelectFood,
-    AppState1,
+    FarmState,
     AppState2,
     AppState3,
     AppState4,
