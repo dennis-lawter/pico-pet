@@ -119,22 +119,6 @@ impl State for SettingsState {
 }
 
 impl SettingsState {
-    pub fn new() -> Self {
-        Self {
-            frame_count: 0,
-            next_state: None,
-            song: song::BALL_GAME,
-            current_frequency: AudioFrequency::None,
-            setting_selected: SettingSelected::None,
-            setting_highlighted: SettingSelected::None,
-            input_enabled: false,
-            time: None,
-            new_time: None,
-            new_time_selection: 0,
-            frames_reset_button_held: 0,
-        }
-    }
-
     fn adjust_setting(&mut self, setting: &mut Setting) {
         let input = crate::globals::get_input();
 
@@ -496,6 +480,24 @@ impl SettingsState {
             }
         } else {
             self.frames_reset_button_held = 0;
+        }
+    }
+}
+
+impl Default for SettingsState {
+    fn default() -> Self {
+        Self {
+            frame_count: 0,
+            next_state: None,
+            song: song::BALL_GAME,
+            current_frequency: AudioFrequency::None,
+            setting_selected: SettingSelected::None,
+            setting_highlighted: SettingSelected::None,
+            input_enabled: false,
+            time: None,
+            new_time: None,
+            new_time_selection: 0,
+            frames_reset_button_held: 0,
         }
     }
 }

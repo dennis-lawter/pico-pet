@@ -51,10 +51,12 @@ impl StateManager<'static> {
                 self.farm_state = None;
 
                 match next_state {
-                    AppState::GamePlay => self.game_play_state = Some(GamePlayState::new()),
-                    AppState::SelectFood => self.select_food_state = Some(SelectFoodState::new()),
-                    AppState::Settings => self.settings_state = Some(SettingsState::new()),
-                    AppState::FarmState => self.farm_state = Some(FarmState::new()),
+                    AppState::GamePlay => self.game_play_state = Some(GamePlayState::default()),
+                    AppState::SelectFood => {
+                        self.select_food_state = Some(SelectFoodState::default())
+                    }
+                    AppState::Settings => self.settings_state = Some(SettingsState::default()),
+                    AppState::FarmState => self.farm_state = Some(FarmState::default()),
 
                     AppState::AppState2
                     | AppState::AppState3
@@ -62,7 +64,7 @@ impl StateManager<'static> {
                     | AppState::AppState5
                     | AppState::AppState6
                     | AppState::AppState7
-                    | AppState::AppState8 => self.state_nyi = Some(StateNyi::new()),
+                    | AppState::AppState8 => self.state_nyi = Some(StateNyi::default()),
                 }
             }
             None => {}

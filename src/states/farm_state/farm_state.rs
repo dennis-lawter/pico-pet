@@ -4,20 +4,13 @@ use crate::{
     states::{AppState, State},
 };
 
-#[derive(Clone, Copy)]
-enum FarmTile {
-    Soil,
-}
-impl FarmTile {
-    pub fn draw(&self, x: i32, y: i32) {
-        render::fill_rect(x, y, 16, 16, 0b010_001_00);
-    }
-}
+use super::farm_garden::FarmGarden;
 
 pub struct FarmState {
-    farm: [FarmTile; 7 * 7],
+    farm: FarmGarden,
     tile_selected: Option<usize>,
     next_state: Option<AppState>,
+    frame_count: usize,
 }
 
 impl State for FarmState {
@@ -27,21 +20,21 @@ impl State for FarmState {
         if self.tile_selected.is_none() {
             if input.get_state(&KeyNames::Back).just_released {
                 self.next_state = Some(AppState::GamePlay);
-            } else if input.get_state(&KeyNames::Left).just_pressed {
+            } else if input.get_state(&KeyNames::Left).key_repeat_triggered {
                 self.tile_selected = Some(7 * 7 - 1);
-            } else if input.get_state(&KeyNames::Right).just_pressed {
+            } else if input.get_state(&KeyNames::Right).key_repeat_triggered {
                 self.tile_selected = Some(0);
             }
         } else {
             if input.get_state(&KeyNames::Back).just_released {
                 self.tile_selected = None;
-            } else if input.get_state(&KeyNames::Left).just_pressed {
+            } else if input.get_state(&KeyNames::Left).key_repeat_triggered {
                 if self.tile_selected.unwrap() == 0 {
                     self.tile_selected = None
                 } else {
                     self.tile_selected = Some(self.tile_selected.unwrap() - 1);
                 }
-            } else if input.get_state(&KeyNames::Right).just_pressed {
+            } else if input.get_state(&KeyNames::Right).key_repeat_triggered {
                 if self.tile_selected.unwrap() == (7 * 7 - 1) {
                     self.tile_selected = None
                 } else {
@@ -52,7 +45,7 @@ impl State for FarmState {
     }
 
     fn tick(&mut self) {
-        //
+        self.frame_count += 1;
     }
 
     fn sound(&mut self) {
@@ -63,16 +56,22 @@ impl State for FarmState {
     fn draw(&mut self) {
         render::flood(0b000_111_00);
 
-        for y in 0..7 {
-            for x in 0..7 {
-                let index = y * 7 + x;
-                let x_pixel = x as i32 * 17 + 5;
-                let y_pixel = y as i32 * 17 + 5;
-                self.farm[index].draw(x_pixel, y_pixel);
-                if self.tile_selected.is_some() && index == self.tile_selected.unwrap() {
-                    render::solid_line_rect(x_pixel - 1, y_pixel - 1, 18, 18, 0b000_000_11);
-                }
-            }
+        self.farm.draw();
+
+        if self.tile_selected.is_some() {
+            let index_x = self.tile_selected.unwrap() % 7;
+            let index_y = self.tile_selected.unwrap() / 7;
+
+            let x_pixel = index_x as i32 * 17 + 4;
+            let y_pixel = index_y as i32 * 17 + 4;
+            render::dithered_line_rect(
+                x_pixel,
+                y_pixel,
+                18,
+                18,
+                0b000_000_11,
+                (self.frame_count / 5) % 2 == 0,
+            );
         }
     }
 
@@ -80,12 +79,14 @@ impl State for FarmState {
         &self.next_state
     }
 }
-impl FarmState {
-    pub fn new() -> Self {
+
+impl Default for FarmState {
+    fn default() -> Self {
         Self {
-            farm: [FarmTile::Soil; 7 * 7],
             tile_selected: None,
             next_state: None,
+            farm: FarmGarden::default(),
+            frame_count: 0,
         }
     }
 }

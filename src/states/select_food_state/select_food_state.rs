@@ -94,8 +94,9 @@ impl State for SelectFoodState {
         &self.next_state
     }
 }
-impl SelectFoodState {
-    pub fn new() -> Self {
+
+impl Default for SelectFoodState {
+    fn default() -> Self {
         Self {
             key0_down: false,
             key1_down: false,

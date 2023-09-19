@@ -124,12 +124,13 @@ pub fn solid_line_rect(x0: i32, y0: i32, w: usize, h: usize, color: u8) {
     v_solid_line(x0 + w as i32 - 1, y0, h, color);
 }
 
-pub fn h_dithered_line(x0: i32, y0: i32, w: usize, color: u8) {
+pub fn h_dithered_line(x0: i32, y0: i32, w: usize, color: u8, inverted: bool) {
     if y0 < 0 || y0 >= LCD_HEIGHT as i32 {
         return;
     }
+    let inverted_int = inverted as i32;
     let ext_color = RGB_332_TO_565[color as usize];
-    let (mut x0, w) = if (y0 + x0) % 2 == 0 {
+    let (mut x0, w) = if (y0 + x0) % 2 == inverted_int {
         (x0 + 1, w.saturating_sub(1))
     } else {
         (x0, w)
@@ -146,12 +147,13 @@ pub fn h_dithered_line(x0: i32, y0: i32, w: usize, color: u8) {
     }
 }
 
-pub fn v_dithered_line(x0: i32, y0: i32, h: usize, color: u8) {
+pub fn v_dithered_line(x0: i32, y0: i32, h: usize, color: u8, inverted: bool) {
     if x0 < 0 || x0 >= LCD_WIDTH as i32 {
         return;
     }
+    let inverted_int = inverted as i32;
     let ext_color = RGB_332_TO_565[color as usize];
-    let (mut y0, h) = if (y0 + x0) % 2 == 0 {
+    let (mut y0, h) = if (y0 + x0) % 2 == inverted_int {
         (y0 + 1, h.saturating_sub(1))
     } else {
         (y0, h)
@@ -166,6 +168,14 @@ pub fn v_dithered_line(x0: i32, y0: i32, h: usize, color: u8) {
             BUFFER[(y * LCD_WIDTH as i32 + x0) as usize] = ext_color;
         }
     }
+}
+
+pub fn dithered_line_rect(x0: i32, y0: i32, w: usize, h: usize, color: u8, inverted: bool) {
+    h_dithered_line(x0, y0, w, color, inverted);
+    h_dithered_line(x0, y0 + h as i32 - 1, w, color, inverted);
+
+    v_dithered_line(x0, y0, h, color, inverted);
+    v_dithered_line(x0 + w as i32 - 1, y0, h, color, inverted);
 }
 
 const FANCY_BORDER_THICKNESS: usize = 4;
@@ -232,7 +242,13 @@ fn fancy_border_edge(x0: i32, y0: i32, length: usize, orientation: FancyBorderEd
             h_solid_line(x0, y0, length, FANCY_BORDER_EDGE_COLOR);
             h_solid_line(x0, y1, length, FANCY_BORDER_EDGE_COLOR);
             for i in 1..(FANCY_BORDER_THICKNESS - 1) {
-                h_dithered_line(x0, y0 + i as i32, length, FANCY_BORDER_EDGE_FILL_COLOR);
+                h_dithered_line(
+                    x0,
+                    y0 + i as i32,
+                    length,
+                    FANCY_BORDER_EDGE_FILL_COLOR,
+                    false,
+                );
             }
         }
         FancyBorderEdgeOrientation::Vertical => {
@@ -240,7 +256,13 @@ fn fancy_border_edge(x0: i32, y0: i32, length: usize, orientation: FancyBorderEd
             v_solid_line(x0, y0, length, FANCY_BORDER_EDGE_COLOR);
             v_solid_line(x1, y0, length, FANCY_BORDER_EDGE_COLOR);
             for i in 1..(FANCY_BORDER_THICKNESS - 1) {
-                v_dithered_line(x0 + i as i32, y0, length, FANCY_BORDER_EDGE_FILL_COLOR);
+                v_dithered_line(
+                    x0 + i as i32,
+                    y0,
+                    length,
+                    FANCY_BORDER_EDGE_FILL_COLOR,
+                    false,
+                );
             }
         }
     }

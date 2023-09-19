@@ -4,7 +4,7 @@ use super::state_manager::StateManager;
 
 pub fn primary_main_loop() -> ! {
     let mut state_manager = StateManager::default();
-    state_manager.game_play_state = Some(GamePlayState::new());
+    state_manager.game_play_state = Some(GamePlayState::default());
     state_manager.active_state = AppState::GamePlay;
 
     loop {

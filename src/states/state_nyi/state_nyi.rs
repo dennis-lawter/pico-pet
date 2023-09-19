@@ -1,30 +1,23 @@
 use crate::{
     display::{render, text_writer},
+    hardware::input::KeyNames,
     states::{AppState, State},
 };
 
 pub struct StateNyi {
-    key0_down: bool,
-    key1_down: bool,
-    key2_down: bool,
-    key3_down: bool,
     next_state: Option<AppState>,
 }
 
 impl State for StateNyi {
     fn input(&mut self) {
-        let hardware = crate::globals::get_hardware();
-        if !hardware.key0_pressed() && self.key0_down {
+        let input = crate::globals::get_input();
+        if input.get_state(&KeyNames::Back).just_released {
             self.next_state = Some(AppState::GamePlay);
         }
-        self.key0_down = hardware.key0_pressed();
-        self.key1_down = hardware.key1_pressed();
-        self.key2_down = hardware.key2_pressed();
-        self.key3_down = hardware.key3_pressed();
     }
 
     fn tick(&mut self) {
-        //
+        ()
     }
 
     fn sound(&mut self) {
@@ -41,14 +34,8 @@ impl State for StateNyi {
         &self.next_state
     }
 }
-impl StateNyi {
-    pub fn new() -> Self {
-        Self {
-            key0_down: false,
-            key1_down: false,
-            key2_down: false,
-            key3_down: false,
-            next_state: None,
-        }
+impl Default for StateNyi {
+    fn default() -> Self {
+        Self { next_state: None }
     }
 }

@@ -93,7 +93,25 @@ impl State for GamePlayState<'static> {
 }
 
 impl GamePlayState<'static> {
-    pub fn new() -> Self {
+    fn menu_button_confirmed(&mut self) {
+        match self.menu_item_selected {
+            MenuSelection::Feed => self.next_state = Some(AppState::SelectFood),
+            MenuSelection::Item1 => self.next_state = Some(AppState::FarmState),
+            MenuSelection::Item2 => self.next_state = Some(AppState::AppState2),
+            MenuSelection::Item3 => self.next_state = Some(AppState::AppState3),
+            MenuSelection::Item4 => self.next_state = Some(AppState::AppState4),
+            MenuSelection::Item5 => self.next_state = Some(AppState::AppState5),
+            MenuSelection::Item6 => self.next_state = Some(AppState::AppState6),
+            MenuSelection::Item7 => self.next_state = Some(AppState::AppState7),
+            MenuSelection::Item8 => self.next_state = Some(AppState::AppState8),
+            MenuSelection::Settings => self.next_state = Some(AppState::Settings),
+            MenuSelection::None => {}
+        }
+    }
+}
+
+impl Default for GamePlayState<'static> {
+    fn default() -> Self {
         let ferris = SpriteFactory::new_ferris_sprite(
             (128 - SpriteFactory::FERRIS_DIMENSIONS.0 as i32) / 2,
             128 - 64,
@@ -108,22 +126,6 @@ impl GamePlayState<'static> {
             next_state: None,
             menu_item_selected: MenuSelection::Feed,
             menu_select_tone_timer: 0,
-        }
-    }
-
-    fn menu_button_confirmed(&mut self) {
-        match self.menu_item_selected {
-            MenuSelection::Feed => self.next_state = Some(AppState::SelectFood),
-            MenuSelection::Item1 => self.next_state = Some(AppState::FarmState),
-            MenuSelection::Item2 => self.next_state = Some(AppState::AppState2),
-            MenuSelection::Item3 => self.next_state = Some(AppState::AppState3),
-            MenuSelection::Item4 => self.next_state = Some(AppState::AppState4),
-            MenuSelection::Item5 => self.next_state = Some(AppState::AppState5),
-            MenuSelection::Item6 => self.next_state = Some(AppState::AppState6),
-            MenuSelection::Item7 => self.next_state = Some(AppState::AppState7),
-            MenuSelection::Item8 => self.next_state = Some(AppState::AppState8),
-            MenuSelection::Settings => self.next_state = Some(AppState::Settings),
-            MenuSelection::None => {}
         }
     }
 }
