@@ -57,6 +57,6 @@ impl Nvm {
             hardware.write_nvm_page(page, &blank_data_buffer);
         }
 
-        crate::reboot();
+        crate::exit::reboot();
     }
 }
