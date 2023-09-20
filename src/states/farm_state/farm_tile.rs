@@ -1,25 +1,25 @@
 use crate::display::{render, sprite::Sprite};
 
-pub const HARVESTABLE_SPRITES: [FarmTileSprites; 13] = [
-    FarmTileSprites::Cuke3,    //
-    FarmTileSprites::Corn4,    //
-    FarmTileSprites::Onion2,   // veg
-    FarmTileSprites::Onion5,   // seeds
-    FarmTileSprites::Tater5,   // veg
-    FarmTileSprites::Tater3,   // seeds
-    FarmTileSprites::Carrot3,  // veg
-    FarmTileSprites::Carrot6,  // seeds
-    FarmTileSprites::Spinach4, // veg
-    FarmTileSprites::Spinach6, // seeds
-    FarmTileSprites::Mater4,   //
-    FarmTileSprites::Pump5,    // veg
-    FarmTileSprites::Pump6,    // seeds
+pub const HARVESTABLE_SPRITES: [FarmTileSprite; 13] = [
+    FarmTileSprite::Cuke3,    //
+    FarmTileSprite::Corn4,    //
+    FarmTileSprite::Onion2,   // veg
+    FarmTileSprite::Onion5,   // seeds
+    FarmTileSprite::Tater5,   // veg
+    FarmTileSprite::Tater3,   // seeds
+    FarmTileSprite::Carrot3,  // veg
+    FarmTileSprite::Carrot6,  // seeds
+    FarmTileSprite::Spinach4, // veg
+    FarmTileSprite::Spinach6, // seeds
+    FarmTileSprite::Mater4,   //
+    FarmTileSprite::Pump5,    // veg
+    FarmTileSprite::Pump6,    // seeds
 ];
 
 pub const HARVESTABLE_COLOR: u8 = 0b000_000_11;
 
 #[derive(Clone, Copy, PartialEq)]
-pub enum FarmTileSprites {
+pub enum FarmTileSprite {
     Tilled = 0,
 
     Sprout,
@@ -87,12 +87,12 @@ pub enum FarmTileSprites {
     // no sprite
     Soil,
 }
-impl Into<usize> for FarmTileSprites {
+impl Into<usize> for FarmTileSprite {
     fn into(self) -> usize {
         self as usize
     }
 }
-impl FarmTileSprites {
+impl FarmTileSprite {
     pub fn draw(&self, x: i32, y: i32, sprite_sheet: &mut Sprite) {
         render::fill_rect(x, y, 16, 16, 0b010_001_00);
         if self != &Self::Soil {
