@@ -64,13 +64,14 @@ impl State for FarmState<'static> {
 
             let x_pixel = index_x as i32 * 17 + 4;
             let y_pixel = index_y as i32 * 17 + 4;
+
             render::dithered_line_rect(
                 x_pixel,
                 y_pixel,
                 18,
                 18,
-                0b000_000_11,
-                (self.frame_count / 5) % 2 == 0,
+                0b111_111_11,
+                (self.frame_count / 5) % 2 == 1,
             );
         }
     }

@@ -1,7 +1,6 @@
 #![no_std]
 #![no_main]
 #![feature(iter_advance_by)]
-// #![feature(panic_info_message)]
 // TODO: remove dead_code
 #![allow(dead_code)]
 

@@ -1,10 +1,26 @@
 use crate::display::{render, sprite::Sprite};
 
-#[derive(Clone, Copy, PartialEq)]
-pub enum FarmTile {
-    Soil = 0,
+pub const HARVESTABLE_SPRITES: [FarmTileSprites; 13] = [
+    FarmTileSprites::Cuke3,    //
+    FarmTileSprites::Corn4,    //
+    FarmTileSprites::Onion2,   // veg
+    FarmTileSprites::Onion5,   // seeds
+    FarmTileSprites::Tater5,   // veg
+    FarmTileSprites::Tater3,   // seeds
+    FarmTileSprites::Carrot3,  // veg
+    FarmTileSprites::Carrot6,  // seeds
+    FarmTileSprites::Spinach4, // veg
+    FarmTileSprites::Spinach6, // seeds
+    FarmTileSprites::Mater4,   //
+    FarmTileSprites::Pump5,    // veg
+    FarmTileSprites::Pump6,    // seeds
+];
 
-    Tilled,
+pub const HARVESTABLE_COLOR: u8 = 0b000_000_11;
+
+#[derive(Clone, Copy, PartialEq)]
+pub enum FarmTileSprites {
+    Tilled = 0,
 
     Sprout,
 
@@ -67,19 +83,26 @@ pub enum FarmTile {
 
     Scare1,
     Scare2,
+
+    // no sprite
+    Soil,
 }
-impl Into<usize> for FarmTile {
+impl Into<usize> for FarmTileSprites {
     fn into(self) -> usize {
         self as usize
     }
 }
-impl FarmTile {
+impl FarmTileSprites {
     pub fn draw(&self, x: i32, y: i32, sprite_sheet: &mut Sprite) {
         render::fill_rect(x, y, 16, 16, 0b010_001_00);
         if self != &Self::Soil {
             sprite_sheet.x = x;
             sprite_sheet.y = y;
-            sprite_sheet.draw((*self) as usize - 1usize);
+            sprite_sheet.draw((*self) as usize);
+
+            if HARVESTABLE_SPRITES.contains(self) {
+                render::solid_line_rect(x - 1, y - 1, 18, 18, HARVESTABLE_COLOR);
+            }
         }
     }
 }

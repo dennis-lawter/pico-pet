@@ -1,63 +1,63 @@
 use crate::display::sprite::{Sprite, SpriteFactory};
 
-use super::farm_tile::FarmTile;
+use super::farm_tile::FarmTileSprites;
 
 pub struct FarmGarden<'a> {
-    tiles: [FarmTile; 7 * 7],
+    tiles: [FarmTileSprites; 7 * 7],
     sprite_sheet: Sprite<'a>,
 }
 impl Default for FarmGarden<'static> {
     fn default() -> Self {
         let mock_garden = [
-            FarmTile::Tilled,
-            FarmTile::Sprout,
-            FarmTile::Weed1,
-            FarmTile::Weed2,
-            FarmTile::Weed3,
-            FarmTile::Cuke1,
-            FarmTile::Cuke2,
-            FarmTile::Cuke3,
-            FarmTile::Corn1,
-            FarmTile::Corn2,
-            FarmTile::Corn3,
-            FarmTile::Corn4,
-            FarmTile::Onion1,
-            FarmTile::Onion2,
-            FarmTile::Onion3,
-            FarmTile::Onion4,
-            FarmTile::Onion5,
-            FarmTile::Tater1,
-            FarmTile::Tater2,
-            FarmTile::Tater3,
-            FarmTile::Tater4,
-            FarmTile::Tater5,
-            FarmTile::Carrot1,
-            FarmTile::Carrot2,
-            FarmTile::Carrot3,
-            FarmTile::Carrot4,
-            FarmTile::Carrot5,
-            FarmTile::Carrot6,
-            FarmTile::Spinach1,
-            FarmTile::Spinach2,
-            FarmTile::Spinach3,
-            FarmTile::Spinach4,
-            FarmTile::Spinach5,
-            FarmTile::Spinach6,
-            FarmTile::Mater1,
-            FarmTile::Mater2,
-            FarmTile::Mater3,
-            FarmTile::Mater4,
-            FarmTile::Pump1,
-            FarmTile::Pump2,
-            FarmTile::Pump3,
-            FarmTile::Pump4,
-            FarmTile::Pump5,
-            FarmTile::Pump6,
-            FarmTile::Planter,
-            FarmTile::Mulch,
-            FarmTile::BirdSeed,
-            FarmTile::Scare1,
-            FarmTile::Scare2,
+            FarmTileSprites::Tilled,
+            FarmTileSprites::Sprout,
+            FarmTileSprites::Weed1,
+            FarmTileSprites::Weed2,
+            FarmTileSprites::Weed3,
+            FarmTileSprites::Cuke1,
+            FarmTileSprites::Cuke2,
+            FarmTileSprites::Cuke3,
+            FarmTileSprites::Corn1,
+            FarmTileSprites::Corn2,
+            FarmTileSprites::Corn3,
+            FarmTileSprites::Corn4,
+            FarmTileSprites::Onion1,
+            FarmTileSprites::Onion2,
+            FarmTileSprites::Onion3,
+            FarmTileSprites::Onion4,
+            FarmTileSprites::Onion5,
+            FarmTileSprites::Tater1,
+            FarmTileSprites::Tater2,
+            FarmTileSprites::Tater3,
+            FarmTileSprites::Tater4,
+            FarmTileSprites::Tater5,
+            FarmTileSprites::Carrot1,
+            FarmTileSprites::Carrot2,
+            FarmTileSprites::Carrot3,
+            FarmTileSprites::Carrot4,
+            FarmTileSprites::Carrot5,
+            FarmTileSprites::Carrot6,
+            FarmTileSprites::Spinach1,
+            FarmTileSprites::Spinach2,
+            FarmTileSprites::Spinach3,
+            FarmTileSprites::Spinach4,
+            FarmTileSprites::Spinach5,
+            FarmTileSprites::Spinach6,
+            FarmTileSprites::Mater1,
+            FarmTileSprites::Mater2,
+            FarmTileSprites::Mater3,
+            FarmTileSprites::Mater4,
+            FarmTileSprites::Pump1,
+            FarmTileSprites::Pump2,
+            FarmTileSprites::Pump3,
+            FarmTileSprites::Pump4,
+            FarmTileSprites::Pump5,
+            FarmTileSprites::Pump6,
+            FarmTileSprites::Planter,
+            FarmTileSprites::Mulch,
+            FarmTileSprites::BirdSeed,
+            FarmTileSprites::Scare1,
+            FarmTileSprites::Scare2,
         ];
         Self {
             tiles: mock_garden,
@@ -66,6 +66,13 @@ impl Default for FarmGarden<'static> {
     }
 }
 impl FarmGarden<'static> {
+    pub fn tick(&mut self) {
+        // check to make sure we're in daylight hours (8:00 - 19:00)
+        // check to see if we're running a tended tick (minute should be 29-31)
+        // advance each tile
+        // check for birds
+        // check for weeds
+    }
     pub fn draw(&mut self) {
         for y in 0..7 {
             for x in 0..7 {
