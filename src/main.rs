@@ -1,7 +1,7 @@
 #![no_std]
 #![no_main]
 #![feature(iter_advance_by)]
-// TODO: remove dead_code
+// TODO (RELEASE): remove dead_code
 #![allow(dead_code)]
 
 extern crate cortex_m;
@@ -39,8 +39,9 @@ fn main() -> ! {
 
 fn init_globals() {
     globals::init_hardware();
-    globals::init_input();
     globals::init_nvm();
+    globals::init_input();
+    globals::init_garden();
     display::text_writer::init_singleton_fonts();
 }
 

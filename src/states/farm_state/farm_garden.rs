@@ -1,6 +1,6 @@
 use crate::display::sprite::{Sprite, SpriteFactory};
 
-use super::farm_tile::FarmTileSprite;
+use super::{farm_tile::FarmTileSprite, garden_action::GardenAction};
 
 pub struct FarmGarden<'a> {
     pub tiles: [FarmTileSprite; 7 * 7],
@@ -81,6 +81,69 @@ impl FarmGarden<'static> {
                 let y_pixel = y as i32 * 17 + 5;
                 self.tiles[index].draw(x_pixel, y_pixel, &mut self.sprite_sheet);
             }
+        }
+    }
+    pub fn act(&mut self, tile_id: usize, action: &GardenAction) {
+        let tile = self.tiles[tile_id];
+        match tile {
+            super::farm_tile::FarmTileSprite::Tilled => todo!(),
+            super::farm_tile::FarmTileSprite::Sprout => todo!(),
+            super::farm_tile::FarmTileSprite::Weed1 => todo!(),
+            super::farm_tile::FarmTileSprite::Weed2 => todo!(),
+            super::farm_tile::FarmTileSprite::Weed3 => todo!(),
+            super::farm_tile::FarmTileSprite::Cuke1 => todo!(),
+            super::farm_tile::FarmTileSprite::Cuke2 => todo!(),
+            super::farm_tile::FarmTileSprite::Cuke3 => todo!(),
+            super::farm_tile::FarmTileSprite::Corn1 => todo!(),
+            super::farm_tile::FarmTileSprite::Corn2 => todo!(),
+            super::farm_tile::FarmTileSprite::Corn3 => todo!(),
+            super::farm_tile::FarmTileSprite::Corn4 => todo!(),
+            super::farm_tile::FarmTileSprite::Onion1 => todo!(),
+            super::farm_tile::FarmTileSprite::Onion2 => todo!(),
+            super::farm_tile::FarmTileSprite::Onion3 => todo!(),
+            super::farm_tile::FarmTileSprite::Onion4 => todo!(),
+            super::farm_tile::FarmTileSprite::Onion5 => todo!(),
+            super::farm_tile::FarmTileSprite::Tater1 => todo!(),
+            super::farm_tile::FarmTileSprite::Tater2 => todo!(),
+            super::farm_tile::FarmTileSprite::Tater3 => todo!(),
+            super::farm_tile::FarmTileSprite::Tater4 => todo!(),
+            super::farm_tile::FarmTileSprite::Tater5 => todo!(),
+            super::farm_tile::FarmTileSprite::Carrot1 => todo!(),
+            super::farm_tile::FarmTileSprite::Carrot2 => todo!(),
+            super::farm_tile::FarmTileSprite::Carrot3 => todo!(),
+            super::farm_tile::FarmTileSprite::Carrot4 => todo!(),
+            super::farm_tile::FarmTileSprite::Carrot5 => todo!(),
+            super::farm_tile::FarmTileSprite::Carrot6 => todo!(),
+            super::farm_tile::FarmTileSprite::Spinach1 => todo!(),
+            super::farm_tile::FarmTileSprite::Spinach2 => todo!(),
+            super::farm_tile::FarmTileSprite::Spinach3 => todo!(),
+            super::farm_tile::FarmTileSprite::Spinach4 => todo!(),
+            super::farm_tile::FarmTileSprite::Spinach5 => todo!(),
+            super::farm_tile::FarmTileSprite::Spinach6 => todo!(),
+            super::farm_tile::FarmTileSprite::Mater1 => todo!(),
+            super::farm_tile::FarmTileSprite::Mater2 => todo!(),
+            super::farm_tile::FarmTileSprite::Mater3 => todo!(),
+            super::farm_tile::FarmTileSprite::Mater4 => todo!(),
+            super::farm_tile::FarmTileSprite::Pump1 => todo!(),
+            super::farm_tile::FarmTileSprite::Pump2 => todo!(),
+            super::farm_tile::FarmTileSprite::Pump3 => todo!(),
+            super::farm_tile::FarmTileSprite::Pump4 => todo!(),
+            super::farm_tile::FarmTileSprite::Pump5 => todo!(),
+            super::farm_tile::FarmTileSprite::Pump6 => todo!(),
+            super::farm_tile::FarmTileSprite::Planter => todo!(),
+            super::farm_tile::FarmTileSprite::Mulch => todo!(),
+            super::farm_tile::FarmTileSprite::BirdSeed => todo!(),
+            super::farm_tile::FarmTileSprite::Scare1 => todo!(),
+            super::farm_tile::FarmTileSprite::Scare2 => todo!(),
+
+            super::farm_tile::FarmTileSprite::Soil => match action {
+                GardenAction::Till => self.tiles[tile_id] = FarmTileSprite::Tilled,
+                GardenAction::BuildScarecrow => todo!(),
+                GardenAction::BuildPlanter => todo!(),
+                GardenAction::PlaceMulch => todo!(),
+                GardenAction::PlaceBirdseed => todo!(),
+                _ => todo!(),
+            },
         }
     }
 }

@@ -9,7 +9,7 @@ static mut BIG_REGULAR_FONT: Option<Font> = None;
 static mut BIG_BOLD_FONT: Option<Font> = None;
 static mut BIG_ITALIC_FONT: Option<Font> = None;
 
-// TODO: Remove unused fonts
+// TODO (RELEASE): Remove unused fonts
 #[allow(dead_code)]
 pub enum FontStyle {
     Small,

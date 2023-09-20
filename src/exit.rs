@@ -45,7 +45,7 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
         && !hardware.key2_pressed()
         && !hardware.key3_pressed()
     {}
-    // TODO: don't release with reset to USB
+    // TODO (RELEASE): don't reset to USB
     rom_data::reset_to_usb_boot(0, 0);
     // if reset fails, just reboot
     cortex_m::peripheral::SCB::sys_reset()

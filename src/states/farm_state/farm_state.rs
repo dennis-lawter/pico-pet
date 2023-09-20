@@ -4,17 +4,16 @@ use crate::{
     states::{AppState, State},
 };
 
-use super::{farm_action_menu::FarmActionMenu, farm_garden::FarmGarden};
+use super::garden_action_menu::GardenActionMenu;
 
-pub struct FarmState<'a> {
-    farm: FarmGarden<'a>,
+pub struct FarmState {
     tile_selected: Option<usize>,
     next_state: Option<AppState>,
     frame_count: usize,
-    selector_menu: Option<FarmActionMenu>,
+    selector_menu: Option<GardenActionMenu>,
 }
 
-impl State for FarmState<'static> {
+impl State for FarmState {
     fn input(&mut self) {
         let input = crate::globals::get_input();
 
@@ -51,20 +50,20 @@ impl State for FarmState<'static> {
                         let selected_y = (self.tile_selected.unwrap() / 7) * 17 + 5;
 
                         let menu_x = if selected_x > 64 {
-                            selected_x + 18 - FarmActionMenu::MENU_WIDTH
+                            selected_x + 18 - GardenActionMenu::MENU_WIDTH
                         } else {
                             selected_x - 1
                         };
                         let menu_y = if selected_y > 64 {
-                            selected_y - 2 - FarmActionMenu::MENU_HEIGHT
+                            selected_y - 2 - GardenActionMenu::MENU_HEIGHT
                         } else {
                             selected_y + 18
                         };
 
-                        self.selector_menu = Some(FarmActionMenu::new(
+                        self.selector_menu = Some(GardenActionMenu::new(
                             menu_x as i32,
                             menu_y as i32,
-                            &self.farm.tiles[self.tile_selected.unwrap()],
+                            self.tile_selected.unwrap(),
                         ));
                     }
                 }
@@ -89,7 +88,7 @@ impl State for FarmState<'static> {
     fn draw(&mut self) {
         render::flood(0b000_111_00);
 
-        self.farm.draw();
+        crate::globals::get_garden().draw();
 
         if self.tile_selected.is_some() {
             let index_x = self.tile_selected.unwrap() % 7;
@@ -126,12 +125,11 @@ impl State for FarmState<'static> {
     }
 }
 
-impl Default for FarmState<'static> {
+impl Default for FarmState {
     fn default() -> Self {
         Self {
             tile_selected: None,
             next_state: None,
-            farm: FarmGarden::default(),
             frame_count: 0,
             selector_menu: None,
         }
