@@ -13,7 +13,6 @@ extern crate embedded_hal;
 extern crate embedded_time;
 extern crate fixedstr;
 extern crate fugit;
-// extern crate panic_halt;
 extern crate st7735_lcd;
 extern crate waveshare_rp2040_lcd_0_96;
 
@@ -26,16 +25,7 @@ mod nvm;
 mod setting_value;
 mod states;
 
-use waveshare_rp2040_lcd_0_96::{entry, hal::multicore::Multicore};
-
-#[entry]
-fn main() -> ! {
-    init_globals();
-
-    spawn_secondary_core_worker();
-
-    cores::primary_main_loop()
-}
+use waveshare_rp2040_lcd_0_96::entry;
 
 fn init_globals() {
     globals::init_hardware();
@@ -45,19 +35,11 @@ fn init_globals() {
     display::text_writer::init_singleton_fonts();
 }
 
-fn spawn_secondary_core_worker() {
-    unsafe {
-        let hardware = globals::get_hardware();
-        let mut mc = Multicore::new(
-            &mut *hardware.psm_ptr,
-            &mut *hardware.ppb_ptr,
-            &mut *hardware.fifo_ptr,
-        );
-        let cores = &mut mc.cores();
-        let core1 = &mut cores[1];
-        let sys_freq = hardware.sys_freq;
-        let _test = core1.spawn(&mut cores::secondary_core::CORE1_STACK.mem, move || {
-            cores::secondary_main_loop(sys_freq)
-        });
-    }
+#[entry]
+fn main() -> ! {
+    init_globals();
+
+    cores::spawn_secondary_core_worker();
+
+    cores::run_primary_main_loop()
 }
