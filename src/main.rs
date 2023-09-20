@@ -22,6 +22,7 @@ mod exit;
 mod globals;
 mod hardware;
 mod nvm;
+mod rand;
 mod setting_value;
 mod states;
 
