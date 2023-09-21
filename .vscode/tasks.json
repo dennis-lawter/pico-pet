@@ -4,7 +4,7 @@
         {
             "label": "Build and upload",
             "type": "shell",
-            "command": "clear && cargo run --release --bin pico-pet",
+            "command": "clear && cargo run --release --bin pico-pet --target thumbv6m-none-eabi",
             "group": {
                 "kind": "build",
                 "isDefault": true

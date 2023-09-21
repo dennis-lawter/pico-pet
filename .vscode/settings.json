@@ -5,5 +5,8 @@
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true,
     "rust-analyzer.cargo.target": "thumbv6m-none-eabi",
-    "rust-analyzer.check.allTargets": false
+    "rust-analyzer.check.allTargets": false,
+    "rust-analyzer.files.excludeDirs": [
+        "/helpers/**"
+    ]
 }
