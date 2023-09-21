@@ -37,6 +37,3 @@ path = "src/main.rs"
 #opt-level = 's'
 opt-level = 3
 lto = true
-
-[dev-dependencies]
-indexmap = "2.0.0"

@@ -1,48 +1,46 @@
-use indexmap::IndexMap;
-
 /// Finds the best RP2040 PWM register settings to approximate A440 notes
 fn main() {
-    let mut freq_table: IndexMap<&str, f32> = IndexMap::new();
+    let freq_table: Vec<(&str, f32)> = vec![
+        ("C4", 261.63),
+        ("Cs4", 277.18),
+        ("D4", 293.66),
+        ("Ds4", 311.13),
+        ("E4", 329.63),
+        ("F4", 349.23),
+        ("Fs4", 369.99),
+        ("G4", 392.0),
+        ("Gs4", 415.3),
+        ("A4", 440.0),
+        ("As4", 466.16),
+        ("B4", 493.88),
+        ("C5", 523.25),
+        ("Cs5", 554.37),
+        ("D5", 587.33),
+        ("Ds5", 622.25),
+        ("E5", 659.25),
+        ("F5", 698.46),
+        ("Fs5", 739.99),
+        ("G5", 783.99),
+        ("Gs5", 830.61),
+        ("A5", 880.0),
+        ("As5", 932.33),
+        ("B5", 987.77),
+        ("C6", 1046.5),
+        ("Cs6", 1108.73),
+        ("D6", 1174.66),
+        ("Ds6", 1244.51),
+        ("E6", 1318.51),
+        ("F6", 1396.91),
+        ("Fs6", 1479.98),
+        ("G6", 1567.98),
+        ("Gs6", 1661.22),
+        ("A6", 1760.0),
+        ("As6", 1864.66),
+        ("B6", 1975.53),
+        ("C7", 2093.0),
+    ];
 
-    freq_table.insert("C4", 261.63);
-    freq_table.insert("Cs4", 277.18);
-    freq_table.insert("D4", 293.66);
-    freq_table.insert("Ds4", 311.13);
-    freq_table.insert("E4", 329.63);
-    freq_table.insert("F4", 349.23);
-    freq_table.insert("Fs4", 369.99);
-    freq_table.insert("G4", 392.0);
-    freq_table.insert("Gs4", 415.3);
-    freq_table.insert("A4", 440.0);
-    freq_table.insert("As4", 466.16);
-    freq_table.insert("B4", 493.88);
-    freq_table.insert("C5", 523.25);
-    freq_table.insert("Cs5", 554.37);
-    freq_table.insert("D5", 587.33);
-    freq_table.insert("Ds5", 622.25);
-    freq_table.insert("E5", 659.25);
-    freq_table.insert("F5", 698.46);
-    freq_table.insert("Fs5", 739.99);
-    freq_table.insert("G5", 783.99);
-    freq_table.insert("Gs5", 830.61);
-    freq_table.insert("A5", 880.0);
-    freq_table.insert("As5", 932.33);
-    freq_table.insert("B5", 987.77);
-    freq_table.insert("C6", 1046.5);
-    freq_table.insert("Cs6", 1108.73);
-    freq_table.insert("D6", 1174.66);
-    freq_table.insert("Ds6", 1244.51);
-    freq_table.insert("E6", 1318.51);
-    freq_table.insert("F6", 1396.91);
-    freq_table.insert("Fs6", 1479.98);
-    freq_table.insert("G6", 1567.98);
-    freq_table.insert("Gs6", 1661.22);
-    freq_table.insert("A6", 1760.0);
-    freq_table.insert("As6", 1864.66);
-    freq_table.insert("B6", 1975.53);
-    freq_table.insert("C7", 2093.0);
-
-    for (note, freq) in freq_table {
+    for &(note, freq) in &freq_table {
         let best_combo = get_closest_setting(freq);
         println!("            Self::{} => {:?},", note, best_combo);
     }
