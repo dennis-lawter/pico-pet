@@ -8,7 +8,7 @@ use crate::{
 
 use super::{farm_tile::FarmTileSprite, garden_action::GardenAction};
 
-const NUM_OF_ACTIONS: usize = 9;
+const NUM_OF_ACTIONS: usize = 8;
 
 pub struct GardenActionMenu {
     pub x: i32,
@@ -17,12 +17,13 @@ pub struct GardenActionMenu {
     selection_list: [GardenAction; NUM_OF_ACTIONS],
     tile_selected: usize,
     pub ready_to_exit: bool,
+    err_timer: usize,
 }
 
 impl GardenActionMenu {
     pub const MENU_WIDTH: usize = 60;
     pub const MENU_HEIGHT: usize = 50;
-    fn get_selection_list_from_tile(sprite: &FarmTileSprite) -> [GardenAction; 9] {
+    fn get_selection_list_from_tile(sprite: &FarmTileSprite) -> [GardenAction; 8] {
         match sprite {
             FarmTileSprite::Tilled => [
                 GardenAction::None,
@@ -32,8 +33,7 @@ impl GardenActionMenu {
                 GardenAction::None,
                 GardenAction::None,
                 GardenAction::None,
-                GardenAction::None,
-                GardenAction::None,
+                GardenAction::Remove,
             ],
 
             FarmTileSprite::Sprout => [
@@ -44,8 +44,7 @@ impl GardenActionMenu {
                 GardenAction::None,
                 GardenAction::None,
                 GardenAction::None,
-                GardenAction::None,
-                GardenAction::None,
+                GardenAction::Remove,
             ],
 
             FarmTileSprite::Weed1
@@ -79,13 +78,12 @@ impl GardenActionMenu {
             | FarmTileSprite::Pump4 => [
                 GardenAction::None,
                 GardenAction::None,
-                GardenAction::Prune,
                 GardenAction::None,
                 GardenAction::None,
                 GardenAction::None,
                 GardenAction::None,
                 GardenAction::None,
-                GardenAction::None,
+                GardenAction::Remove,
             ],
 
             FarmTileSprite::Cuke3
@@ -103,13 +101,12 @@ impl GardenActionMenu {
             | FarmTileSprite::Pump6 => [
                 GardenAction::None,
                 GardenAction::None,
-                GardenAction::Prune,
                 GardenAction::Harvest,
                 GardenAction::None,
                 GardenAction::None,
                 GardenAction::None,
                 GardenAction::None,
-                GardenAction::None,
+                GardenAction::Remove,
             ],
 
             FarmTileSprite::Planter
@@ -124,13 +121,11 @@ impl GardenActionMenu {
                 GardenAction::None,
                 GardenAction::None,
                 GardenAction::None,
-                GardenAction::None,
-                GardenAction::Destroy,
+                GardenAction::Remove,
             ],
 
             FarmTileSprite::Soil => [
                 GardenAction::Till,
-                GardenAction::None,
                 GardenAction::None,
                 GardenAction::None,
                 GardenAction::BuildScarecrow,
@@ -150,6 +145,7 @@ impl GardenActionMenu {
             x,
             y,
             tile_selected,
+            err_timer: 0,
         }
     }
     pub fn input(&mut self) {
@@ -169,11 +165,15 @@ impl GardenActionMenu {
         if input.get_state(&KeyNames::Confirm).just_released && self.selection != NUM_OF_ACTIONS {
             // TODO: handle action
             let action = &self.selection_list[self.selection];
-            crate::globals::get_garden().act(self.tile_selected, action);
-            self.ready_to_exit = true;
+            let result = crate::globals::get_garden().act(self.tile_selected, action);
+            if result.is_ok() {
+                self.ready_to_exit = true;
+            } else {
+                self.err_timer = 20;
+            }
         }
     }
-    pub fn draw(&self) {
+    pub fn draw(&mut self) {
         render::fill_rect(
             self.x,
             self.y,
@@ -193,7 +193,17 @@ impl GardenActionMenu {
                 text_writer::draw_text(self.x + 10, y, FontStyle::Small, 0b000_000_00, &action_str);
 
                 if i == self.selection {
-                    text_writer::draw_text(self.x + 5, y, FontStyle::Icon, 0b000_000_00, "}")
+                    if self.err_timer > 0 {
+                        render::h_solid_line(
+                            self.x + 5,
+                            y + 4,
+                            Self::MENU_WIDTH - 10,
+                            0b111_000_00,
+                        );
+                        self.err_timer -= 1;
+                    } else {
+                        text_writer::draw_text(self.x + 5, y, FontStyle::Icon, 0b000_000_00, "}");
+                    }
                 }
 
                 y += 8;

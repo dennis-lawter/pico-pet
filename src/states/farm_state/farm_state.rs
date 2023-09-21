@@ -116,7 +116,7 @@ impl State for FarmState {
         }
 
         if self.selector_menu.is_some() {
-            self.selector_menu.as_ref().unwrap().draw();
+            self.selector_menu.as_mut().unwrap().draw();
         }
     }
 
