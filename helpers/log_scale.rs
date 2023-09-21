@@ -1,5 +1,4 @@
 /// LOG SCALE TO 65535 BY 24 STEPS, KEEP HIGHEST 16
-
 fn main() {
     const MAX_VALUE: f64 = 65535.0;
     const TOTAL_VALUES: usize = 32;

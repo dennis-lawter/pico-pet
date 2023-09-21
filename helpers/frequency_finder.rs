@@ -1,6 +1,6 @@
-/// Finds the best RP2040 PWM register settings to approximate A440 notes
 use indexmap::IndexMap;
 
+/// Finds the best RP2040 PWM register settings to approximate A440 notes
 fn main() {
     let mut freq_table: IndexMap<&str, f32> = IndexMap::new();
 
