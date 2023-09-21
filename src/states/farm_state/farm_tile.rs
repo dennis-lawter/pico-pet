@@ -1,3 +1,5 @@
+use core::convert::TryFrom;
+
 use crate::display::{render, sprite::Sprite};
 
 pub const HARVESTABLE_SPRITES: [FarmTileSprite; 13] = [
@@ -90,6 +92,17 @@ pub enum FarmTileSprite {
 impl Into<usize> for FarmTileSprite {
     fn into(self) -> usize {
         self as usize
+    }
+}
+impl TryFrom<u8> for FarmTileSprite {
+    type Error = ();
+
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        if value <= (FarmTileSprite::Soil as u8) {
+            Ok(unsafe { core::mem::transmute(value) })
+        } else {
+            Err(())
+        }
     }
 }
 impl FarmTileSprite {

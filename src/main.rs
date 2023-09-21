@@ -31,6 +31,7 @@ use waveshare_rp2040_lcd_0_96::entry;
 fn init_globals() {
     globals::init_hardware();
     globals::init_nvm();
+    globals::init_rng();
     globals::init_input();
     globals::init_garden();
     display::text_writer::init_singleton_fonts();

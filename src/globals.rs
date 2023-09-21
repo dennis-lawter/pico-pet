@@ -1,6 +1,7 @@
 use crate::{
     hardware::{hardware::HardwareComponents, input::InputHandler},
     nvm::Nvm,
+    rand::Lcg,
     setting_value::Setting,
     states::farm_state::farm_garden::FarmGarden,
 };
@@ -44,4 +45,12 @@ pub fn init_garden() {
 }
 pub fn get_garden() -> &'static mut FarmGarden<'static> {
     unsafe { self::GARDEN.as_mut().unwrap() }
+}
+
+pub static mut RNG: Option<Lcg> = None;
+pub fn init_rng() {
+    unsafe { self::RNG = Some(Lcg::default()) }
+}
+pub fn get_rng() -> &'static mut Lcg {
+    unsafe { self::RNG.as_mut().unwrap() }
 }
