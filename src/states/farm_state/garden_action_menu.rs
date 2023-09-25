@@ -6,7 +6,7 @@ use crate::{
     hardware::input::KeyNames,
 };
 
-use super::{farm_tile::FarmTileSprite, garden_action::GardenAction};
+use super::{farm_tile::FarmTileSprite, garden_action::GardenAction, seed_menu::SeedMenu};
 
 const NUM_OF_ACTIONS: usize = 8;
 
@@ -18,6 +18,7 @@ pub struct GardenActionMenu {
     tile_selected: usize,
     pub ready_to_exit: bool,
     err_timer: usize,
+    seed_menu: Option<SeedMenu>,
 }
 
 impl GardenActionMenu {
@@ -146,67 +147,99 @@ impl GardenActionMenu {
             y,
             tile_selected,
             err_timer: 0,
+            seed_menu: None,
         }
     }
     pub fn input(&mut self) {
-        let input = crate::globals::get_input();
+        match &mut self.seed_menu {
+            Some(seed_menu) => seed_menu.input(),
+            None => {
+                let input = crate::globals::get_input();
 
-        if input.get_state(&KeyNames::Back).just_released {
-            self.ready_to_exit = true;
-            return;
-        }
+                if input.get_state(&KeyNames::Back).just_released {
+                    self.ready_to_exit = true;
+                    return;
+                }
 
-        if input.get_state(&KeyNames::Left).just_pressed {
-            self.dec_selection();
-        }
-        if input.get_state(&KeyNames::Right).just_pressed {
-            self.inc_selection();
-        }
-        if input.get_state(&KeyNames::Confirm).just_released && self.selection != NUM_OF_ACTIONS {
-            // TODO: handle action
-            let action = &self.selection_list[self.selection];
-            let result = crate::globals::get_garden().act(self.tile_selected, action);
-            if result.is_ok() {
-                self.ready_to_exit = true;
-            } else {
-                self.err_timer = 20;
+                if input.get_state(&KeyNames::Left).just_pressed {
+                    self.dec_selection();
+                }
+                if input.get_state(&KeyNames::Right).just_pressed {
+                    self.inc_selection();
+                }
+                if input.get_state(&KeyNames::Confirm).just_released
+                    && self.selection != NUM_OF_ACTIONS
+                {
+                    let action = &self.selection_list[self.selection];
+                    match action {
+                        GardenAction::Plant => {
+                            self.seed_menu = Some(SeedMenu::default());
+                        }
+                        _ => {
+                            let result =
+                                crate::globals::get_garden().act(self.tile_selected, action);
+                            if result.is_ok() {
+                                self.ready_to_exit = true;
+                            } else {
+                                self.err_timer = 20;
+                            }
+                        }
+                    }
+                }
             }
         }
     }
     pub fn draw(&mut self) {
-        render::fill_rect(
-            self.x,
-            self.y,
-            Self::MENU_WIDTH,
-            Self::MENU_HEIGHT,
-            0b111_111_11,
-        );
-        render::fancy_border(self.x, self.y, Self::MENU_WIDTH, Self::MENU_HEIGHT);
-        let mut y = self.y + 5;
-        for i in 0..NUM_OF_ACTIONS {
-            if self.selection_list[i] != GardenAction::None {
-                let action_str = fixedstr::str_format!(
-                    fixedstr::str12,
-                    "{}",
-                    GardenAction::from_usize(i).unwrap()
+        match &mut self.seed_menu {
+            Some(seed_menu) => seed_menu.draw(),
+            None => {
+                render::fill_rect(
+                    self.x,
+                    self.y,
+                    Self::MENU_WIDTH,
+                    Self::MENU_HEIGHT,
+                    0b111_111_11,
                 );
-                text_writer::draw_text(self.x + 10, y, FontStyle::Small, 0b000_000_00, &action_str);
-
-                if i == self.selection {
-                    if self.err_timer > 0 {
-                        render::h_solid_line(
-                            self.x + 5,
-                            y + 4,
-                            Self::MENU_WIDTH - 10,
-                            0b111_000_00,
+                render::fancy_border(self.x, self.y, Self::MENU_WIDTH, Self::MENU_HEIGHT);
+                let mut y = self.y + 5;
+                for i in 0..NUM_OF_ACTIONS {
+                    if self.selection_list[i] != GardenAction::None {
+                        let action_str = fixedstr::str_format!(
+                            fixedstr::str12,
+                            "{}",
+                            GardenAction::from_usize(i).unwrap()
                         );
-                        self.err_timer -= 1;
-                    } else {
-                        text_writer::draw_text(self.x + 5, y, FontStyle::Icon, 0b000_000_00, "}");
+                        text_writer::draw_text(
+                            self.x + 10,
+                            y,
+                            FontStyle::Small,
+                            0b000_000_00,
+                            &action_str,
+                        );
+
+                        if i == self.selection {
+                            if self.err_timer > 0 {
+                                render::h_solid_line(
+                                    self.x + 5,
+                                    y + 4,
+                                    Self::MENU_WIDTH - 10,
+                                    0b111_000_00,
+                                );
+                                self.err_timer -= 1;
+                            } else {
+                                text_writer::draw_text(
+                                    self.x + 5,
+                                    y,
+                                    FontStyle::Icon,
+                                    0b000_000_00,
+                                    "}",
+                                );
+                            }
+                        }
+
+                        y += 8;
                     }
                 }
-
-                y += 8;
             }
         }
     }

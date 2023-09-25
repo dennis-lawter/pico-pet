@@ -2,7 +2,7 @@ const SEED_SAMPLE_SIZE: usize = 86400;
 
 /// Profiles the Linear Congruential Generator
 fn main() {
-    let mut rng = Lcg::new(1);
+    let mut rng = Lcg::new(0);
     const ITERATIONS: usize = 1 << 16;
     let mut counts = [0u32; 256];
 
@@ -75,9 +75,12 @@ impl Lcg {
     const M: u32 = (1 << 16) + 1;
     const A: u32 = 75;
     const C: u32 = 74;
+    const S_OFFSET: u32 = 69691;
 
     pub fn new(seed: u32) -> Self {
-        Self { state: seed }
+        Self {
+            state: seed + Self::S_OFFSET,
+        }
     }
 
     pub fn next(&mut self) -> u8 {

@@ -1,4 +1,5 @@
 pub mod header;
+pub mod inventory;
 pub mod settings;
 
 pub use self::header::NvmHeader;
