@@ -1,6 +1,11 @@
 use core::{convert::TryFrom, fmt::Display};
 
-use crate::display::text_writer::{self, FontStyle};
+use crate::{
+    display::text_writer::{self, FontStyle},
+    nvm::page_canon::PageCanon,
+};
+
+// const NVM_SETTINGS_PAGE: u16 = 0x002;
 
 pub enum Seed {
     Cuke = 0,
@@ -91,21 +96,46 @@ pub struct SeedInventory {
 }
 impl Default for SeedInventory {
     fn default() -> Self {
-        let rng = crate::globals::get_rng();
+        let _rng = crate::globals::get_rng();
         Self {
             data: [
-                SeedCountData::new((rng.next() / 2).saturating_sub(14)),
-                SeedCountData::new((rng.next() / 2).saturating_sub(14)),
-                SeedCountData::new((rng.next() / 2).saturating_sub(14)),
-                SeedCountData::new((rng.next() / 2).saturating_sub(14)),
-                SeedCountData::new((rng.next() / 2).saturating_sub(14)),
-                SeedCountData::new((rng.next() / 2).saturating_sub(14)),
-                SeedCountData::new((rng.next() / 2).saturating_sub(14)),
+                // For testing
+                // SeedCountData::new((rng.next() / 2).saturating_sub(14)),
+                // SeedCountData::new((rng.next() / 2).saturating_sub(14)),
+                // SeedCountData::new((rng.next() / 2).saturating_sub(14)),
+                // SeedCountData::new((rng.next() / 2).saturating_sub(14)),
+                // SeedCountData::new((rng.next() / 2).saturating_sub(14)),
+                // SeedCountData::new((rng.next() / 2).saturating_sub(14)),
+                // SeedCountData::new((rng.next() / 2).saturating_sub(14)),
+                SeedCountData::new(0),
+                SeedCountData::new(0),
+                SeedCountData::new(0),
+                SeedCountData::new(0),
+                SeedCountData::new(0),
+                SeedCountData::new(0),
+                SeedCountData::new(0),
             ],
         }
     }
 }
 impl SeedInventory {
+    pub fn load() -> Self {
+        let hardware = crate::globals::get_hardware();
+        let data_u8s = hardware.get_nvm_page(PageCanon::SeedInventory.into());
+        let data = [
+            SeedCountData::new(data_u8s[0]),
+            SeedCountData::new(data_u8s[1]),
+            SeedCountData::new(data_u8s[2]),
+            SeedCountData::new(data_u8s[3]),
+            SeedCountData::new(data_u8s[4]),
+            SeedCountData::new(data_u8s[5]),
+            SeedCountData::new(data_u8s[6]),
+        ];
+        Self { data: data }
+    }
+    pub fn save(&self) {
+        todo!()
+    }
     pub fn display(&self, x: i32, y: i32) {
         let text = fixedstr::str_format!(fixedstr::str24, "{} x  ", Seed::Cuke);
         text_writer::draw_text(x, y, FontStyle::Small, 0b000_000_00, &text);

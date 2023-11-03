@@ -2,13 +2,23 @@ use self::seed_inventory::SeedInventory;
 
 pub mod seed_inventory;
 
-pub struct Inventory {
+pub struct NvmInventory {
     pub seed_inventory: SeedInventory,
 }
-impl Default for Inventory {
+impl Default for NvmInventory {
     fn default() -> Self {
         Self {
             seed_inventory: SeedInventory::default(),
         }
+    }
+}
+impl NvmInventory {
+    pub fn load() -> Self {
+        Self {
+            seed_inventory: SeedInventory::load(),
+        }
+    }
+    pub fn save(&self) {
+        self.seed_inventory.save()
     }
 }

@@ -1,6 +1,6 @@
 use crate::{
     hardware::{hardware::HardwareComponents, input::InputHandler},
-    nvm::{inventory::Inventory, Nvm},
+    nvm::{inventory::NvmInventory, Nvm},
     rand::Lcg,
     setting_value::Setting,
     states::farm_state::farm_garden::FarmGarden,
@@ -55,10 +55,14 @@ pub fn get_rng() -> &'static mut Lcg {
     unsafe { self::RNG.as_mut().unwrap() }
 }
 
-pub static mut INVENTORY: Option<Inventory> = None;
-pub fn init_inv() {
-    unsafe { self::INVENTORY = Some(Inventory::default()) }
-}
-pub fn get_inv() -> &'static mut Inventory {
-    unsafe { self::INVENTORY.as_mut().unwrap() }
+// pub static mut INVENTORY: Option<NvmInventory> = None;
+// pub fn init_inv() {
+//     unsafe { self::INVENTORY = Some(NvmInventory::default()) }
+// }
+// pub fn get_inv() -> &'static mut NvmInventory {
+//     unsafe { self::INVENTORY.as_mut().unwrap() }
+// }
+pub fn get_inv() -> &'static mut NvmInventory {
+    let nvm = get_nvm();
+    &mut nvm.inventory
 }
