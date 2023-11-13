@@ -2,7 +2,7 @@ use core::{convert::TryFrom, fmt::Display};
 
 use crate::{
     display::text_writer::{self, FontStyle},
-    nvm::page_canon::PageCanon,
+    nvm::{page_canon::PageCanon, NVM_BLANK},
 };
 
 // const NVM_SETTINGS_PAGE: u16 = 0x002;
@@ -96,7 +96,8 @@ pub struct SeedInventory {
 }
 impl Default for SeedInventory {
     fn default() -> Self {
-        let _rng = crate::globals::get_rng();
+        // rng does not exist yet...
+        // let _rng = crate::globals::get_rng();
         Self {
             data: [
                 // For testing
@@ -133,8 +134,21 @@ impl SeedInventory {
         ];
         Self { data: data }
     }
-    pub fn save(&self) {
-        todo!()
+    pub fn write(&self) {
+        let hardware = crate::globals::get_hardware();
+
+        let data_as_u8s = [
+            self.data[0].0,
+            self.data[1].0,
+            self.data[2].0,
+            self.data[3].0,
+            self.data[4].0,
+            self.data[5].0,
+            self.data[6].0,
+            NVM_BLANK,
+        ];
+
+        hardware.write_nvm_page(PageCanon::SeedInventory.into(), &data_as_u8s);
     }
     pub fn display(&self, x: i32, y: i32) {
         let text = fixedstr::str_format!(fixedstr::str24, "{} x  ", Seed::Cuke);

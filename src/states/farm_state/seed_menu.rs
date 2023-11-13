@@ -42,6 +42,21 @@ impl SeedMenu {
         inv.seed_inventory.display(16, 20);
 
         if self.selection != Self::NUM_OF_SELECTIONS {
+            // Testing seed write doesn't crash
+            // if self.selection == 0 {
+            //     let inv = crate::globals::get_inv();
+            //     inv.seed_inventory.write();
+            //     // let nvm = crate::globals::get_nvm();
+            //     // nvm.write_all();
+
+            //     text_writer::draw_text(
+            //         00,
+            //         20 + 8 * self.selection as i32,
+            //         text_writer::FontStyle::Icon,
+            //         0b000_000_00,
+            //         "}",
+            //     );
+            // }
             text_writer::draw_text(
                 10,
                 20 + 8 * self.selection as i32,

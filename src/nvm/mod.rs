@@ -53,6 +53,7 @@ impl Nvm {
     pub fn write_all(&mut self) {
         self.parity.write();
         self.settings.write();
+        self.inventory.write();
     }
 
     pub fn erase_all_then_reboot(&mut self) {

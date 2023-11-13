@@ -18,7 +18,7 @@ impl NvmInventory {
             seed_inventory: SeedInventory::load(),
         }
     }
-    pub fn save(&self) {
-        self.seed_inventory.save()
+    pub fn write(&self) {
+        self.seed_inventory.write()
     }
 }
