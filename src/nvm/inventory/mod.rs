@@ -1,21 +1,21 @@
-use self::seed_inventory::SeedInventory;
+use self::garden_inventory::GardenInventory;
 
-pub mod seed_inventory;
+pub mod garden_inventory;
 
 pub struct NvmInventory {
-    pub seed_inventory: SeedInventory,
+    pub seed_inventory: GardenInventory,
 }
 impl Default for NvmInventory {
     fn default() -> Self {
         Self {
-            seed_inventory: SeedInventory::default(),
+            seed_inventory: GardenInventory::default(),
         }
     }
 }
 impl NvmInventory {
     pub fn load() -> Self {
         Self {
-            seed_inventory: SeedInventory::load(),
+            seed_inventory: GardenInventory::load(),
         }
     }
     pub fn write(&self) {

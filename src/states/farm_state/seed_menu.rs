@@ -39,7 +39,7 @@ impl SeedMenu {
 
         text_writer::full_dialog_box("SEED BAG", "");
 
-        inv.seed_inventory.display(16, 20);
+        inv.seed_inventory.display_seeds(16, 20);
 
         if self.selection != Self::NUM_OF_SELECTIONS {
             // Testing seed write doesn't crash

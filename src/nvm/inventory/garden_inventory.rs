@@ -19,6 +19,7 @@ pub enum Seed {
 
     COUNT,
 }
+type Harvest = Seed;
 impl TryFrom<u8> for Seed {
     type Error = ();
 
@@ -91,10 +92,10 @@ impl SeedCountData {
     }
 }
 
-pub struct SeedInventory {
+pub struct GardenInventory {
     data: [SeedCountData; Seed::COUNT as usize - 1], // exclude cuke
 }
-impl Default for SeedInventory {
+impl Default for GardenInventory {
     fn default() -> Self {
         // rng does not exist yet...
         // let _rng = crate::globals::get_rng();
@@ -119,7 +120,7 @@ impl Default for SeedInventory {
         }
     }
 }
-impl SeedInventory {
+impl GardenInventory {
     pub fn load() -> Self {
         let hardware = crate::globals::get_hardware();
         let data_u8s = hardware.get_nvm_page(PageCanon::SeedInventory.into());
@@ -150,7 +151,7 @@ impl SeedInventory {
 
         hardware.write_nvm_page(PageCanon::SeedInventory.into(), &data_as_u8s);
     }
-    pub fn display(&self, x: i32, y: i32) {
+    pub fn display_seeds(&self, x: i32, y: i32) {
         let text = fixedstr::str_format!(fixedstr::str24, "{} x  ", Seed::Cuke);
         text_writer::draw_text(x, y, FontStyle::Small, 0b000_000_00, &text);
         text_writer::draw_text(x + 50, y, FontStyle::Icon, 0b000_000_00, "pq"); // infinity

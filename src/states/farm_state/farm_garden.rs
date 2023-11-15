@@ -53,6 +53,7 @@ impl FarmGarden<'static> {
             }
 
             GardenAction::BuildScarecrow => {
+                // TODO: consider adding building materials
                 if tile_id > 6 && self.tiles[tile_id - 7] == FarmTileSprite::Soil {
                     self.tiles[tile_id - 7] = FarmTileSprite::Scare1;
                     self.tiles[tile_id] = FarmTileSprite::Scare2;
