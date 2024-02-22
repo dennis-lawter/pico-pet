@@ -54,19 +54,13 @@ impl State for GamePlayState<'static> {
 
         for column in 0..5 {
             self.menu_sprite.x = column * 24 + 4;
-            self.menu_sprite.y = 0;
-
-            self.menu_sprite.draw(column as usize);
-        }
-        for column in 0..5 {
-            self.menu_sprite.x = column * 24 + 4;
             self.menu_sprite.y = 128 - 24;
 
-            self.menu_sprite.draw((column + 5) as usize);
+            self.menu_sprite.draw((column) as usize);
         }
 
         let sel_x: i32 = self.menu_item_selected as u8 as i32 % 5 * 24 + 5;
-        let sel_y: i32 = self.menu_item_selected as u8 as i32 / 5 * (128 - 24);
+        let sel_y: i32 = 128 - 24;
         render::fancy_border(sel_x as i32, sel_y as i32, 24, 24);
     }
 
@@ -95,15 +89,10 @@ impl State for GamePlayState<'static> {
 impl GamePlayState<'static> {
     fn menu_button_confirmed(&mut self) {
         match self.menu_item_selected {
-            MenuSelection::Feed => self.next_state = Some(AppState::SelectFood),
-            MenuSelection::Item1 => self.next_state = Some(AppState::FarmState),
-            MenuSelection::Item2 => self.next_state = Some(AppState::AppState2),
-            MenuSelection::Item3 => self.next_state = Some(AppState::AppState3),
-            MenuSelection::Item4 => self.next_state = Some(AppState::AppState4),
-            MenuSelection::Item5 => self.next_state = Some(AppState::AppState5),
-            MenuSelection::Item6 => self.next_state = Some(AppState::AppState6),
-            MenuSelection::Item7 => self.next_state = Some(AppState::AppState7),
-            MenuSelection::Item8 => self.next_state = Some(AppState::AppState8),
+            MenuSelection::Pomo => self.next_state = Some(AppState::SelectFood),
+            MenuSelection::Eat => self.next_state = Some(AppState::FarmState),
+            MenuSelection::Stat => self.next_state = Some(AppState::AppState2),
+            MenuSelection::Cosmetic => self.next_state = Some(AppState::AppState3),
             MenuSelection::Settings => self.next_state = Some(AppState::Settings),
             MenuSelection::None => {}
         }
@@ -124,7 +113,7 @@ impl Default for GamePlayState<'static> {
             menu_sprite,
             frame_count: 0,
             next_state: None,
-            menu_item_selected: MenuSelection::Feed,
+            menu_item_selected: MenuSelection::Pomo,
             menu_select_tone_timer: 0,
         }
     }
