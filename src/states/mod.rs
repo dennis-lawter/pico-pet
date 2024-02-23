@@ -1,6 +1,4 @@
-pub mod farm_state;
 pub mod game_play_state;
-pub mod select_food_state;
 pub mod settings_state;
 pub mod state_nyi;
 
@@ -8,16 +6,11 @@ pub mod state_nyi;
 pub enum AppState {
     GamePlay,
 
-    SelectFood,
-    FarmState,
-    AppState2,
-    AppState3,
-    AppState4,
-    AppState5,
-    AppState6,
-    AppState7,
-    AppState8,
-    Settings,
+    PomoState,
+    EatState,
+    StatState,
+    CosmeticState,
+    SettingsState,
 }
 impl Default for AppState {
     fn default() -> Self {

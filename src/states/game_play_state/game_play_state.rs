@@ -59,7 +59,7 @@ impl State for GamePlayState<'static> {
             self.menu_sprite.draw((column) as usize);
         }
 
-        let sel_x: i32 = self.menu_item_selected as u8 as i32 % 5 * 24 + 5;
+        let sel_x: i32 = self.menu_item_selected as u8 as i32 * 24 + 4;
         let sel_y: i32 = 128 - 24;
         render::fancy_border(sel_x as i32, sel_y as i32, 24, 24);
     }
@@ -89,11 +89,11 @@ impl State for GamePlayState<'static> {
 impl GamePlayState<'static> {
     fn menu_button_confirmed(&mut self) {
         match self.menu_item_selected {
-            MenuSelection::Pomo => self.next_state = Some(AppState::SelectFood),
-            MenuSelection::Eat => self.next_state = Some(AppState::FarmState),
-            MenuSelection::Stat => self.next_state = Some(AppState::AppState2),
-            MenuSelection::Cosmetic => self.next_state = Some(AppState::AppState3),
-            MenuSelection::Settings => self.next_state = Some(AppState::Settings),
+            MenuSelection::Pomo => self.next_state = Some(AppState::PomoState),
+            MenuSelection::Eat => self.next_state = Some(AppState::EatState),
+            MenuSelection::Stat => self.next_state = Some(AppState::StatState),
+            MenuSelection::Cosmetic => self.next_state = Some(AppState::CosmeticState),
+            MenuSelection::Settings => self.next_state = Some(AppState::SettingsState),
             MenuSelection::None => {}
         }
     }

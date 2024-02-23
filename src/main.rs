@@ -35,7 +35,6 @@ fn init_globals() {
     globals::init_rng();
     // globals::init_inv();
     globals::init_input();
-    globals::init_garden();
     display::text_writer::init_singleton_fonts();
 }
 

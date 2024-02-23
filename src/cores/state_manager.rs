@@ -1,15 +1,16 @@
 use crate::states::{
-    farm_state::FarmState, game_play_state::GamePlayState, select_food_state::SelectFoodState,
-    settings_state::SettingsState, state_nyi::StateNyi, AppState, State,
+    game_play_state::GamePlayState, settings_state::SettingsState, state_nyi::StateNyi, AppState,
+    State,
 };
 
 #[derive(Default)]
 pub struct StateManager<'a> {
     pub game_play_state: Option<GamePlayState<'a>>,
-    pub select_food_state: Option<SelectFoodState>,
-    pub state_nyi: Option<StateNyi>,
+    pub pomo_state: Option<StateNyi>,
+    pub eat_state: Option<StateNyi>,
+    pub stat_state: Option<StateNyi>,
+    pub cosmetic_state: Option<StateNyi>,
     pub settings_state: Option<SettingsState>,
-    pub farm_state: Option<FarmState>,
 
     pub active_state: AppState,
 }
@@ -17,17 +18,11 @@ impl StateManager<'static> {
     fn get_state(&mut self) -> &mut dyn State {
         match self.active_state {
             AppState::GamePlay => self.game_play_state.as_mut().unwrap(),
-            AppState::SelectFood => self.select_food_state.as_mut().unwrap(),
-            AppState::Settings => self.settings_state.as_mut().unwrap(),
-            AppState::FarmState => self.farm_state.as_mut().unwrap(),
-
-            AppState::AppState2
-            | AppState::AppState3
-            | AppState::AppState4
-            | AppState::AppState5
-            | AppState::AppState6
-            | AppState::AppState7
-            | AppState::AppState8 => self.state_nyi.as_mut().unwrap(),
+            AppState::SettingsState => self.settings_state.as_mut().unwrap(),
+            AppState::PomoState => self.pomo_state.as_mut().unwrap(),
+            AppState::EatState => self.eat_state.as_mut().unwrap(),
+            AppState::StatState => self.stat_state.as_mut().unwrap(),
+            AppState::CosmeticState => self.cosmetic_state.as_mut().unwrap(),
         }
     }
 
@@ -45,26 +40,19 @@ impl StateManager<'static> {
             Some(next_state) => {
                 self.active_state = next_state.clone();
                 self.game_play_state = None;
-                self.select_food_state = None;
-                self.state_nyi = None;
+                self.pomo_state = None;
+                self.eat_state = None;
+                self.stat_state = None;
+                self.cosmetic_state = None;
                 self.settings_state = None;
-                self.farm_state = None;
 
                 match next_state {
                     AppState::GamePlay => self.game_play_state = Some(GamePlayState::default()),
-                    AppState::SelectFood => {
-                        self.select_food_state = Some(SelectFoodState::default())
-                    }
-                    AppState::Settings => self.settings_state = Some(SettingsState::default()),
-                    AppState::FarmState => self.farm_state = Some(FarmState::default()),
-
-                    AppState::AppState2
-                    | AppState::AppState3
-                    | AppState::AppState4
-                    | AppState::AppState5
-                    | AppState::AppState6
-                    | AppState::AppState7
-                    | AppState::AppState8 => self.state_nyi = Some(StateNyi::default()),
+                    AppState::PomoState => self.pomo_state = Some(StateNyi::default()),
+                    AppState::EatState => self.eat_state = Some(StateNyi::default()),
+                    AppState::StatState => self.stat_state = Some(StateNyi::default()),
+                    AppState::CosmeticState => self.cosmetic_state = Some(StateNyi::default()),
+                    AppState::SettingsState => self.settings_state = Some(SettingsState::default()),
                 }
             }
             None => {}

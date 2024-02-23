@@ -3,7 +3,6 @@ use crate::{
     nvm::{inventory::NvmInventory, Nvm},
     rand::Lcg,
     setting_value::Setting,
-    states::farm_state::farm_garden::FarmGarden,
 };
 
 pub static mut BRIGHTNESS_SETTING: Setting = Setting {
@@ -37,14 +36,6 @@ pub fn init_nvm() {
 }
 pub fn get_nvm() -> &'static mut Nvm {
     unsafe { self::NVM.as_mut().unwrap() }
-}
-
-pub static mut GARDEN: Option<FarmGarden> = None;
-pub fn init_garden() {
-    unsafe { self::GARDEN = Some(FarmGarden::default()) }
-}
-pub fn get_garden() -> &'static mut FarmGarden<'static> {
-    unsafe { self::GARDEN.as_mut().unwrap() }
 }
 
 pub static mut RNG: Option<Lcg> = None;
