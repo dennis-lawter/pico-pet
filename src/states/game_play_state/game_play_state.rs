@@ -48,8 +48,12 @@ impl State for GamePlayState<'static> {
     }
 
     fn draw(&mut self) {
-        render::flood(0b010_010_01);
-
+        let input = crate::globals::get_input();
+        if input.get_state(&KeyNames::Clock).is_down {
+            render::flood(0b000_000_00)
+        } else {
+            render::flood(0b000_000_11);
+        }
         self.ferris.draw(((self.frame_count / 20) % 2) as usize);
 
         for column in 0..5 {

@@ -51,6 +51,7 @@ type Key1Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio17, hal::gpio::Input<hal::gp
 type Key1AltPin = hal::gpio::Pin<hal::gpio::bank0::Gpio29, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key2Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio2, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key3Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio3, hal::gpio::Input<hal::gpio::PullUp>>;
+type Key5Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio5, hal::gpio::Input<hal::gpio::PullUp>>;
 
 type I2CBus = hal::I2C<
     pac::I2C0,
@@ -72,6 +73,7 @@ pub struct HardwareComponents {
     pub key1_alt: Key1AltPin,
     pub key2: Key2Pin,
     pub key3: Key3Pin,
+    pub second_clock: Key5Pin,
     pub psm_ptr: *mut PSM,
     pub ppb_ptr: *mut PPB,
     pub fifo_ptr: *mut SioFifo,
@@ -146,6 +148,8 @@ impl HardwareComponents {
             let key2 = pins.gpio2.into_pull_up_input();
             let key3 = pins.gpio3.into_pull_up_input();
 
+            let second_clock = pins.gpio5.into_pull_up_input();
+
             let sys_freq = clocks.system_clock.freq().to_Hz();
             let mut delay = Delay::new(core.SYST, sys_freq);
 
@@ -205,7 +209,7 @@ impl HardwareComponents {
                 &clocks.system_clock,
             );
 
-            Self {
+            let mut s = Self {
                 display,
                 sys_freq,
                 backlight_channel_ptr,
@@ -217,11 +221,17 @@ impl HardwareComponents {
                 key1_alt,
                 key2,
                 key3,
+                second_clock,
                 psm_ptr,
                 ppb_ptr,
                 fifo_ptr,
                 i2c_bus,
-            }
+            };
+
+            // enable 1hz clock
+            s.write_sqw_pin_mode(0x00);
+
+            s
         }
     }
 
@@ -239,6 +249,10 @@ impl HardwareComponents {
 
     pub fn key3_pressed(&self) -> bool {
         self.key3.is_low().unwrap()
+    }
+
+    pub fn clock_high(&self) -> bool {
+        self.second_clock.is_low().unwrap()
     }
 
     const BRIGHTNESS_LUT: [u16; 16] = [
@@ -277,6 +291,20 @@ impl HardwareComponents {
 
     pub fn end_tone(&mut self) {
         self.start_tone(&AudioFrequency::None);
+    }
+
+    fn write_sqw_pin_mode(&mut self, mode: u8) -> () {
+        let mut buffer = [0u8; 1];
+        self.i2c_bus.write(0x68, &[0x0E]).unwrap();
+        self.i2c_bus.read(0x68, &mut buffer).unwrap();
+        let mut ctrl = buffer[0];
+
+        ctrl &= !0x04; // turn off INTCON
+        ctrl &= !0x18; // set freq bits to 0
+
+        ctrl |= mode;
+
+        self.i2c_bus.write(0x68, &[0x0E, ctrl]).unwrap();
     }
 
     pub fn get_time(&mut self) -> RealTime {

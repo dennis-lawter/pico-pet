@@ -1,4 +1,10 @@
 # Pico Pet
+A virtual pet that requires the user to complete pomodoros for the health of their pet.
+
+## Hardware
+- RP2040 or RP2040-Tiny
+- Waveshare 1.44"
+- DS3231
 
 ## NVM Utilization
 The NVM (Non-Volatile Memory) module offers 4KiB arranged in 512 pages of 8 bytes each.
@@ -118,11 +124,14 @@ graph LR
     subgraph RTC_NVM
         RTC_SDA
         RTC_SCL
+        RTC_SQW
     end
     Pin1[Pin1 I2C0_SDA] --> RTC_SDA
     RTC_SDA --> TinyPin0[TinyPin0 I2C0_SDA]
     Pin2[Pin2 I2C0_SCL] --> RTC_SCL
     RTC_SCL --> TinyPin1[TinyPin1 I2C0_SCL]
+    Pin7[Pin7 GP5] --> RTC_SQW
+    RTC_SQW --> TinyPin5[TinyPin5 GP5]
 
 
 
