@@ -7,11 +7,33 @@ use crate::{
 
 pub static mut BRIGHTNESS_SETTING: Setting = Setting {
     value: 15,
+    min_value: 0,
     max_value: 15,
 };
 pub static mut VOLUME_SETTING: Setting = Setting {
     value: 2,
+    min_value: 0,
     max_value: 4,
+};
+pub static mut POMO_TIME_SETTING: Setting = Setting {
+    value: 25,
+    min_value: 5,
+    max_value: 90,
+};
+pub static mut SHORT_BREAK_TIME_SETTING: Setting = Setting {
+    value: 5,
+    min_value: 1,
+    max_value: 90,
+};
+pub static mut LONG_BREAK_TIME_SETTING: Setting = Setting {
+    value: 15,
+    min_value: 1,
+    max_value: 90,
+};
+pub static mut POMO_CYCLE_SETTING: Setting = Setting {
+    value: 4,
+    min_value: 1,
+    max_value: 9,
 };
 
 pub static mut HARDWARE: Option<HardwareComponents> = None;

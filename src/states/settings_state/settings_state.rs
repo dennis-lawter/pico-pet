@@ -31,9 +31,6 @@ pub struct SettingsState {
     new_time: Option<RealTime>,
     new_time_selection: u8,
 
-    pomo_time_setting: u8,
-    pomo_cycle_setting: u8,
-
     frames_reset_button_held: u8,
 }
 impl State for SettingsState {
@@ -107,10 +104,10 @@ impl State for SettingsState {
                 self.adjust_time();
             }
             SettingSelected::PomoTime => {
-                self.adjust_pomo_time();
+                self.adjust_setting(unsafe { &mut globals::POMO_TIME_SETTING });
             }
             SettingSelected::PomoCycle => {
-                self.adjust_pomo_cycle();
+                self.adjust_setting(unsafe { &mut globals::POMO_CYCLE_SETTING });
             }
             SettingSelected::Reset => {
                 self.process_reset();
@@ -165,7 +162,10 @@ impl SettingsState {
             && input.get_state(&KeyNames::Back).just_released
         {
             match self.setting_selected {
-                SettingSelected::Brightness | SettingSelected::Volume => {
+                SettingSelected::Brightness
+                | SettingSelected::Volume
+                | SettingSelected::PomoTime
+                | SettingSelected::PomoCycle => {
                     crate::globals::get_nvm().settings.write();
                 }
                 _ => {}
@@ -264,24 +264,6 @@ impl SettingsState {
                 hardware.set_time(self.new_time.as_mut().unwrap());
                 self.new_time = None;
             }
-        }
-    }
-
-    fn adjust_pomo_time(&mut self) {
-        let input = crate::globals::get_input();
-        if input.get_state(&KeyNames::Left).just_pressed {
-            self.pomo_time_setting = self.pomo_time_setting.wrapping_sub(1);
-        } else if input.get_state(&KeyNames::Right).just_pressed {
-            self.pomo_time_setting = self.pomo_time_setting.wrapping_add(1);
-        }
-    }
-
-    fn adjust_pomo_cycle(&mut self) {
-        let input = crate::globals::get_input();
-        if input.get_state(&KeyNames::Left).just_pressed {
-            self.pomo_cycle_setting = self.pomo_cycle_setting.wrapping_sub(1);
-        } else if input.get_state(&KeyNames::Right).just_pressed {
-            self.pomo_cycle_setting = self.pomo_cycle_setting.wrapping_add(1);
         }
     }
 
@@ -480,8 +462,9 @@ impl SettingsState {
             0b000_000_00,
             "POMODORO TIME",
         );
+        let pomo_time_setting = unsafe { &globals::POMO_TIME_SETTING }.get_value();
         if self.setting_selected == SettingSelected::PomoTime {
-            let time_str = str_format!(fixedstr::str12, "{:02}        ", self.pomo_time_setting,);
+            let time_str = str_format!(fixedstr::str12, "{:02}        ", pomo_time_setting,);
             text_writer::draw_text_centered(
                 LCD_WIDTH as i32 / 2,
                 18 + (y_offset * 2 + 1) * 8 - 1,
@@ -490,7 +473,7 @@ impl SettingsState {
                 time_str.as_str(),
             );
         } else {
-            let time_str = str_format!(fixedstr::str12, "{:02}        ", self.pomo_time_setting,);
+            let time_str = str_format!(fixedstr::str12, "{:02}        ", pomo_time_setting,);
             text_writer::draw_text_centered(
                 LCD_WIDTH as i32 / 2,
                 18 + (y_offset * 2 + 1) * 8,
@@ -517,8 +500,9 @@ impl SettingsState {
             0b000_000_00,
             "POMODORO CYCLES",
         );
+        let pomo_cycle_setting = unsafe { &globals::POMO_CYCLE_SETTING }.get_value();
         if self.setting_selected == SettingSelected::PomoCycle {
-            let time_str = str_format!(fixedstr::str12, "{:01}      ", self.pomo_cycle_setting,);
+            let time_str = str_format!(fixedstr::str12, "{:01}      ", pomo_cycle_setting,);
             text_writer::draw_text_centered(
                 LCD_WIDTH as i32 / 2,
                 18 + (y_offset * 2 + 1) * 8 - 1,
@@ -527,7 +511,7 @@ impl SettingsState {
                 time_str.as_str(),
             );
         } else {
-            let time_str = str_format!(fixedstr::str12, "{:01}      ", self.pomo_cycle_setting,);
+            let time_str = str_format!(fixedstr::str12, "{:01}      ", pomo_cycle_setting,);
             text_writer::draw_text_centered(
                 LCD_WIDTH as i32 / 2,
                 18 + (y_offset * 2 + 1) * 8,
@@ -605,10 +589,6 @@ impl Default for SettingsState {
             time: None,
             new_time: None,
             new_time_selection: 0,
-
-            // TODO: temporary
-            pomo_time_setting: 25,
-            pomo_cycle_setting: 4,
 
             frames_reset_button_held: 0,
         }

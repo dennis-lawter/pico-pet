@@ -3,6 +3,7 @@ const SETTING_BAR_SIZE: usize = 15;
 pub struct Setting {
     // must be pub to allow static instantiation
     pub value: u8,
+    pub min_value: u8,
     pub max_value: u8,
 }
 
@@ -18,11 +19,11 @@ impl Setting {
     }
 
     pub fn inc(&mut self) {
-        self.value = (self.value + 1).min(self.max_value);
+        self.value = (self.value.saturating_add(1)).min(self.max_value);
     }
 
     pub fn dec(&mut self) {
-        self.value = self.value.saturating_sub(1);
+        self.value = (self.value.saturating_sub(1)).max(self.min_value);
     }
 
     pub fn generate_bar(&self, active: bool) -> &'static str {
