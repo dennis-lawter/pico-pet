@@ -31,6 +31,8 @@ pub struct SettingsState {
     new_time: Option<RealTime>,
     new_time_selection: u8,
 
+    pomo_time_setting: u8,
+
     frames_reset_button_held: u8,
 }
 impl State for SettingsState {
@@ -60,13 +62,15 @@ impl State for SettingsState {
 
         self.display_cursor();
 
-        self.display_brightness_setting();
+        self.display_brightness_setting(0);
 
-        self.display_volume_setting();
+        self.display_volume_setting(1);
 
-        self.display_time_adjustment_setting();
+        self.display_time_adjustment_setting(2);
 
-        self.display_reset_setting();
+        self.display_pomo_time_selector(3);
+
+        self.display_reset_setting(4);
     }
 
     fn input(&mut self) {
@@ -98,6 +102,9 @@ impl State for SettingsState {
             }
             SettingSelected::Time => {
                 self.adjust_time();
+            }
+            SettingSelected::Pomo => {
+                self.adjust_pomo();
             }
             SettingSelected::Reset => {
                 self.process_reset();
@@ -254,13 +261,12 @@ impl SettingsState {
         }
     }
 
+    fn adjust_pomo(&mut self) {}
+
     fn setting_to_y_offset(setting: &SettingSelected) -> i32 {
         match setting {
-            SettingSelected::Brightness => 1,
-            SettingSelected::Volume => 3,
-            SettingSelected::Time => 5,
-            SettingSelected::Reset => 7,
             SettingSelected::None => -4, // hide cursor far above screen
+            _ => (*setting as i32) * 2 + 1,
         }
     }
 
@@ -270,21 +276,27 @@ impl SettingsState {
             _ => ("4}", &self.setting_selected),
         };
 
-        let y_offset = Self::setting_to_y_offset(setting);
-        text_writer::draw_text(10, 18 + 8 * y_offset, FontStyle::Icon, 0b111_000_00, icon);
+        let y_cursor_offset = Self::setting_to_y_offset(setting);
+        text_writer::draw_text(
+            10,
+            18 + 8 * y_cursor_offset,
+            FontStyle::Icon,
+            0b111_000_00,
+            icon,
+        );
     }
 
-    fn display_brightness_setting(&self) {
+    fn display_brightness_setting(&self, y_offset: i32) {
         text_writer::draw_text_centered(
             LCD_WIDTH as i32 / 2,
-            18,
+            18 + y_offset * 2 * 8,
             FontStyle::Small,
             0b000_000_00,
             "BRIGHTNESS",
         );
         text_writer::draw_text(
             24,
-            18 + 8,
+            18 + (y_offset * 2 + 1) * 8,
             FontStyle::Icon,
             0b000_000_11,
             unsafe { &globals::BRIGHTNESS_SETTING }
@@ -292,17 +304,17 @@ impl SettingsState {
         );
     }
 
-    fn display_volume_setting(&self) {
+    fn display_volume_setting(&self, y_offset: i32) {
         text_writer::draw_text_centered(
             LCD_WIDTH as i32 / 2,
-            18 + 8 * 2,
+            18 + y_offset * 2 * 8,
             FontStyle::Small,
             0b000_000_00,
             "VOLUME",
         );
         text_writer::draw_text(
             24,
-            18 + 8 * 3,
+            18 + (y_offset * 2 + 1) * 8,
             FontStyle::Icon,
             0b000_000_11,
             unsafe { &globals::VOLUME_SETTING }
@@ -310,10 +322,10 @@ impl SettingsState {
         );
     }
 
-    fn display_time_adjustment_setting(&self) {
+    fn display_time_adjustment_setting(&self, y_offset: i32) {
         text_writer::draw_text_centered(
             LCD_WIDTH as i32 / 2,
-            18 + 8 * 4,
+            18 + y_offset * 2 * 8,
             FontStyle::Small,
             0b000_000_00,
             "ADJUST TIME",
@@ -331,7 +343,7 @@ impl SettingsState {
                         );
                         text_writer::draw_text_centered(
                             LCD_WIDTH as i32 / 2,
-                            18 + 8 * 5,
+                            18 + (y_offset * 2 + 1) * 8,
                             FontStyle::Small,
                             0b000_000_00,
                             time_str.as_str(),
@@ -345,7 +357,7 @@ impl SettingsState {
                         );
                         text_writer::draw_text_centered(
                             LCD_WIDTH as i32 / 2,
-                            18 + 8 * 5 - 1,
+                            18 + (y_offset * 2 + 1) * 8 - 1,
                             FontStyle::Small,
                             0b000_000_11,
                             active_time_str.as_str(),
@@ -361,7 +373,7 @@ impl SettingsState {
                         );
                         text_writer::draw_text_centered(
                             LCD_WIDTH as i32 / 2,
-                            18 + 8 * 5,
+                            18 + (y_offset * 2 + 1) * 8,
                             FontStyle::Small,
                             0b000_000_00,
                             time_str.as_str(),
@@ -375,7 +387,7 @@ impl SettingsState {
                         );
                         text_writer::draw_text_centered(
                             LCD_WIDTH as i32 / 2,
-                            18 + 8 * 5 - 1,
+                            18 + (y_offset * 2 + 1) * 8 - 1,
                             FontStyle::Small,
                             0b000_000_11,
                             active_time_str.as_str(),
@@ -391,7 +403,7 @@ impl SettingsState {
                         );
                         text_writer::draw_text_centered(
                             LCD_WIDTH as i32 / 2,
-                            18 + 8 * 5,
+                            18 + (y_offset * 2 + 1) * 8,
                             FontStyle::Small,
                             0b000_000_00,
                             time_str.as_str(),
@@ -405,7 +417,7 @@ impl SettingsState {
                         );
                         text_writer::draw_text_centered(
                             LCD_WIDTH as i32 / 2,
-                            18 + 8 * 5 - 1,
+                            18 + (y_offset * 2 + 1) * 8 - 1,
                             FontStyle::Small,
                             0b000_000_11,
                             active_time_str.as_str(),
@@ -427,7 +439,7 @@ impl SettingsState {
                     );
                     text_writer::draw_text_centered(
                         LCD_WIDTH as i32 / 2,
-                        18 + 8 * 5,
+                        18 + (y_offset * 2 + 1) * 8,
                         FontStyle::Small,
                         0b000_000_00,
                         time_str.as_str(),
@@ -438,10 +450,47 @@ impl SettingsState {
         };
     }
 
-    fn display_reset_setting(&self) {
+    fn display_pomo_time_selector(&self, y_offset: i32) {
         text_writer::draw_text_centered(
             LCD_WIDTH as i32 / 2,
-            18 + 8 * 6,
+            18 + y_offset * 2 * 8,
+            FontStyle::Small,
+            0b000_000_00,
+            "POMODORO TIME",
+        );
+        if self.setting_selected == SettingSelected::Pomo {
+            let time_str = str_format!(fixedstr::str12, "{:02}        ", self.pomo_time_setting,);
+            text_writer::draw_text_centered(
+                LCD_WIDTH as i32 / 2,
+                18 + (y_offset * 2 + 1) * 8 - 1,
+                FontStyle::Small,
+                0b000_000_11,
+                time_str.as_str(),
+            );
+        } else {
+            let time_str = str_format!(fixedstr::str12, "{:02}        ", self.pomo_time_setting,);
+            text_writer::draw_text_centered(
+                LCD_WIDTH as i32 / 2,
+                18 + (y_offset * 2 + 1) * 8,
+                FontStyle::Small,
+                0b000_000_00,
+                time_str.as_str(),
+            );
+        }
+        let min_str = "   minutes";
+        text_writer::draw_text_centered(
+            LCD_WIDTH as i32 / 2,
+            18 + (y_offset * 2 + 1) * 8 - 1,
+            FontStyle::Small,
+            0b000_000_00,
+            min_str,
+        );
+    }
+
+    fn display_reset_setting(&self, y_offset: i32) {
+        text_writer::draw_text_centered(
+            LCD_WIDTH as i32 / 2,
+            18 + y_offset * 2 * 8,
             FontStyle::Small,
             0b110_000_00,
             "RESET (HOLD CONFIRM)",
@@ -449,7 +498,7 @@ impl SettingsState {
 
         crate::display::render::solid_line_rect(
             LCD_WIDTH as i32 / 2 - (5 * 8),
-            18 + 8 * 7,
+            18 + (y_offset * 2 + 1) * 8,
             5 * 16,
             8,
             0b110_000_00,
@@ -457,7 +506,7 @@ impl SettingsState {
 
         crate::display::render::fill_rect(
             LCD_WIDTH as i32 / 2 - (5 * 8) + 1,
-            18 + 8 * 7 + 1,
+            18 + (y_offset * 2 + 1) * 8 + 1,
             self.frames_reset_button_held as usize,
             6,
             0b001_000_00,
@@ -497,6 +546,10 @@ impl Default for SettingsState {
             time: None,
             new_time: None,
             new_time_selection: 0,
+
+            // TODO: temporary
+            pomo_time_setting: 25,
+
             frames_reset_button_held: 0,
         }
     }
