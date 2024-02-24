@@ -3,7 +3,8 @@ pub enum SettingSelected {
     Brightness = 0,
     Volume,
     Time,
-    Pomo,
+    PomoTime,
+    PomoCycle,
     Reset,
     None = 255,
 }

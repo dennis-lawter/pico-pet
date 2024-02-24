@@ -32,6 +32,7 @@ pub struct SettingsState {
     new_time_selection: u8,
 
     pomo_time_setting: u8,
+    pomo_cycle_setting: u8,
 
     frames_reset_button_held: u8,
 }
@@ -70,7 +71,9 @@ impl State for SettingsState {
 
         self.display_pomo_time_selector(3);
 
-        self.display_reset_setting(4);
+        self.display_pomo_cycle_selector(4);
+
+        self.display_reset_setting(5);
     }
 
     fn input(&mut self) {
@@ -103,8 +106,11 @@ impl State for SettingsState {
             SettingSelected::Time => {
                 self.adjust_time();
             }
-            SettingSelected::Pomo => {
-                self.adjust_pomo();
+            SettingSelected::PomoTime => {
+                self.adjust_pomo_time();
+            }
+            SettingSelected::PomoCycle => {
+                self.adjust_pomo_cycle();
             }
             SettingSelected::Reset => {
                 self.process_reset();
@@ -261,7 +267,23 @@ impl SettingsState {
         }
     }
 
-    fn adjust_pomo(&mut self) {}
+    fn adjust_pomo_time(&mut self) {
+        let input = crate::globals::get_input();
+        if input.get_state(&KeyNames::Left).just_pressed {
+            self.pomo_time_setting = self.pomo_time_setting.wrapping_sub(1);
+        } else if input.get_state(&KeyNames::Right).just_pressed {
+            self.pomo_time_setting = self.pomo_time_setting.wrapping_add(1);
+        }
+    }
+
+    fn adjust_pomo_cycle(&mut self) {
+        let input = crate::globals::get_input();
+        if input.get_state(&KeyNames::Left).just_pressed {
+            self.pomo_cycle_setting = self.pomo_cycle_setting.wrapping_sub(1);
+        } else if input.get_state(&KeyNames::Right).just_pressed {
+            self.pomo_cycle_setting = self.pomo_cycle_setting.wrapping_add(1);
+        }
+    }
 
     fn setting_to_y_offset(setting: &SettingSelected) -> i32 {
         match setting {
@@ -458,7 +480,7 @@ impl SettingsState {
             0b000_000_00,
             "POMODORO TIME",
         );
-        if self.setting_selected == SettingSelected::Pomo {
+        if self.setting_selected == SettingSelected::PomoTime {
             let time_str = str_format!(fixedstr::str12, "{:02}        ", self.pomo_time_setting,);
             text_writer::draw_text_centered(
                 LCD_WIDTH as i32 / 2,
@@ -478,6 +500,43 @@ impl SettingsState {
             );
         }
         let min_str = "   minutes";
+        text_writer::draw_text_centered(
+            LCD_WIDTH as i32 / 2,
+            18 + (y_offset * 2 + 1) * 8 - 1,
+            FontStyle::Small,
+            0b000_000_00,
+            min_str,
+        );
+    }
+
+    fn display_pomo_cycle_selector(&self, y_offset: i32) {
+        text_writer::draw_text_centered(
+            LCD_WIDTH as i32 / 2,
+            18 + y_offset * 2 * 8,
+            FontStyle::Small,
+            0b000_000_00,
+            "POMODORO CYCLES",
+        );
+        if self.setting_selected == SettingSelected::PomoCycle {
+            let time_str = str_format!(fixedstr::str12, "{:01}      ", self.pomo_cycle_setting,);
+            text_writer::draw_text_centered(
+                LCD_WIDTH as i32 / 2,
+                18 + (y_offset * 2 + 1) * 8 - 1,
+                FontStyle::Small,
+                0b000_000_11,
+                time_str.as_str(),
+            );
+        } else {
+            let time_str = str_format!(fixedstr::str12, "{:01}      ", self.pomo_cycle_setting,);
+            text_writer::draw_text_centered(
+                LCD_WIDTH as i32 / 2,
+                18 + (y_offset * 2 + 1) * 8,
+                FontStyle::Small,
+                0b000_000_00,
+                time_str.as_str(),
+            );
+        }
+        let min_str = "  cycles";
         text_writer::draw_text_centered(
             LCD_WIDTH as i32 / 2,
             18 + (y_offset * 2 + 1) * 8 - 1,
@@ -549,6 +608,7 @@ impl Default for SettingsState {
 
             // TODO: temporary
             pomo_time_setting: 25,
+            pomo_cycle_setting: 4,
 
             frames_reset_button_held: 0,
         }
