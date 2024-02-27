@@ -13,10 +13,14 @@ use crate::setting_value::Setting;
 use crate::states::AppState;
 use crate::states::State;
 
+use super::setting_components::SettingComponent;
 use super::setting_selected::SettingSelected;
 use super::song;
 
 const FRAMES_TO_RESET: u8 = 5 * 16 - 2;
+const SETTING_HEIGHT_OFFSET: i32 = 10;
+const SCROLL_AMOUNT: i32 = 16;
+const SCROLL_LIMIT: i32 = SCROLL_AMOUNT * 8;
 
 pub struct SettingsState {
     frame_count: u32,
@@ -29,6 +33,8 @@ pub struct SettingsState {
     time: Option<RealTime>,
     new_time: Option<RealTime>,
     new_time_selection: u8,
+
+    scroll_offset: i32,
 
     frames_reset_button_held: u8,
 }
@@ -59,20 +65,46 @@ impl State for SettingsState {
 
         self.display_cursor();
 
-        // TODO: make these an array
         // TODO: move pomo settings to a submenu
 
-        self.display_brightness_setting(0);
+        text_writer::draw_text_centered(
+            LCD_WIDTH as i32 / 2,
+            SETTING_HEIGHT_OFFSET + 8,
+            FontStyle::Icon,
+            Rgb332::GREEN,
+            "kl",
+        );
 
-        self.display_volume_setting(1);
+        // let mut tmp = [
+        //     SettingComponent::Brightness(super::setting_components::BrightnessSettingComponent {}),
+        //     SettingComponent::Volume(super::setting_components::VolumeSettingComponent {}),
+        //     SettingComponent::Time(super::setting_components::TimeSettingComponent {
+        //         time: None,
+        //         new_time: None,
+        //         new_time_selection: 0,
+        //     }),
+        // ];
+        // tmp[0].draw(
+        //     24 + 16 * 0,
+        //     self.setting_selected == SettingSelected::Brightness,
+        // );
+        // tmp[1].draw(
+        //     24 + 16 * 1,
+        //     self.setting_selected == SettingSelected::Volume,
+        // );
+        // tmp[2].draw(24 + 16 * 2, self.setting_selected == SettingSelected::Time);
 
-        self.display_time_adjustment_setting(2);
+        self.display_brightness_setting(1);
 
-        self.display_pomo_time_selector(3);
+        self.display_volume_setting(2);
 
-        self.display_pomo_cycle_selector(4);
+        self.display_time_adjustment_setting(3);
 
-        self.display_reset_setting(5);
+        self.display_pomo_time_selector(4);
+
+        self.display_pomo_cycle_selector(5);
+
+        self.display_reset_setting(6);
     }
 
     fn input(&mut self) {
@@ -285,7 +317,7 @@ impl SettingsState {
         let y_cursor_offset = Self::setting_to_y_offset(setting);
         text_writer::draw_text(
             10,
-            18 + 8 * y_cursor_offset,
+            SETTING_HEIGHT_OFFSET + 8 * y_cursor_offset,
             FontStyle::Icon,
             Rgb332::RED,
             icon,
@@ -295,14 +327,14 @@ impl SettingsState {
     fn display_brightness_setting(&self, y_offset: i32) {
         text_writer::draw_text_centered(
             LCD_WIDTH as i32 / 2,
-            18 + y_offset * 2 * 8,
+            SETTING_HEIGHT_OFFSET + y_offset * 2 * 8,
             FontStyle::Small,
             Rgb332::BLACK,
             "BRIGHTNESS",
         );
         text_writer::draw_text(
             24,
-            18 + (y_offset * 2 + 1) * 8,
+            SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8,
             FontStyle::Icon,
             Rgb332::BLUE,
             unsafe { &globals::BRIGHTNESS_SETTING }
@@ -313,14 +345,14 @@ impl SettingsState {
     fn display_volume_setting(&self, y_offset: i32) {
         text_writer::draw_text_centered(
             LCD_WIDTH as i32 / 2,
-            18 + y_offset * 2 * 8,
+            SETTING_HEIGHT_OFFSET + y_offset * 2 * 8,
             FontStyle::Small,
             Rgb332::BLACK,
             "VOLUME",
         );
         text_writer::draw_text(
             24,
-            18 + (y_offset * 2 + 1) * 8,
+            SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8,
             FontStyle::Icon,
             Rgb332::BLUE,
             unsafe { &globals::VOLUME_SETTING }
@@ -331,7 +363,7 @@ impl SettingsState {
     fn display_time_adjustment_setting(&self, y_offset: i32) {
         text_writer::draw_text_centered(
             LCD_WIDTH as i32 / 2,
-            18 + y_offset * 2 * 8,
+            SETTING_HEIGHT_OFFSET + y_offset * 2 * 8,
             FontStyle::Small,
             Rgb332::BLACK,
             "ADJUST TIME",
@@ -349,7 +381,7 @@ impl SettingsState {
                         );
                         text_writer::draw_text_centered(
                             LCD_WIDTH as i32 / 2,
-                            18 + (y_offset * 2 + 1) * 8,
+                            SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8,
                             FontStyle::Small,
                             Rgb332::BLACK,
                             time_str.as_str(),
@@ -363,7 +395,7 @@ impl SettingsState {
                         );
                         text_writer::draw_text_centered(
                             LCD_WIDTH as i32 / 2,
-                            18 + (y_offset * 2 + 1) * 8 - 1,
+                            SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8 - 1,
                             FontStyle::Small,
                             Rgb332::BLUE,
                             active_time_str.as_str(),
@@ -379,7 +411,7 @@ impl SettingsState {
                         );
                         text_writer::draw_text_centered(
                             LCD_WIDTH as i32 / 2,
-                            18 + (y_offset * 2 + 1) * 8,
+                            SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8,
                             FontStyle::Small,
                             Rgb332::BLACK,
                             time_str.as_str(),
@@ -393,7 +425,7 @@ impl SettingsState {
                         );
                         text_writer::draw_text_centered(
                             LCD_WIDTH as i32 / 2,
-                            18 + (y_offset * 2 + 1) * 8 - 1,
+                            SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8 - 1,
                             FontStyle::Small,
                             Rgb332::BLUE,
                             active_time_str.as_str(),
@@ -409,7 +441,7 @@ impl SettingsState {
                         );
                         text_writer::draw_text_centered(
                             LCD_WIDTH as i32 / 2,
-                            18 + (y_offset * 2 + 1) * 8,
+                            SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8,
                             FontStyle::Small,
                             Rgb332::BLACK,
                             time_str.as_str(),
@@ -423,7 +455,7 @@ impl SettingsState {
                         );
                         text_writer::draw_text_centered(
                             LCD_WIDTH as i32 / 2,
-                            18 + (y_offset * 2 + 1) * 8 - 1,
+                            SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8 - 1,
                             FontStyle::Small,
                             Rgb332::BLUE,
                             active_time_str.as_str(),
@@ -445,7 +477,7 @@ impl SettingsState {
                     );
                     text_writer::draw_text_centered(
                         LCD_WIDTH as i32 / 2,
-                        18 + (y_offset * 2 + 1) * 8,
+                        SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8,
                         FontStyle::Small,
                         Rgb332::BLACK,
                         time_str.as_str(),
@@ -459,7 +491,7 @@ impl SettingsState {
     fn display_pomo_time_selector(&self, y_offset: i32) {
         text_writer::draw_text_centered(
             LCD_WIDTH as i32 / 2,
-            18 + y_offset * 2 * 8,
+            SETTING_HEIGHT_OFFSET + y_offset * 2 * 8,
             FontStyle::Small,
             Rgb332::BLACK,
             "POMODORO TIME",
@@ -469,7 +501,7 @@ impl SettingsState {
             let time_str = str_format!(fixedstr::str12, "{:02}        ", pomo_time_setting,);
             text_writer::draw_text_centered(
                 LCD_WIDTH as i32 / 2,
-                18 + (y_offset * 2 + 1) * 8 - 1,
+                SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8 - 1,
                 FontStyle::Small,
                 Rgb332::BLUE,
                 time_str.as_str(),
@@ -478,7 +510,7 @@ impl SettingsState {
             let time_str = str_format!(fixedstr::str12, "{:02}        ", pomo_time_setting,);
             text_writer::draw_text_centered(
                 LCD_WIDTH as i32 / 2,
-                18 + (y_offset * 2 + 1) * 8,
+                SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8,
                 FontStyle::Small,
                 Rgb332::BLACK,
                 time_str.as_str(),
@@ -487,7 +519,7 @@ impl SettingsState {
         let min_str = "   minutes";
         text_writer::draw_text_centered(
             LCD_WIDTH as i32 / 2,
-            18 + (y_offset * 2 + 1) * 8 - 1,
+            SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8 - 1,
             FontStyle::Small,
             Rgb332::BLACK,
             min_str,
@@ -497,7 +529,7 @@ impl SettingsState {
     fn display_pomo_cycle_selector(&self, y_offset: i32) {
         text_writer::draw_text_centered(
             LCD_WIDTH as i32 / 2,
-            18 + y_offset * 2 * 8,
+            SETTING_HEIGHT_OFFSET + y_offset * 2 * 8,
             FontStyle::Small,
             Rgb332::BLACK,
             "POMODORO CYCLES",
@@ -507,7 +539,7 @@ impl SettingsState {
             let time_str = str_format!(fixedstr::str12, "{:01}      ", pomo_cycle_setting,);
             text_writer::draw_text_centered(
                 LCD_WIDTH as i32 / 2,
-                18 + (y_offset * 2 + 1) * 8 - 1,
+                SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8 - 1,
                 FontStyle::Small,
                 Rgb332::BLUE,
                 time_str.as_str(),
@@ -516,7 +548,7 @@ impl SettingsState {
             let time_str = str_format!(fixedstr::str12, "{:01}      ", pomo_cycle_setting,);
             text_writer::draw_text_centered(
                 LCD_WIDTH as i32 / 2,
-                18 + (y_offset * 2 + 1) * 8,
+                SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8,
                 FontStyle::Small,
                 Rgb332::BLACK,
                 time_str.as_str(),
@@ -525,7 +557,7 @@ impl SettingsState {
         let min_str = "  cycles";
         text_writer::draw_text_centered(
             LCD_WIDTH as i32 / 2,
-            18 + (y_offset * 2 + 1) * 8 - 1,
+            SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8 - 1,
             FontStyle::Small,
             Rgb332::BLACK,
             min_str,
@@ -535,7 +567,7 @@ impl SettingsState {
     fn display_reset_setting(&self, y_offset: i32) {
         text_writer::draw_text_centered(
             LCD_WIDTH as i32 / 2,
-            18 + y_offset * 2 * 8,
+            SETTING_HEIGHT_OFFSET + y_offset * 2 * 8,
             FontStyle::Small,
             Rgb332::from_u8(0b110_000_00),
             "RESET (HOLD CONFIRM)",
@@ -543,7 +575,7 @@ impl SettingsState {
 
         crate::display::render::solid_line_rect(
             LCD_WIDTH as i32 / 2 - (5 * 8),
-            18 + (y_offset * 2 + 1) * 8,
+            SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8,
             5 * 16,
             8,
             Rgb332::from_u8(0b110_000_00),
@@ -551,7 +583,7 @@ impl SettingsState {
 
         crate::display::render::fill_rect(
             LCD_WIDTH as i32 / 2 - (5 * 8) + 1,
-            18 + (y_offset * 2 + 1) * 8 + 1,
+            SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8 + 1,
             self.frames_reset_button_held as usize,
             6,
             Rgb332::from_u8(0b001_000_00),
@@ -591,6 +623,7 @@ impl Default for SettingsState {
             time: None,
             new_time: None,
             new_time_selection: 0,
+            scroll_offset: 0,
 
             frames_reset_button_held: 0,
         }
