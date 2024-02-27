@@ -1,4 +1,4 @@
-use crate::color;
+use crate::color::Rgb332;
 use crate::display::render;
 use crate::display::text_writer;
 use crate::hardware::input::KeyNames;
@@ -27,7 +27,7 @@ impl State for StateNyi {
     }
 
     fn draw(&mut self) {
-        render::flood(color::BLACK);
+        render::flood(Rgb332::BLACK);
         text_writer::full_dialog_box("NOT IMPL", "todo!()");
     }
 

@@ -1,11 +1,7 @@
 use core::cmp::max;
 use core::cmp::min;
 
-use crate::color;
 use crate::color::Rgb332;
-use crate::color::FANCY_BORDER_CORNER_COLOR;
-use crate::color::FANCY_BORDER_EDGE_COLOR;
-use crate::color::FANCY_BORDER_EDGE_FILL_COLOR;
 use crate::display::rgb_converter::RGB_332_TO_565;
 use crate::hardware::hardware::Lcd;
 use crate::hardware::hardware::LCD_HEIGHT;
@@ -34,7 +30,7 @@ pub fn blit(x0: i32, y0: i32, w: usize, h: usize, sprite_data: &[u8]) {
             }
             let src_coord = y * w + x;
             let pixel = sprite_data[src_coord];
-            if pixel == color::INVISIBLE.into_u8() {
+            if pixel == Rgb332::INVISIBLE.into_u8() {
                 continue;
             }
             let pixel_index: usize = pixel.into();
@@ -62,7 +58,7 @@ pub fn blit_from_offset(x0: i32, y0: i32, offset: usize, w: usize, h: usize, spr
             }
             let src_coord = y * w + x;
             let pixel = sprite_data[src_coord + offset];
-            if pixel == color::INVISIBLE.into_u8() {
+            if pixel == Rgb332::INVISIBLE.into_u8() {
                 continue;
             }
             let pixel_index: usize = pixel.into();
@@ -200,7 +196,7 @@ fn fancy_border_corner(x: i32, y: i32, orientation: FancyBorderCornerOrientation
                     x,
                     y + i as i32,
                     FANCY_BORDER_CORNER_SIZE - i,
-                    FANCY_BORDER_CORNER_COLOR,
+                    Rgb332::FANCY_BORDER_CORNER_COLOR,
                 );
             }
             FancyBorderCornerOrientation::TopRight => {
@@ -208,7 +204,7 @@ fn fancy_border_corner(x: i32, y: i32, orientation: FancyBorderCornerOrientation
                     x - (FANCY_BORDER_CORNER_SIZE - i) as i32,
                     y + i as i32,
                     FANCY_BORDER_CORNER_SIZE - i,
-                    FANCY_BORDER_CORNER_COLOR,
+                    Rgb332::FANCY_BORDER_CORNER_COLOR,
                 );
             }
             FancyBorderCornerOrientation::BottomLeft => {
@@ -216,7 +212,7 @@ fn fancy_border_corner(x: i32, y: i32, orientation: FancyBorderCornerOrientation
                     x,
                     y - (FANCY_BORDER_CORNER_SIZE - i) as i32,
                     i,
-                    FANCY_BORDER_CORNER_COLOR,
+                    Rgb332::FANCY_BORDER_CORNER_COLOR,
                 );
             }
             FancyBorderCornerOrientation::BottomRight => {
@@ -224,7 +220,7 @@ fn fancy_border_corner(x: i32, y: i32, orientation: FancyBorderCornerOrientation
                     x - i as i32,
                     y - (FANCY_BORDER_CORNER_SIZE - i) as i32,
                     i,
-                    FANCY_BORDER_CORNER_COLOR,
+                    Rgb332::FANCY_BORDER_CORNER_COLOR,
                 );
             }
         }
@@ -240,28 +236,28 @@ fn fancy_border_edge(x0: i32, y0: i32, length: usize, orientation: FancyBorderEd
     match orientation {
         FancyBorderEdgeOrientation::Horizontal => {
             let y1 = y0 + FANCY_BORDER_THICKNESS as i32 - 1;
-            h_solid_line(x0, y0, length, FANCY_BORDER_EDGE_COLOR);
-            h_solid_line(x0, y1, length, FANCY_BORDER_EDGE_COLOR);
+            h_solid_line(x0, y0, length, Rgb332::FANCY_BORDER_EDGE_COLOR);
+            h_solid_line(x0, y1, length, Rgb332::FANCY_BORDER_EDGE_COLOR);
             for i in 1..(FANCY_BORDER_THICKNESS - 1) {
                 h_dithered_line(
                     x0,
                     y0 + i as i32,
                     length,
-                    FANCY_BORDER_EDGE_FILL_COLOR,
+                    Rgb332::FANCY_BORDER_EDGE_FILL_COLOR,
                     false,
                 );
             }
         }
         FancyBorderEdgeOrientation::Vertical => {
             let x1 = x0 + FANCY_BORDER_THICKNESS as i32 - 1;
-            v_solid_line(x0, y0, length, FANCY_BORDER_EDGE_COLOR);
-            v_solid_line(x1, y0, length, FANCY_BORDER_EDGE_COLOR);
+            v_solid_line(x0, y0, length, Rgb332::FANCY_BORDER_EDGE_COLOR);
+            v_solid_line(x1, y0, length, Rgb332::FANCY_BORDER_EDGE_COLOR);
             for i in 1..(FANCY_BORDER_THICKNESS - 1) {
                 v_dithered_line(
                     x0 + i as i32,
                     y0,
                     length,
-                    FANCY_BORDER_EDGE_FILL_COLOR,
+                    Rgb332::FANCY_BORDER_EDGE_FILL_COLOR,
                     false,
                 );
             }

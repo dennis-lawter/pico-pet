@@ -1,7 +1,6 @@
 use core::str::Chars;
 
 use crate::color::Rgb332;
-use crate::color::{self};
 use crate::display::render;
 use crate::hardware::hardware::LCD_WIDTH;
 
@@ -47,7 +46,7 @@ impl<'a> Font<'a> {
         let size = &self.size;
         let (glyph_w, glyph_h) = size.get_glyph_dimensions();
         let mut fg_color = color;
-        let mut bg_color = color::INVISIBLE;
+        let mut bg_color = Rgb332::INVISIBLE;
         let mut chars = text.chars();
 
         while let Some(c) = chars.next() {

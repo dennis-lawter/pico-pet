@@ -1,4 +1,3 @@
-use crate::color;
 use crate::color::Rgb332;
 
 use super::font::Font;
@@ -72,19 +71,19 @@ pub fn bottom_dialog_box(text: &str) {
     let text_x = 5;
     let text_y = 128 - 24 + 4 - height as i32;
 
-    render::fill_rect(box_x, box_y, 128, height, color::WHITE);
+    render::fill_rect(box_x, box_y, 128, height, Rgb332::WHITE);
     render::fancy_border(0, box_y, 128, height);
 
-    draw_text(text_x, text_y, FontStyle::Small, color::BLUE, text)
+    draw_text(text_x, text_y, FontStyle::Small, Rgb332::BLUE, text)
 }
 
 pub fn full_dialog_box(title: &str, text: &str) {
     let title_width = 8 * title.len() as i32;
     let title_x = 64 - (title_width / 2);
 
-    render::flood(color::WHITE);
+    render::flood(Rgb332::WHITE);
     render::fancy_border(0, 0, 128, 128);
 
-    draw_text(title_x, 5, FontStyle::BigBold, color::BLACK, title);
-    draw_text(5, 18, FontStyle::Small, color::BLUE, text);
+    draw_text(title_x, 5, FontStyle::BigBold, Rgb332::BLACK, title);
+    draw_text(5, 18, FontStyle::Small, Rgb332::BLUE, text);
 }

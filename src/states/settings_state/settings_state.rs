@@ -1,7 +1,6 @@
 use fixedstr::str_format;
 
 use crate::color::Rgb332;
-use crate::color::{self};
 use crate::display::render;
 use crate::display::text_writer::FontStyle;
 use crate::display::text_writer::{self};
@@ -52,7 +51,7 @@ impl State for SettingsState {
     }
 
     fn draw(&mut self) {
-        render::flood(color::BLACK);
+        render::flood(Rgb332::BLACK);
 
         let title = "SETTINGS";
         let menu_body = "";
@@ -288,7 +287,7 @@ impl SettingsState {
             10,
             18 + 8 * y_cursor_offset,
             FontStyle::Icon,
-            color::RED,
+            Rgb332::RED,
             icon,
         );
     }
@@ -298,14 +297,14 @@ impl SettingsState {
             LCD_WIDTH as i32 / 2,
             18 + y_offset * 2 * 8,
             FontStyle::Small,
-            color::BLACK,
+            Rgb332::BLACK,
             "BRIGHTNESS",
         );
         text_writer::draw_text(
             24,
             18 + (y_offset * 2 + 1) * 8,
             FontStyle::Icon,
-            color::BLUE,
+            Rgb332::BLUE,
             unsafe { &globals::BRIGHTNESS_SETTING }
                 .generate_bar(self.setting_selected == SettingSelected::Brightness),
         );
@@ -316,14 +315,14 @@ impl SettingsState {
             LCD_WIDTH as i32 / 2,
             18 + y_offset * 2 * 8,
             FontStyle::Small,
-            color::BLACK,
+            Rgb332::BLACK,
             "VOLUME",
         );
         text_writer::draw_text(
             24,
             18 + (y_offset * 2 + 1) * 8,
             FontStyle::Icon,
-            color::BLUE,
+            Rgb332::BLUE,
             unsafe { &globals::VOLUME_SETTING }
                 .generate_bar(self.setting_selected == SettingSelected::Volume),
         );
@@ -334,7 +333,7 @@ impl SettingsState {
             LCD_WIDTH as i32 / 2,
             18 + y_offset * 2 * 8,
             FontStyle::Small,
-            color::BLACK,
+            Rgb332::BLACK,
             "ADJUST TIME",
         );
         if self.setting_selected == SettingSelected::Time {
@@ -352,7 +351,7 @@ impl SettingsState {
                             LCD_WIDTH as i32 / 2,
                             18 + (y_offset * 2 + 1) * 8,
                             FontStyle::Small,
-                            color::BLACK,
+                            Rgb332::BLACK,
                             time_str.as_str(),
                         );
                         let active_time_str = str_format!(
@@ -366,7 +365,7 @@ impl SettingsState {
                             LCD_WIDTH as i32 / 2,
                             18 + (y_offset * 2 + 1) * 8 - 1,
                             FontStyle::Small,
-                            color::BLUE,
+                            Rgb332::BLUE,
                             active_time_str.as_str(),
                         );
                     }
@@ -382,7 +381,7 @@ impl SettingsState {
                             LCD_WIDTH as i32 / 2,
                             18 + (y_offset * 2 + 1) * 8,
                             FontStyle::Small,
-                            color::BLACK,
+                            Rgb332::BLACK,
                             time_str.as_str(),
                         );
                         let active_time_str = str_format!(
@@ -396,7 +395,7 @@ impl SettingsState {
                             LCD_WIDTH as i32 / 2,
                             18 + (y_offset * 2 + 1) * 8 - 1,
                             FontStyle::Small,
-                            color::BLUE,
+                            Rgb332::BLUE,
                             active_time_str.as_str(),
                         );
                     }
@@ -412,7 +411,7 @@ impl SettingsState {
                             LCD_WIDTH as i32 / 2,
                             18 + (y_offset * 2 + 1) * 8,
                             FontStyle::Small,
-                            color::BLACK,
+                            Rgb332::BLACK,
                             time_str.as_str(),
                         );
                         let active_time_str = str_format!(
@@ -426,7 +425,7 @@ impl SettingsState {
                             LCD_WIDTH as i32 / 2,
                             18 + (y_offset * 2 + 1) * 8 - 1,
                             FontStyle::Small,
-                            color::BLUE,
+                            Rgb332::BLUE,
                             active_time_str.as_str(),
                         );
                     }
@@ -448,7 +447,7 @@ impl SettingsState {
                         LCD_WIDTH as i32 / 2,
                         18 + (y_offset * 2 + 1) * 8,
                         FontStyle::Small,
-                        color::BLACK,
+                        Rgb332::BLACK,
                         time_str.as_str(),
                     );
                 }
@@ -462,7 +461,7 @@ impl SettingsState {
             LCD_WIDTH as i32 / 2,
             18 + y_offset * 2 * 8,
             FontStyle::Small,
-            color::BLACK,
+            Rgb332::BLACK,
             "POMODORO TIME",
         );
         let pomo_time_setting = unsafe { &globals::POMO_TIME_SETTING }.get_value();
@@ -472,7 +471,7 @@ impl SettingsState {
                 LCD_WIDTH as i32 / 2,
                 18 + (y_offset * 2 + 1) * 8 - 1,
                 FontStyle::Small,
-                color::BLUE,
+                Rgb332::BLUE,
                 time_str.as_str(),
             );
         } else {
@@ -481,7 +480,7 @@ impl SettingsState {
                 LCD_WIDTH as i32 / 2,
                 18 + (y_offset * 2 + 1) * 8,
                 FontStyle::Small,
-                color::BLACK,
+                Rgb332::BLACK,
                 time_str.as_str(),
             );
         }
@@ -490,7 +489,7 @@ impl SettingsState {
             LCD_WIDTH as i32 / 2,
             18 + (y_offset * 2 + 1) * 8 - 1,
             FontStyle::Small,
-            color::BLACK,
+            Rgb332::BLACK,
             min_str,
         );
     }
@@ -500,7 +499,7 @@ impl SettingsState {
             LCD_WIDTH as i32 / 2,
             18 + y_offset * 2 * 8,
             FontStyle::Small,
-            color::BLACK,
+            Rgb332::BLACK,
             "POMODORO CYCLES",
         );
         let pomo_cycle_setting = unsafe { &globals::POMO_CYCLE_SETTING }.get_value();
@@ -510,7 +509,7 @@ impl SettingsState {
                 LCD_WIDTH as i32 / 2,
                 18 + (y_offset * 2 + 1) * 8 - 1,
                 FontStyle::Small,
-                color::BLUE,
+                Rgb332::BLUE,
                 time_str.as_str(),
             );
         } else {
@@ -519,7 +518,7 @@ impl SettingsState {
                 LCD_WIDTH as i32 / 2,
                 18 + (y_offset * 2 + 1) * 8,
                 FontStyle::Small,
-                color::BLACK,
+                Rgb332::BLACK,
                 time_str.as_str(),
             );
         }
@@ -528,7 +527,7 @@ impl SettingsState {
             LCD_WIDTH as i32 / 2,
             18 + (y_offset * 2 + 1) * 8 - 1,
             FontStyle::Small,
-            color::BLACK,
+            Rgb332::BLACK,
             min_str,
         );
     }
