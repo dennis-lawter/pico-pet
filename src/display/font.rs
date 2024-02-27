@@ -1,5 +1,7 @@
 use core::str::Chars;
 
+use crate::color::Rgb332;
+use crate::color::{self};
 use crate::display::render;
 use crate::hardware::hardware::LCD_WIDTH;
 
@@ -39,20 +41,20 @@ impl<'a> Font<'a> {
         (r << 5) ^ (g << 2) ^ b
     }
 
-    pub fn draw_text(&self, x0: i32, y0: i32, color: u8, text: &str, wrap: bool) {
+    pub fn draw_text(&self, x0: i32, y0: i32, color: Rgb332, text: &str, wrap: bool) {
         let mut x = x0;
         let mut y = y0;
         let size = &self.size;
         let (glyph_w, glyph_h) = size.get_glyph_dimensions();
         let mut fg_color = color;
-        let mut bg_color = render::ALPHA_MASK;
+        let mut bg_color = color::INVISIBLE;
         let mut chars = text.chars();
 
         while let Some(c) = chars.next() {
             match c {
                 '\\' => match chars.next() {
-                    Some('c') => fg_color = Self::extract_color(&mut chars),
-                    Some('b') => bg_color = Self::extract_color(&mut chars),
+                    Some('c') => fg_color = Rgb332::from_u8(Self::extract_color(&mut chars)),
+                    Some('b') => bg_color = Rgb332::from_u8(Self::extract_color(&mut chars)),
                     Some(other_char) => {
                         self.blit_glyph(x, y, other_char, bg_color, fg_color);
                         x += glyph_w as i32;
@@ -79,7 +81,7 @@ impl<'a> Font<'a> {
         }
     }
 
-    fn blit_glyph(&self, x: i32, y: i32, c: char, bg_color: u8, fg_color: u8) {
+    fn blit_glyph(&self, x: i32, y: i32, c: char, bg_color: Rgb332, fg_color: Rgb332) {
         match self.size {
             FontSize::Size5x8 => self.build_5x8_glyph(x, y, c, bg_color, fg_color),
             FontSize::Size8x13 => self.build_8x13_glyph(x, y, c, bg_color, fg_color),
@@ -92,8 +94,8 @@ impl<'a> Font<'a> {
         (x, y)
     }
 
-    fn build_5x8_glyph(&self, x: i32, y: i32, c: char, bg_color: u8, fg_color: u8) {
-        let mut glyph = [bg_color; 5 * 8];
+    fn build_5x8_glyph(&self, x: i32, y: i32, c: char, bg_color: Rgb332, fg_color: Rgb332) {
+        let mut glyph = [bg_color.into_u8(); 5 * 8];
         let (glyph_x0, glyph_y0) = Self::font_lookup(c);
         let (glyph_bit_x0, glyph_bit_y0) = (glyph_x0 * 5, glyph_y0 * 8);
         for glyph_y in 0..8 {
@@ -103,22 +105,22 @@ impl<'a> Font<'a> {
                 let glyph_byte_bit_offset = glyph_bit_loc % 8;
                 let src = self.data[glyph_byte_loc];
                 if (0b1000_0000 >> glyph_byte_bit_offset) & src != 0b0 {
-                    glyph[(glyph_y * 5) + glyph_x] = fg_color.clone();
+                    glyph[(glyph_y * 5) + glyph_x] = fg_color.into_u8();
                 }
             }
         }
         render::blit(x, y, 5, 8, &glyph)
     }
 
-    fn build_8x13_glyph(&self, x: i32, y: i32, c: char, bg_color: u8, fg_color: u8) {
-        let mut glyph = [bg_color; 8 * 13];
+    fn build_8x13_glyph(&self, x: i32, y: i32, c: char, bg_color: Rgb332, fg_color: Rgb332) {
+        let mut glyph = [bg_color.into_u8(); 8 * 13];
         let (glyph_x0, glyph_y0) = Self::font_lookup(c);
 
         for glyph_y in 0..13 {
             let data_row = self.data[(glyph_y + glyph_y0 * 13) * 16 + glyph_x0];
             for bit_idx in 0..8 {
                 if (data_row & (0b1000_0000 >> bit_idx)) != 0 {
-                    glyph[glyph_y * 8 + bit_idx] = fg_color;
+                    glyph[glyph_y * 8 + bit_idx] = fg_color.into_u8();
                 }
             }
         }

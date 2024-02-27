@@ -1,14 +1,17 @@
 use core::cmp::max;
 use core::cmp::min;
 
+use crate::color;
+use crate::color::Rgb332;
+use crate::color::FANCY_BORDER_CORNER_COLOR;
+use crate::color::FANCY_BORDER_EDGE_COLOR;
+use crate::color::FANCY_BORDER_EDGE_FILL_COLOR;
 use crate::display::rgb_converter::RGB_332_TO_565;
 use crate::hardware::hardware::Lcd;
 use crate::hardware::hardware::LCD_HEIGHT;
 use crate::hardware::hardware::LCD_WIDTH;
 
 static mut BUFFER: [u16; LCD_WIDTH * LCD_HEIGHT] = [0b00000_111111_00000; 128 * 128];
-
-pub const ALPHA_MASK: u8 = 0b11100011;
 
 pub fn draw(display: &mut Lcd) {
     unsafe {
@@ -31,7 +34,7 @@ pub fn blit(x0: i32, y0: i32, w: usize, h: usize, sprite_data: &[u8]) {
             }
             let src_coord = y * w + x;
             let pixel = sprite_data[src_coord];
-            if pixel == ALPHA_MASK {
+            if pixel == color::INVISIBLE.into_u8() {
                 continue;
             }
             let pixel_index: usize = pixel.into();
@@ -59,7 +62,7 @@ pub fn blit_from_offset(x0: i32, y0: i32, offset: usize, w: usize, h: usize, spr
             }
             let src_coord = y * w + x;
             let pixel = sprite_data[src_coord + offset];
-            if pixel == ALPHA_MASK {
+            if pixel == color::INVISIBLE.into_u8() {
                 continue;
             }
             let pixel_index: usize = pixel.into();
@@ -72,16 +75,16 @@ pub fn blit_from_offset(x0: i32, y0: i32, offset: usize, w: usize, h: usize, spr
     }
 }
 
-pub fn flood(color: u8) {
-    let color_index = color as usize;
+pub fn flood(color: Rgb332) {
+    let color_index = color.into_usize();
     let mapped_color = RGB_332_TO_565[color_index];
     unsafe {
         BUFFER = [mapped_color; LCD_WIDTH * LCD_HEIGHT];
     }
 }
 
-pub fn fill_rect(x0: i32, y0: i32, w: usize, h: usize, color: u8) {
-    let ext_color = RGB_332_TO_565[color as usize];
+pub fn fill_rect(x0: i32, y0: i32, w: usize, h: usize, color: Rgb332) {
+    let ext_color = RGB_332_TO_565[color.into_usize()];
 
     let effective_width = min(w, (LCD_WIDTH as i32 - x0) as usize);
     let effective_height = min(h, (LCD_HEIGHT as i32 - y0) as usize);
@@ -103,21 +106,21 @@ pub fn fill_rect(x0: i32, y0: i32, w: usize, h: usize, color: u8) {
     }
 }
 
-pub fn h_solid_line(x0: i32, y0: i32, w: usize, color: u8) {
+pub fn h_solid_line(x0: i32, y0: i32, w: usize, color: Rgb332) {
     if y0 < 0 || y0 >= LCD_HEIGHT as i32 {
         return;
     }
     fill_rect(x0, y0, w, 1, color)
 }
 
-pub fn v_solid_line(x0: i32, y0: i32, h: usize, color: u8) {
+pub fn v_solid_line(x0: i32, y0: i32, h: usize, color: Rgb332) {
     if x0 < 0 || x0 >= LCD_WIDTH as i32 {
         return;
     }
     fill_rect(x0, y0, 1, h, color)
 }
 
-pub fn solid_line_rect(x0: i32, y0: i32, w: usize, h: usize, color: u8) {
+pub fn solid_line_rect(x0: i32, y0: i32, w: usize, h: usize, color: Rgb332) {
     h_solid_line(x0, y0, w, color);
     h_solid_line(x0, y0 + h as i32 - 1, w, color);
 
@@ -125,12 +128,12 @@ pub fn solid_line_rect(x0: i32, y0: i32, w: usize, h: usize, color: u8) {
     v_solid_line(x0 + w as i32 - 1, y0, h, color);
 }
 
-pub fn h_dithered_line(x0: i32, y0: i32, w: usize, color: u8, inverted: bool) {
+pub fn h_dithered_line(x0: i32, y0: i32, w: usize, color: Rgb332, inverted: bool) {
     if y0 < 0 || y0 >= LCD_HEIGHT as i32 {
         return;
     }
     let inverted_int = inverted as i32;
-    let ext_color = RGB_332_TO_565[color as usize];
+    let ext_color = RGB_332_TO_565[color.into_usize()];
     let (mut x0, w) = if (y0 + x0) % 2 == inverted_int {
         (x0 + 1, w.saturating_sub(1))
     } else {
@@ -148,12 +151,12 @@ pub fn h_dithered_line(x0: i32, y0: i32, w: usize, color: u8, inverted: bool) {
     }
 }
 
-pub fn v_dithered_line(x0: i32, y0: i32, h: usize, color: u8, inverted: bool) {
+pub fn v_dithered_line(x0: i32, y0: i32, h: usize, color: Rgb332, inverted: bool) {
     if x0 < 0 || x0 >= LCD_WIDTH as i32 {
         return;
     }
     let inverted_int = inverted as i32;
-    let ext_color = RGB_332_TO_565[color as usize];
+    let ext_color = RGB_332_TO_565[color.into_usize()];
     let (mut y0, h) = if (y0 + x0) % 2 == inverted_int {
         (y0 + 1, h.saturating_sub(1))
     } else {
@@ -171,7 +174,7 @@ pub fn v_dithered_line(x0: i32, y0: i32, h: usize, color: u8, inverted: bool) {
     }
 }
 
-pub fn dithered_line_rect(x0: i32, y0: i32, w: usize, h: usize, color: u8, inverted: bool) {
+pub fn dithered_line_rect(x0: i32, y0: i32, w: usize, h: usize, color: Rgb332, inverted: bool) {
     h_dithered_line(x0, y0, w, color, inverted);
     h_dithered_line(x0, y0 + h as i32 - 1, w, color, inverted);
 
@@ -181,9 +184,6 @@ pub fn dithered_line_rect(x0: i32, y0: i32, w: usize, h: usize, color: u8, inver
 
 const FANCY_BORDER_THICKNESS: usize = 4;
 const FANCY_BORDER_CORNER_SIZE: usize = 7;
-const FANCY_BORDER_CORNER_COLOR: u8 = 0b000_000_10;
-const FANCY_BORDER_EDGE_COLOR: u8 = 0b000_000_11;
-const FANCY_BORDER_EDGE_FILL_COLOR: u8 = 0b101_101_11;
 
 enum FancyBorderCornerOrientation {
     TopLeft,

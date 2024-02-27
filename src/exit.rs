@@ -1,5 +1,7 @@
 use waveshare_rp2040_lcd_0_96::hal::rom_data;
 
+use crate::color;
+use crate::color::Rgb332;
 use crate::display::render;
 use crate::display::text_writer;
 
@@ -13,7 +15,7 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
         }
     }
     let hardware = crate::globals::get_hardware();
-    render::flood(0b111_000_00);
+    render::flood(color::RED);
     unsafe {
         embedded_hal::PwmPin::set_duty(&mut (*hardware.backlight_channel_ptr), 32767);
         hardware.end_tone();
@@ -25,17 +27,17 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
         64,
         4,
         text_writer::FontStyle::BigBold,
-        0b111_111_11,
+        color::WHITE,
         "PANIC!",
     );
 
-    text_writer::draw_text_wrapped(0, 16, text_writer::FontStyle::Small, 0b111_111_11, &err_str);
+    text_writer::draw_text_wrapped(0, 16, text_writer::FontStyle::Small, color::WHITE, &err_str);
 
     text_writer::draw_text_centered(
         64,
         128 - 15,
         text_writer::FontStyle::Small,
-        0b111_111_11,
+        color::WHITE,
         "press any key to reboot",
     );
 
@@ -61,7 +63,7 @@ pub fn reboot() -> ! {
         }
     }
     let hardware = crate::globals::get_hardware();
-    render::flood(0b010_010_11);
+    render::flood(Rgb332::from_u8(0b010_010_11));
     unsafe {
         embedded_hal::PwmPin::set_duty(&mut (*hardware.backlight_channel_ptr), 32767);
         hardware.end_tone();
@@ -70,7 +72,7 @@ pub fn reboot() -> ! {
         64,
         128 - 15,
         text_writer::FontStyle::Small,
-        0b111_111_11,
+        color::WHITE,
         "Rebooting...",
     );
 
