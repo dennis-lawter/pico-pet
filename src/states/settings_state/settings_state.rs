@@ -1,18 +1,16 @@
 use fixedstr::str_format;
 
+use crate::display::render;
+use crate::display::text_writer::FontStyle;
+use crate::display::text_writer::{self};
+use crate::globals;
 use crate::hardware::audio::AudioFrequency;
+use crate::hardware::hardware::LCD_WIDTH;
 use crate::hardware::input::KeyNames;
 use crate::hardware::rtc::RealTime;
-use crate::states::{AppState, State};
-use crate::{
-    display::{
-        render,
-        text_writer::{self, FontStyle},
-    },
-    globals,
-    hardware::hardware::LCD_WIDTH,
-    setting_value::Setting,
-};
+use crate::setting_value::Setting;
+use crate::states::AppState;
+use crate::states::State;
 
 use super::setting_selected::SettingSelected;
 use super::song;
@@ -59,6 +57,9 @@ impl State for SettingsState {
         text_writer::full_dialog_box(title, menu_body);
 
         self.display_cursor();
+
+        // todo: make these an array
+        // todo: move pomo settings to a submenu
 
         self.display_brightness_setting(0);
 

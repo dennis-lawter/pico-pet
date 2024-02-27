@@ -1,4 +1,5 @@
-use waveshare_rp2040_lcd_0_96::{hal::multicore::Stack, pac};
+use waveshare_rp2040_lcd_0_96::hal::multicore::Stack;
+use waveshare_rp2040_lcd_0_96::pac;
 
 pub static mut CORE1_STACK: Stack<4096> = Stack::new();
 pub fn secondary_main_loop(sys_freq: u32) -> ! {

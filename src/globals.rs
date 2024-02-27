@@ -1,9 +1,8 @@
-use crate::{
-    hardware::{hardware::HardwareComponents, input::InputHandler},
-    nvm::{inventory::NvmInventory, Nvm},
-    rand::Lcg,
-    setting_value::Setting,
-};
+use crate::hardware::hardware::HardwareComponents;
+use crate::hardware::input::InputHandler;
+use crate::nvm::Nvm;
+use crate::rand::Lcg;
+use crate::setting_value::Setting;
 
 pub static mut BRIGHTNESS_SETTING: Setting = Setting {
     value: 15,
@@ -66,16 +65,4 @@ pub fn init_rng() {
 }
 pub fn get_rng() -> &'static mut Lcg {
     unsafe { self::RNG.as_mut().unwrap() }
-}
-
-// pub static mut INVENTORY: Option<NvmInventory> = None;
-// pub fn init_inv() {
-//     unsafe { self::INVENTORY = Some(NvmInventory::default()) }
-// }
-// pub fn get_inv() -> &'static mut NvmInventory {
-//     unsafe { self::INVENTORY.as_mut().unwrap() }
-// }
-pub fn get_inv() -> &'static mut NvmInventory {
-    let nvm = get_nvm();
-    &mut nvm.inventory
 }

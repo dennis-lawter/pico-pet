@@ -1,7 +1,8 @@
-use crate::states::{
-    game_play_state::GamePlayState, settings_state::SettingsState, state_nyi::StateNyi, AppState,
-    State,
-};
+use crate::states::game_play_state::GamePlayState;
+use crate::states::settings_state::SettingsState;
+use crate::states::state_nyi::StateNyi;
+use crate::states::AppState;
+use crate::states::State;
 
 #[derive(Default)]
 pub struct StateManager<'a> {

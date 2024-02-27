@@ -1,4 +1,5 @@
-use super::{page_canon::PageCanon, NVM_BLANK};
+use super::page_canon::PageCanon;
+use super::NVM_BLANK;
 
 const DEFAULT_BRIGHTNESS: u8 = 15;
 const DEFAULT_VOLUME: u8 = 2;

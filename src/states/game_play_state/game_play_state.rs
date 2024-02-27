@@ -1,11 +1,10 @@
-use crate::{
-    display::{
-        render,
-        sprite::{Sprite, SpriteFactory},
-    },
-    hardware::{audio::AudioFrequency, input::KeyNames},
-    states::{AppState, State},
-};
+use crate::display::render;
+use crate::display::sprite::Sprite;
+use crate::display::sprite::SpriteFactory;
+use crate::hardware::audio::AudioFrequency;
+use crate::hardware::input::KeyNames;
+use crate::states::AppState;
+use crate::states::State;
 
 use super::menu_selection::MenuSelection;
 

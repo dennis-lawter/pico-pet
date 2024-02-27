@@ -1,6 +1,7 @@
 use core::str::Chars;
 
-use crate::{display::render, hardware::hardware::LCD_WIDTH};
+use crate::display::render;
+use crate::hardware::hardware::LCD_WIDTH;
 
 pub enum FontSize {
     Size5x8,

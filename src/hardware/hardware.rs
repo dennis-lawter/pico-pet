@@ -1,37 +1,35 @@
 use cortex_m::delay::Delay;
 
 use debugless_unwrap::DebuglessUnwrap;
-use embedded_graphics::{
-    pixelcolor::Rgb565,
-    prelude::{DrawTarget, RgbColor},
-};
-use embedded_hal::{
-    digital::v2::InputPin,
-    prelude::{_embedded_hal_blocking_i2c_Read, _embedded_hal_blocking_i2c_Write},
-    PwmPin,
-};
+use embedded_graphics::pixelcolor::Rgb565;
+use embedded_graphics::prelude::DrawTarget;
+use embedded_graphics::prelude::RgbColor;
+use embedded_hal::digital::v2::InputPin;
+use embedded_hal::prelude::_embedded_hal_blocking_i2c_Read;
+use embedded_hal::prelude::_embedded_hal_blocking_i2c_Write;
+use embedded_hal::PwmPin;
 use fugit::RateExtU32;
 
-use waveshare_rp2040_lcd_0_96::{
-    hal::{
-        self,
-        clocks::{init_clocks_and_plls, Clock},
-        gpio::Pins,
-        pac,
-        pio::PIOExt,
-        sio::SioFifo,
-        watchdog::Watchdog,
-        Sio,
-    },
-    pac::{PPB, PSM},
-    XOSC_CRYSTAL_FREQ,
-};
+use waveshare_rp2040_lcd_0_96::hal::clocks::init_clocks_and_plls;
+use waveshare_rp2040_lcd_0_96::hal::clocks::Clock;
+use waveshare_rp2040_lcd_0_96::hal::gpio::Pins;
+use waveshare_rp2040_lcd_0_96::hal::pac;
+use waveshare_rp2040_lcd_0_96::hal::pio::PIOExt;
+use waveshare_rp2040_lcd_0_96::hal::sio::SioFifo;
+use waveshare_rp2040_lcd_0_96::hal::watchdog::Watchdog;
+use waveshare_rp2040_lcd_0_96::hal::Sio;
+use waveshare_rp2040_lcd_0_96::hal::{self};
+use waveshare_rp2040_lcd_0_96::pac::PPB;
+use waveshare_rp2040_lcd_0_96::pac::PSM;
+use waveshare_rp2040_lcd_0_96::XOSC_CRYSTAL_FREQ;
 
-use st7735_lcd::{Orientation, ST7735};
+use st7735_lcd::Orientation;
+use st7735_lcd::ST7735;
 
 use crate::globals;
 
-use super::{audio::AudioFrequency, rtc::RealTime};
+use super::audio::AudioFrequency;
+use super::rtc::RealTime;
 
 pub const LCD_WIDTH: usize = 128;
 pub const LCD_HEIGHT: usize = 128;

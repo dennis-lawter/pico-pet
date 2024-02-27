@@ -1,9 +1,10 @@
-use core::cmp::{max, min};
+use core::cmp::max;
+use core::cmp::min;
 
-use crate::{
-    display::rgb_converter::RGB_332_TO_565,
-    hardware::hardware::{Lcd, LCD_HEIGHT, LCD_WIDTH},
-};
+use crate::display::rgb_converter::RGB_332_TO_565;
+use crate::hardware::hardware::Lcd;
+use crate::hardware::hardware::LCD_HEIGHT;
+use crate::hardware::hardware::LCD_WIDTH;
 
 static mut BUFFER: [u16; LCD_WIDTH * LCD_HEIGHT] = [0b00000_111111_00000; 128 * 128];
 

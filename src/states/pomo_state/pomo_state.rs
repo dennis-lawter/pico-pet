@@ -1,8 +1,8 @@
-use crate::{
-    display::{render, text_writer},
-    hardware::input::KeyNames,
-    states::{AppState, State},
-};
+use crate::display::render;
+use crate::display::text_writer;
+use crate::hardware::input::KeyNames;
+use crate::states::AppState;
+use crate::states::State;
 
 pub struct PomoState {
     next_state: Option<AppState>,

@@ -1,6 +1,7 @@
 use waveshare_rp2040_lcd_0_96::hal::rom_data;
 
-use crate::display::{render, text_writer};
+use crate::display::render;
+use crate::display::text_writer;
 
 #[panic_handler]
 fn panic(info: &core::panic::PanicInfo) -> ! {

@@ -1,4 +1,5 @@
-use crate::states::{game_play_state::GamePlayState, AppState};
+use crate::states::game_play_state::GamePlayState;
+use crate::states::AppState;
 
 use super::state_manager::StateManager;
 

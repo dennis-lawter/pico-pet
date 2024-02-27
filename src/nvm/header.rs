@@ -1,4 +1,5 @@
-use super::{page_canon::PageCanon, NVM_BLANK};
+use super::page_canon::PageCanon;
+use super::NVM_BLANK;
 
 // const NVM_PARITY_PAGE: u16 = 0x000;
 

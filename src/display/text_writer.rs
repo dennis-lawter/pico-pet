@@ -1,7 +1,6 @@
-use super::{
-    font::{Font, FontFactory},
-    render,
-};
+use super::font::Font;
+use super::font::FontFactory;
+use super::render;
 
 static mut SMALL_FONT: Option<Font> = None;
 static mut ICON_FONT: Option<Font> = None;
