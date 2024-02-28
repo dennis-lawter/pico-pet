@@ -30,7 +30,7 @@ pub struct SettingsState {
     setting_highlighted: SettingSelected,
     input_enabled: bool,
 
-    setting_components: [SettingComponent; 4],
+    setting_components: [SettingComponent; 5],
 
     scroll_offset: i32,
 
@@ -77,18 +77,10 @@ impl State for SettingsState {
             "kl",
         );
 
-        self.setting_components[0].draw(
-            24 + 16 * 0,
-            self.setting_selected == SettingSelected::Brightness,
-        );
-        self.setting_components[1].draw(
-            24 + 16 * 1,
-            self.setting_selected == SettingSelected::Volume,
-        );
-        self.setting_components[2]
-            .draw(24 + 16 * 2, self.setting_selected == SettingSelected::Time);
-        self.setting_components[3]
-            .draw(24 + 16 * 3, self.setting_selected == SettingSelected::Reset);
+        for i in 0..self.setting_components.len() {
+            let enabled = i == self.setting_selected as usize;
+            self.setting_components[i].draw(24 + 16 * i as i32, enabled);
+        }
     }
 
     fn input(&mut self) {
@@ -122,7 +114,7 @@ impl State for SettingsState {
                 self.setting_components[2].input();
             }
             SettingSelected::PomoTime => {
-                self.adjust_setting(unsafe { &mut globals::POMO_TIME_SETTING });
+                self.setting_components[3].input();
             }
             SettingSelected::PomoCycle => {
                 self.adjust_setting(unsafe { &mut globals::POMO_CYCLE_SETTING });
@@ -232,48 +224,10 @@ impl SettingsState {
         let y_cursor_offset = Self::setting_to_y_offset(setting);
         text_writer::draw_text(
             10,
-            SETTING_HEIGHT_OFFSET + 8 * 2 + 8 * y_cursor_offset,
+            SETTING_HEIGHT_OFFSET + 8 * 2 + 8 * y_cursor_offset - 2,
             FontStyle::Icon,
             Rgb332::RED,
             icon,
-        );
-    }
-
-    fn display_pomo_time_selector(&self, y_offset: i32) {
-        text_writer::draw_text_centered(
-            LCD_WIDTH as i32 / 2,
-            SETTING_HEIGHT_OFFSET + y_offset * 2 * 8,
-            FontStyle::Small,
-            Rgb332::BLACK,
-            "POMODORO TIME",
-        );
-        let pomo_time_setting = unsafe { &globals::POMO_TIME_SETTING }.get_value();
-        if self.setting_selected == SettingSelected::PomoTime {
-            let time_str = str_format!(fixedstr::str12, "{:02}        ", pomo_time_setting,);
-            text_writer::draw_text_centered(
-                LCD_WIDTH as i32 / 2,
-                SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8 - 1,
-                FontStyle::Small,
-                Rgb332::BLUE,
-                time_str.as_str(),
-            );
-        } else {
-            let time_str = str_format!(fixedstr::str12, "{:02}        ", pomo_time_setting,);
-            text_writer::draw_text_centered(
-                LCD_WIDTH as i32 / 2,
-                SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8,
-                FontStyle::Small,
-                Rgb332::BLACK,
-                time_str.as_str(),
-            );
-        }
-        let min_str = "   minutes";
-        text_writer::draw_text_centered(
-            LCD_WIDTH as i32 / 2,
-            SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8 - 1,
-            FontStyle::Small,
-            Rgb332::BLACK,
-            min_str,
         );
     }
 
@@ -324,6 +278,9 @@ impl Default for SettingsState {
             ),
             SettingComponent::Volume(super::setting_components::VolumeSettingComponent::default()),
             SettingComponent::Time(super::setting_components::TimeSettingComponent::default()),
+            SettingComponent::PomoTime(
+                super::setting_components::PomoTimeSettingComponent::default(),
+            ),
             SettingComponent::Reset(super::setting_components::ResetSettingComponent::default()),
         ];
         Self {
