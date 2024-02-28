@@ -19,6 +19,14 @@ impl SettingComponent {
         }
     }
 
+    pub fn tick(&mut self) {
+        match self {
+            SettingComponent::Brightness(component) => component.tick(),
+            SettingComponent::Volume(component) => component.tick(),
+            SettingComponent::Time(component) => component.tick(),
+        }
+    }
+
     pub fn input(&mut self) {
         match self {
             SettingComponent::Brightness(component) => component.input(),
@@ -26,10 +34,19 @@ impl SettingComponent {
             SettingComponent::Time(component) => component.input(),
         }
     }
+
+    pub fn is_deselected(&mut self) -> bool {
+        match self {
+            SettingComponent::Brightness(component) => component.is_deselected(),
+            SettingComponent::Volume(component) => component.is_deselected(),
+            SettingComponent::Time(component) => component.is_deselected(),
+        }
+    }
 }
 
 trait SettingComponentTrait {
     fn draw(&mut self, y_offset: i32, selected: bool);
-
+    fn tick(&mut self);
     fn input(&mut self);
+    fn is_deselected(&mut self) -> bool;
 }

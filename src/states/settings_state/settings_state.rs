@@ -8,7 +8,6 @@ use crate::globals;
 use crate::hardware::audio::AudioFrequency;
 use crate::hardware::hardware::LCD_WIDTH;
 use crate::hardware::input::KeyNames;
-use crate::hardware::rtc::RealTime;
 use crate::setting_value::Setting;
 use crate::states::AppState;
 use crate::states::State;
@@ -27,12 +26,11 @@ pub struct SettingsState {
     next_state: Option<AppState>,
     song: [AudioFrequency; 396],
     current_frequency: AudioFrequency,
-    setting_selected: SettingSelected,
+    pub setting_selected: SettingSelected,
     setting_highlighted: SettingSelected,
     input_enabled: bool,
-    time: Option<RealTime>,
-    new_time: Option<RealTime>,
-    new_time_selection: u8,
+
+    setting_components: [SettingComponent; 3],
 
     scroll_offset: i32,
 
@@ -40,9 +38,9 @@ pub struct SettingsState {
 }
 impl State for SettingsState {
     fn tick(&mut self) {
-        let hardware = crate::globals::get_hardware();
-        self.time = Some(hardware.get_time());
-
+        for component in self.setting_components.iter_mut() {
+            component.tick();
+        }
         self.frame_count += 1;
     }
 
@@ -65,46 +63,30 @@ impl State for SettingsState {
 
         self.display_cursor();
 
-        // TODO: move pomo settings to a submenu
+        let offset_cycle = [0, -1, -2, -3, -2, -1];
+        let animation_frames = 5;
+        let phase = self.frame_count as usize / animation_frames % offset_cycle.len();
+        let cycle_position = offset_cycle[phase];
+        let top_arrow_offset = SETTING_HEIGHT_OFFSET + 8 + 1 + cycle_position as i32;
 
         text_writer::draw_text_centered(
             LCD_WIDTH as i32 / 2,
-            SETTING_HEIGHT_OFFSET + 8,
+            top_arrow_offset,
             FontStyle::Icon,
-            Rgb332::GREEN,
+            Rgb332::BLUE,
             "kl",
         );
 
-        // let mut tmp = [
-        //     SettingComponent::Brightness(super::setting_components::BrightnessSettingComponent {}),
-        //     SettingComponent::Volume(super::setting_components::VolumeSettingComponent {}),
-        //     SettingComponent::Time(super::setting_components::TimeSettingComponent {
-        //         time: None,
-        //         new_time: None,
-        //         new_time_selection: 0,
-        //     }),
-        // ];
-        // tmp[0].draw(
-        //     24 + 16 * 0,
-        //     self.setting_selected == SettingSelected::Brightness,
-        // );
-        // tmp[1].draw(
-        //     24 + 16 * 1,
-        //     self.setting_selected == SettingSelected::Volume,
-        // );
-        // tmp[2].draw(24 + 16 * 2, self.setting_selected == SettingSelected::Time);
-
-        self.display_brightness_setting(1);
-
-        self.display_volume_setting(2);
-
-        self.display_time_adjustment_setting(3);
-
-        self.display_pomo_time_selector(4);
-
-        self.display_pomo_cycle_selector(5);
-
-        self.display_reset_setting(6);
+        self.setting_components[0].draw(
+            24 + 16 * 0,
+            self.setting_selected == SettingSelected::Brightness,
+        );
+        self.setting_components[1].draw(
+            24 + 16 * 1,
+            self.setting_selected == SettingSelected::Volume,
+        );
+        self.setting_components[2]
+            .draw(24 + 16 * 2, self.setting_selected == SettingSelected::Time);
     }
 
     fn input(&mut self) {
@@ -129,13 +111,13 @@ impl State for SettingsState {
 
         match self.setting_selected {
             SettingSelected::Brightness => {
-                self.adjust_setting(unsafe { &mut globals::BRIGHTNESS_SETTING });
+                self.setting_components[0].input();
             }
             SettingSelected::Volume => {
-                self.adjust_setting(unsafe { &mut globals::VOLUME_SETTING });
+                self.setting_components[1].input();
             }
             SettingSelected::Time => {
-                self.adjust_time();
+                self.setting_components[2].input();
             }
             SettingSelected::PomoTime => {
                 self.adjust_setting(unsafe { &mut globals::POMO_TIME_SETTING });
@@ -204,7 +186,7 @@ impl SettingsState {
                 }
                 _ => {}
             }
-            self.new_time = None;
+            // self.new_time = None;
             self.setting_selected = SettingSelected::None;
 
             true
@@ -230,76 +212,7 @@ impl SettingsState {
         }
     }
 
-    fn adjust_time(&mut self) {
-        let input = crate::globals::get_input();
-        let hardware = crate::globals::get_hardware();
-
-        if self.new_time.is_none() {
-            self.new_time = self.time.clone();
-            self.new_time_selection = 0;
-        }
-        let new_time_mut = self.new_time.as_mut().unwrap();
-
-        if input.get_state(&KeyNames::Left).just_pressed {
-            match self.new_time_selection {
-                0 => {
-                    if new_time_mut.hr == 00 {
-                        new_time_mut.hr = 23;
-                    } else {
-                        new_time_mut.hr -= 1;
-                    }
-                }
-                1 => {
-                    if new_time_mut.min == 00 {
-                        new_time_mut.min = 59;
-                    } else {
-                        new_time_mut.min -= 1;
-                    }
-                }
-                2 => {
-                    if new_time_mut.sec == 00 {
-                        new_time_mut.sec = 59;
-                    } else {
-                        new_time_mut.sec -= 1;
-                    }
-                }
-                _ => {}
-            }
-        } else if input.get_state(&KeyNames::Right).just_pressed {
-            match self.new_time_selection {
-                0 => {
-                    if new_time_mut.hr == 23 {
-                        new_time_mut.hr = 0;
-                    } else {
-                        new_time_mut.hr += 1;
-                    }
-                }
-                1 => {
-                    if new_time_mut.min == 59 {
-                        new_time_mut.min = 0;
-                    } else {
-                        new_time_mut.min += 1;
-                    }
-                }
-                2 => {
-                    if new_time_mut.sec == 59 {
-                        new_time_mut.sec = 0;
-                    } else {
-                        new_time_mut.sec += 1;
-                    }
-                }
-                _ => {}
-            }
-        } else if input.get_state(&KeyNames::Confirm).just_released {
-            self.new_time_selection += 1;
-            if self.new_time_selection == 3 {
-                self.setting_selected = SettingSelected::None;
-                self.new_time_selection = 0;
-                hardware.set_time(self.new_time.as_mut().unwrap());
-                self.new_time = None;
-            }
-        }
-    }
+    fn adjust_time(&mut self) {}
 
     fn setting_to_y_offset(setting: &SettingSelected) -> i32 {
         match setting {
@@ -317,175 +230,11 @@ impl SettingsState {
         let y_cursor_offset = Self::setting_to_y_offset(setting);
         text_writer::draw_text(
             10,
-            SETTING_HEIGHT_OFFSET + 8 * y_cursor_offset,
+            SETTING_HEIGHT_OFFSET + 8 * 2 + 8 * y_cursor_offset,
             FontStyle::Icon,
             Rgb332::RED,
             icon,
         );
-    }
-
-    fn display_brightness_setting(&self, y_offset: i32) {
-        text_writer::draw_text_centered(
-            LCD_WIDTH as i32 / 2,
-            SETTING_HEIGHT_OFFSET + y_offset * 2 * 8,
-            FontStyle::Small,
-            Rgb332::BLACK,
-            "BRIGHTNESS",
-        );
-        text_writer::draw_text(
-            24,
-            SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8,
-            FontStyle::Icon,
-            Rgb332::BLUE,
-            unsafe { &globals::BRIGHTNESS_SETTING }
-                .generate_bar(self.setting_selected == SettingSelected::Brightness),
-        );
-    }
-
-    fn display_volume_setting(&self, y_offset: i32) {
-        text_writer::draw_text_centered(
-            LCD_WIDTH as i32 / 2,
-            SETTING_HEIGHT_OFFSET + y_offset * 2 * 8,
-            FontStyle::Small,
-            Rgb332::BLACK,
-            "VOLUME",
-        );
-        text_writer::draw_text(
-            24,
-            SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8,
-            FontStyle::Icon,
-            Rgb332::BLUE,
-            unsafe { &globals::VOLUME_SETTING }
-                .generate_bar(self.setting_selected == SettingSelected::Volume),
-        );
-    }
-
-    fn display_time_adjustment_setting(&self, y_offset: i32) {
-        text_writer::draw_text_centered(
-            LCD_WIDTH as i32 / 2,
-            SETTING_HEIGHT_OFFSET + y_offset * 2 * 8,
-            FontStyle::Small,
-            Rgb332::BLACK,
-            "ADJUST TIME",
-        );
-        if self.setting_selected == SettingSelected::Time {
-            match &self.new_time {
-                Some(time) => match self.new_time_selection {
-                    0 => {
-                        let time_str = str_format!(
-                            fixedstr::str16,
-                            "  :{:02}:{:02}",
-                            // time.hr,
-                            time.min,
-                            time.sec
-                        );
-                        text_writer::draw_text_centered(
-                            LCD_WIDTH as i32 / 2,
-                            SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8,
-                            FontStyle::Small,
-                            Rgb332::BLACK,
-                            time_str.as_str(),
-                        );
-                        let active_time_str = str_format!(
-                            fixedstr::str16,
-                            "{:02}      ",
-                            time.hr,
-                            // time.min,
-                            // time.sec
-                        );
-                        text_writer::draw_text_centered(
-                            LCD_WIDTH as i32 / 2,
-                            SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8 - 1,
-                            FontStyle::Small,
-                            Rgb332::BLUE,
-                            active_time_str.as_str(),
-                        );
-                    }
-                    1 => {
-                        let time_str = str_format!(
-                            fixedstr::str16,
-                            "{:02}:  :{:02}",
-                            time.hr,
-                            // time.min,
-                            time.sec
-                        );
-                        text_writer::draw_text_centered(
-                            LCD_WIDTH as i32 / 2,
-                            SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8,
-                            FontStyle::Small,
-                            Rgb332::BLACK,
-                            time_str.as_str(),
-                        );
-                        let active_time_str = str_format!(
-                            fixedstr::str16,
-                            "   {:02}   ",
-                            // time.hr,
-                            time.min,
-                            // time.sec
-                        );
-                        text_writer::draw_text_centered(
-                            LCD_WIDTH as i32 / 2,
-                            SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8 - 1,
-                            FontStyle::Small,
-                            Rgb332::BLUE,
-                            active_time_str.as_str(),
-                        );
-                    }
-                    2 => {
-                        let time_str = str_format!(
-                            fixedstr::str16,
-                            "{:02}:{:02}:  ",
-                            time.hr,
-                            time.min,
-                            // time.sec
-                        );
-                        text_writer::draw_text_centered(
-                            LCD_WIDTH as i32 / 2,
-                            SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8,
-                            FontStyle::Small,
-                            Rgb332::BLACK,
-                            time_str.as_str(),
-                        );
-                        let active_time_str = str_format!(
-                            fixedstr::str16,
-                            "      {:02}",
-                            // time.hr,
-                            // time.min,
-                            time.sec
-                        );
-                        text_writer::draw_text_centered(
-                            LCD_WIDTH as i32 / 2,
-                            SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8 - 1,
-                            FontStyle::Small,
-                            Rgb332::BLUE,
-                            active_time_str.as_str(),
-                        );
-                    }
-                    _ => {}
-                },
-                None => {}
-            }
-        } else {
-            match &self.time {
-                Some(time) => {
-                    let time_str = str_format!(
-                        fixedstr::str16,
-                        "{:02}:{:02}:{:02}",
-                        time.hr,
-                        time.min,
-                        time.sec
-                    );
-                    text_writer::draw_text_centered(
-                        LCD_WIDTH as i32 / 2,
-                        SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8,
-                        FontStyle::Small,
-                        Rgb332::BLACK,
-                        time_str.as_str(),
-                    );
-                }
-                None => {}
-            }
-        };
     }
 
     fn display_pomo_time_selector(&self, y_offset: i32) {
@@ -612,6 +361,13 @@ impl SettingsState {
 
 impl Default for SettingsState {
     fn default() -> Self {
+        let setting_components = [
+            SettingComponent::Brightness(
+                super::setting_components::BrightnessSettingComponent::default(),
+            ),
+            SettingComponent::Volume(super::setting_components::VolumeSettingComponent::default()),
+            SettingComponent::Time(super::setting_components::TimeSettingComponent::default()),
+        ];
         Self {
             frame_count: 0,
             next_state: None,
@@ -620,9 +376,8 @@ impl Default for SettingsState {
             setting_selected: SettingSelected::None,
             setting_highlighted: SettingSelected::None,
             input_enabled: false,
-            time: None,
-            new_time: None,
-            new_time_selection: 0,
+            setting_components,
+
             scroll_offset: 0,
 
             frames_reset_button_held: 0,
