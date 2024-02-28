@@ -28,7 +28,7 @@ impl SettingComponentTrait for ResetSettingComponent {
             y_offset,
             FontStyle::Small,
             Rgb332::from_u8(0b110_000_00),
-            "RESET (HOLD CONFIRM)",
+            "!!! RESET ALL DATA !!!",
         );
 
         crate::display::render::solid_line_rect(

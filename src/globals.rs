@@ -19,12 +19,12 @@ pub static mut POMO_TIME_SETTING: Setting = Setting {
     min_value: 5,
     max_value: 90,
 };
-pub static mut SHORT_BREAK_TIME_SETTING: Setting = Setting {
+pub static mut SHORT_REST_TIME_SETTING: Setting = Setting {
     value: 5,
     min_value: 1,
     max_value: 90,
 };
-pub static mut LONG_BREAK_TIME_SETTING: Setting = Setting {
+pub static mut LONG_REST_TIME_SETTING: Setting = Setting {
     value: 15,
     min_value: 1,
     max_value: 90,

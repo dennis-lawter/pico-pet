@@ -1,11 +1,17 @@
 pub mod brightness_setting_component;
+pub mod long_rest_time_setting_component;
+pub mod pomo_cycle_setting_component;
 pub mod pomo_time_setting_component;
 pub mod reset_setting_component;
+pub mod short_rest_time_setting_component;
 pub mod time_setting_component;
 pub mod volume_setting_component;
 pub use self::brightness_setting_component::BrightnessSettingComponent;
+pub use self::long_rest_time_setting_component::LongRestSettingComponent;
+pub use self::pomo_cycle_setting_component::PomoCycleSettingComponent;
 pub use self::pomo_time_setting_component::PomoTimeSettingComponent;
 pub use self::reset_setting_component::ResetSettingComponent;
+pub use self::short_rest_time_setting_component::ShortRestSettingComponent;
 pub use self::time_setting_component::TimeSettingComponent;
 pub use self::volume_setting_component::VolumeSettingComponent;
 
@@ -14,6 +20,9 @@ pub enum SettingComponent {
     Volume(VolumeSettingComponent),
     Time(TimeSettingComponent),
     PomoTime(PomoTimeSettingComponent),
+    ShortRest(ShortRestSettingComponent),
+    LongRest(LongRestSettingComponent),
+    PomoCycle(PomoCycleSettingComponent),
     Reset(ResetSettingComponent),
 }
 impl SettingComponent {
@@ -23,6 +32,9 @@ impl SettingComponent {
             SettingComponent::Volume(component) => component.draw(y_offset, selected),
             SettingComponent::Time(component) => component.draw(y_offset, selected),
             SettingComponent::PomoTime(component) => component.draw(y_offset, selected),
+            SettingComponent::ShortRest(component) => component.draw(y_offset, selected),
+            SettingComponent::LongRest(component) => component.draw(y_offset, selected),
+            SettingComponent::PomoCycle(component) => component.draw(y_offset, selected),
             SettingComponent::Reset(component) => component.draw(y_offset, selected),
         }
     }
@@ -33,6 +45,9 @@ impl SettingComponent {
             SettingComponent::Volume(component) => component.tick(),
             SettingComponent::Time(component) => component.tick(),
             SettingComponent::PomoTime(component) => component.tick(),
+            SettingComponent::ShortRest(component) => component.tick(),
+            SettingComponent::LongRest(component) => component.tick(),
+            SettingComponent::PomoCycle(component) => component.tick(),
             SettingComponent::Reset(component) => component.tick(),
         }
     }
@@ -43,6 +58,9 @@ impl SettingComponent {
             SettingComponent::Volume(component) => component.input(),
             SettingComponent::Time(component) => component.input(),
             SettingComponent::PomoTime(component) => component.input(),
+            SettingComponent::ShortRest(component) => component.input(),
+            SettingComponent::LongRest(component) => component.input(),
+            SettingComponent::PomoCycle(component) => component.input(),
             SettingComponent::Reset(component) => component.input(),
         }
     }
@@ -53,6 +71,9 @@ impl SettingComponent {
             SettingComponent::Volume(component) => component.is_deselected(),
             SettingComponent::Time(component) => component.is_deselected(),
             SettingComponent::PomoTime(component) => component.is_deselected(),
+            SettingComponent::ShortRest(component) => component.is_deselected(),
+            SettingComponent::LongRest(component) => component.is_deselected(),
+            SettingComponent::PomoCycle(component) => component.is_deselected(),
             SettingComponent::Reset(component) => component.is_deselected(),
         }
     }

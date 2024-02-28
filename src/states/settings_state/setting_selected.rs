@@ -4,13 +4,15 @@ pub enum SettingSelected {
     Volume,
     Time,
     PomoTime,
+    ShortRest,
+    LongRest,
     PomoCycle,
     Reset,
     None = 255,
 }
 
 impl SettingSelected {
-    const MAX_VALUE: u8 = SettingSelected::Reset as u8;
+    pub const MAX_VALUE: u8 = SettingSelected::Reset as u8;
     pub fn prev(&self) -> Self {
         match self {
             Self::Brightness => Self::Reset, // loop to bottom
