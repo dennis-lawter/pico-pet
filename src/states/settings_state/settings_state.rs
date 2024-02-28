@@ -30,7 +30,7 @@ pub struct SettingsState {
     setting_highlighted: SettingSelected,
     input_enabled: bool,
 
-    setting_components: [SettingComponent; 3],
+    setting_components: [SettingComponent; 4],
 
     scroll_offset: i32,
 
@@ -87,6 +87,8 @@ impl State for SettingsState {
         );
         self.setting_components[2]
             .draw(24 + 16 * 2, self.setting_selected == SettingSelected::Time);
+        self.setting_components[3]
+            .draw(24 + 16 * 3, self.setting_selected == SettingSelected::Reset);
     }
 
     fn input(&mut self) {
@@ -126,7 +128,7 @@ impl State for SettingsState {
                 self.adjust_setting(unsafe { &mut globals::POMO_CYCLE_SETTING });
             }
             SettingSelected::Reset => {
-                self.process_reset();
+                self.setting_components[3].input();
             }
             SettingSelected::None => {
                 if input.get_state(&KeyNames::Back).just_released {
@@ -312,51 +314,6 @@ impl SettingsState {
             min_str,
         );
     }
-
-    fn display_reset_setting(&self, y_offset: i32) {
-        text_writer::draw_text_centered(
-            LCD_WIDTH as i32 / 2,
-            SETTING_HEIGHT_OFFSET + y_offset * 2 * 8,
-            FontStyle::Small,
-            Rgb332::from_u8(0b110_000_00),
-            "RESET (HOLD CONFIRM)",
-        );
-
-        crate::display::render::solid_line_rect(
-            LCD_WIDTH as i32 / 2 - (5 * 8),
-            SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8,
-            5 * 16,
-            8,
-            Rgb332::from_u8(0b110_000_00),
-        );
-
-        crate::display::render::fill_rect(
-            LCD_WIDTH as i32 / 2 - (5 * 8) + 1,
-            SETTING_HEIGHT_OFFSET + (y_offset * 2 + 1) * 8 + 1,
-            self.frames_reset_button_held as usize,
-            6,
-            Rgb332::from_u8(0b001_000_00),
-        );
-    }
-
-    fn process_reset(&mut self) {
-        let input = crate::globals::get_input();
-        let nvm = crate::globals::get_nvm();
-
-        if input.get_state(&KeyNames::Confirm).is_down {
-            if self.frames_reset_button_held < FRAMES_TO_RESET {
-                self.frames_reset_button_held += 1;
-            } else {
-                nvm.erase_all_then_reboot();
-                nvm.settings.apply_to_globals();
-
-                self.frames_reset_button_held = 0;
-                self.setting_selected = SettingSelected::None;
-            }
-        } else {
-            self.frames_reset_button_held = 0;
-        }
-    }
 }
 
 impl Default for SettingsState {
@@ -367,6 +324,7 @@ impl Default for SettingsState {
             ),
             SettingComponent::Volume(super::setting_components::VolumeSettingComponent::default()),
             SettingComponent::Time(super::setting_components::TimeSettingComponent::default()),
+            SettingComponent::Reset(super::setting_components::ResetSettingComponent::default()),
         ];
         Self {
             frame_count: 0,

@@ -14,11 +14,7 @@ impl SettingSelected {
     pub fn prev(&self) -> Self {
         match self {
             Self::Brightness => Self::Reset, // loop to bottom
-            // Self::Volume => Self::Brightness,
-            // Self::Time => Self::Volume,
-            // Self::Pomo => Self::Time,
-            // Self::Reset => Self::Pomo,
-            Self::None => Self::Reset, // first press to last option
+            Self::None => Self::Reset,       // first press to last option
             _ => {
                 let val = *self as u8;
                 let next_val = val.wrapping_sub(1);
@@ -29,10 +25,6 @@ impl SettingSelected {
     pub fn next(&self) -> Self {
         match self {
             Self::None => Self::Brightness,
-
-            // Self::Brightness => Self::Volume,
-            // Self::Volume => Self::Time,
-            // Self::Time => Self::Reset,
             Self::Reset => Self::Brightness,
             _ => {
                 let val = *self as u8;
