@@ -1,7 +1,6 @@
 pub enum PageCanon {
     Header = 0x000,
-    Settings,
-    SeedInventory,
+    Settings = 0x001,
 
     PagesInUse,
 }

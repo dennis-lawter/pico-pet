@@ -3,8 +3,8 @@ use super::render;
 pub struct Sprite<'a> {
     pub x: i32,
     pub y: i32,
-    w: usize,
-    h: usize,
+    pub w: usize,
+    pub h: usize,
     data: &'a [u8],
 }
 
@@ -24,7 +24,7 @@ pub struct SpriteFactory;
 impl SpriteFactory {
     pub const FERRIS_DIMENSIONS: (usize, usize) = (40, 24);
     pub const MENU_DIMENSIONS: (usize, usize) = (24, 24);
-    pub const FARM_DIMENSIONS: (usize, usize) = (16, 16);
+    pub const POMO_MENU_DIMENSIONS: (usize, usize) = (24, 24);
 
     pub fn new_ferris_sprite(x: i32, y: i32) -> Sprite<'static> {
         Sprite::new(
@@ -46,13 +46,13 @@ impl SpriteFactory {
         )
     }
 
-    pub fn new_farm_sprite(x: i32, y: i32) -> Sprite<'static> {
+    pub fn new_pomo_menu_sprite(x: i32, y: i32) -> Sprite<'static> {
         Sprite::new(
             x,
             y,
-            Self::FARM_DIMENSIONS.0,
-            Self::FARM_DIMENSIONS.1,
-            include_bytes!("../../sprite_raw/farm.data"),
+            Self::POMO_MENU_DIMENSIONS.0,
+            Self::POMO_MENU_DIMENSIONS.1,
+            include_bytes!("../../sprite_raw/pomo_menu.data"),
         )
     }
 }

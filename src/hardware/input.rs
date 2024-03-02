@@ -1,5 +1,5 @@
 const KEY_REPEAT_FRAMES: usize = 5;
-#[allow(dead_code)]
+
 #[derive(Default)]
 pub struct KeyState {
     pub is_down: bool,
@@ -29,9 +29,12 @@ impl KeyState {
 #[derive(Clone)]
 pub enum KeyNames {
     Back = 0,
-    Left = 1,
-    Right = 2,
-    Confirm = 3,
+    Left,
+    Right,
+    Confirm,
+    Clock,
+
+    Count,
 }
 impl Into<usize> for KeyNames {
     fn into(self) -> usize {
@@ -39,10 +42,9 @@ impl Into<usize> for KeyNames {
     }
 }
 
-#[allow(dead_code)]
 #[derive(Default)]
 pub struct InputHandler {
-    pub keys: [KeyState; 4],
+    pub keys: [KeyState; KeyNames::Count as usize],
 }
 
 impl InputHandler {
@@ -53,6 +55,7 @@ impl InputHandler {
             hardware.key1_pressed(),
             hardware.key2_pressed(),
             hardware.key3_pressed(),
+            hardware.clock_high(),
         ];
         for i in 0..self.keys.len() {
             self.keys[i].update(key_positions[i]);

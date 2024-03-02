@@ -1,37 +1,35 @@
 use cortex_m::delay::Delay;
 
 use debugless_unwrap::DebuglessUnwrap;
-use embedded_graphics::{
-    pixelcolor::Rgb565,
-    prelude::{DrawTarget, RgbColor},
-};
-use embedded_hal::{
-    digital::v2::InputPin,
-    prelude::{_embedded_hal_blocking_i2c_Read, _embedded_hal_blocking_i2c_Write},
-    PwmPin,
-};
+use embedded_graphics::pixelcolor::Rgb565;
+use embedded_graphics::prelude::DrawTarget;
+use embedded_graphics::prelude::RgbColor;
+use embedded_hal::digital::v2::InputPin;
+use embedded_hal::prelude::_embedded_hal_blocking_i2c_Read;
+use embedded_hal::prelude::_embedded_hal_blocking_i2c_Write;
+use embedded_hal::PwmPin;
 use fugit::RateExtU32;
 
-use waveshare_rp2040_lcd_0_96::{
-    hal::{
-        self,
-        clocks::{init_clocks_and_plls, Clock},
-        gpio::Pins,
-        pac,
-        pio::PIOExt,
-        sio::SioFifo,
-        watchdog::Watchdog,
-        Sio,
-    },
-    pac::{PPB, PSM},
-    XOSC_CRYSTAL_FREQ,
-};
+use waveshare_rp2040_lcd_0_96::hal::clocks::init_clocks_and_plls;
+use waveshare_rp2040_lcd_0_96::hal::clocks::Clock;
+use waveshare_rp2040_lcd_0_96::hal::gpio::Pins;
+use waveshare_rp2040_lcd_0_96::hal::pac;
+use waveshare_rp2040_lcd_0_96::hal::pio::PIOExt;
+use waveshare_rp2040_lcd_0_96::hal::sio::SioFifo;
+use waveshare_rp2040_lcd_0_96::hal::watchdog::Watchdog;
+use waveshare_rp2040_lcd_0_96::hal::Sio;
+use waveshare_rp2040_lcd_0_96::hal::{self};
+use waveshare_rp2040_lcd_0_96::pac::PPB;
+use waveshare_rp2040_lcd_0_96::pac::PSM;
+use waveshare_rp2040_lcd_0_96::XOSC_CRYSTAL_FREQ;
 
-use st7735_lcd::{Orientation, ST7735};
+use st7735_lcd::Orientation;
+use st7735_lcd::ST7735;
 
 use crate::globals;
 
-use super::{audio::AudioFrequency, rtc::RealTime};
+use super::audio::AudioFrequency;
+use super::rtc::RealTime;
 
 pub const LCD_WIDTH: usize = 128;
 pub const LCD_HEIGHT: usize = 128;
@@ -51,6 +49,7 @@ type Key1Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio17, hal::gpio::Input<hal::gp
 type Key1AltPin = hal::gpio::Pin<hal::gpio::bank0::Gpio29, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key2Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio2, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key3Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio3, hal::gpio::Input<hal::gpio::PullUp>>;
+type Key5Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio5, hal::gpio::Input<hal::gpio::PullUp>>;
 
 type I2CBus = hal::I2C<
     pac::I2C0,
@@ -72,6 +71,7 @@ pub struct HardwareComponents {
     pub key1_alt: Key1AltPin,
     pub key2: Key2Pin,
     pub key3: Key3Pin,
+    pub second_clock: Key5Pin,
     pub psm_ptr: *mut PSM,
     pub ppb_ptr: *mut PPB,
     pub fifo_ptr: *mut SioFifo,
@@ -146,6 +146,8 @@ impl HardwareComponents {
             let key2 = pins.gpio2.into_pull_up_input();
             let key3 = pins.gpio3.into_pull_up_input();
 
+            let second_clock = pins.gpio5.into_pull_up_input();
+
             let sys_freq = clocks.system_clock.freq().to_Hz();
             let mut delay = Delay::new(core.SYST, sys_freq);
 
@@ -205,7 +207,7 @@ impl HardwareComponents {
                 &clocks.system_clock,
             );
 
-            Self {
+            let mut s = Self {
                 display,
                 sys_freq,
                 backlight_channel_ptr,
@@ -217,11 +219,17 @@ impl HardwareComponents {
                 key1_alt,
                 key2,
                 key3,
+                second_clock,
                 psm_ptr,
                 ppb_ptr,
                 fifo_ptr,
                 i2c_bus,
-            }
+            };
+
+            // enable 1hz clock
+            s.write_sqw_pin_mode(0x00);
+
+            s
         }
     }
 
@@ -239,6 +247,10 @@ impl HardwareComponents {
 
     pub fn key3_pressed(&self) -> bool {
         self.key3.is_low().unwrap()
+    }
+
+    pub fn clock_high(&self) -> bool {
+        self.second_clock.is_low().unwrap()
     }
 
     const BRIGHTNESS_LUT: [u16; 16] = [
@@ -277,6 +289,20 @@ impl HardwareComponents {
 
     pub fn end_tone(&mut self) {
         self.start_tone(&AudioFrequency::None);
+    }
+
+    fn write_sqw_pin_mode(&mut self, mode: u8) -> () {
+        let mut buffer = [0u8; 1];
+        self.i2c_bus.write(0x68, &[0x0E]).unwrap();
+        self.i2c_bus.read(0x68, &mut buffer).unwrap();
+        let mut ctrl = buffer[0];
+
+        ctrl &= !0x04; // turn off INTCON
+        ctrl &= !0x18; // set freq bits to 0
+
+        ctrl |= mode;
+
+        self.i2c_bus.write(0x68, &[0x0E, ctrl]).unwrap();
     }
 
     pub fn get_time(&mut self) -> RealTime {

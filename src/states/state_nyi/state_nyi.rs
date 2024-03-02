@@ -1,8 +1,9 @@
-use crate::{
-    display::{render, text_writer},
-    hardware::input::KeyNames,
-    states::{AppState, State},
-};
+use crate::color::Rgb332;
+use crate::display::render;
+use crate::display::text_writer;
+use crate::hardware::input::KeyNames;
+use crate::states::AppState;
+use crate::states::State;
 
 pub struct StateNyi {
     next_state: Option<AppState>,
@@ -12,7 +13,7 @@ impl State for StateNyi {
     fn input(&mut self) {
         let input = crate::globals::get_input();
         if input.get_state(&KeyNames::Back).just_released {
-            self.next_state = Some(AppState::GamePlay);
+            self.next_state = Some(AppState::Main);
         }
     }
 
@@ -26,7 +27,7 @@ impl State for StateNyi {
     }
 
     fn draw(&mut self) {
-        render::flood(0b000_000_00);
+        render::flood(Rgb332::BLACK);
         text_writer::full_dialog_box("NOT IMPL", "todo!()");
     }
 

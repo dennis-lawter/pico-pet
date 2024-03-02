@@ -1,13 +1,13 @@
-use core::cmp::{max, min};
+use core::cmp::max;
+use core::cmp::min;
 
-use crate::{
-    display::rgb_converter::RGB_332_TO_565,
-    hardware::hardware::{Lcd, LCD_HEIGHT, LCD_WIDTH},
-};
+use crate::color::Rgb332;
+use crate::display::rgb_converter::RGB_332_TO_565;
+use crate::hardware::hardware::Lcd;
+use crate::hardware::hardware::LCD_HEIGHT;
+use crate::hardware::hardware::LCD_WIDTH;
 
 static mut BUFFER: [u16; LCD_WIDTH * LCD_HEIGHT] = [0b00000_111111_00000; 128 * 128];
-
-pub const ALPHA_MASK: u8 = 0b11100011;
 
 pub fn draw(display: &mut Lcd) {
     unsafe {
@@ -30,7 +30,7 @@ pub fn blit(x0: i32, y0: i32, w: usize, h: usize, sprite_data: &[u8]) {
             }
             let src_coord = y * w + x;
             let pixel = sprite_data[src_coord];
-            if pixel == ALPHA_MASK {
+            if pixel == Rgb332::INVISIBLE.into_u8() {
                 continue;
             }
             let pixel_index: usize = pixel.into();
@@ -58,7 +58,7 @@ pub fn blit_from_offset(x0: i32, y0: i32, offset: usize, w: usize, h: usize, spr
             }
             let src_coord = y * w + x;
             let pixel = sprite_data[src_coord + offset];
-            if pixel == ALPHA_MASK {
+            if pixel == Rgb332::INVISIBLE.into_u8() {
                 continue;
             }
             let pixel_index: usize = pixel.into();
@@ -71,16 +71,16 @@ pub fn blit_from_offset(x0: i32, y0: i32, offset: usize, w: usize, h: usize, spr
     }
 }
 
-pub fn flood(color: u8) {
-    let color_index = color as usize;
+pub fn flood(color: Rgb332) {
+    let color_index = color.into_usize();
     let mapped_color = RGB_332_TO_565[color_index];
     unsafe {
         BUFFER = [mapped_color; LCD_WIDTH * LCD_HEIGHT];
     }
 }
 
-pub fn fill_rect(x0: i32, y0: i32, w: usize, h: usize, color: u8) {
-    let ext_color = RGB_332_TO_565[color as usize];
+pub fn fill_rect(x0: i32, y0: i32, w: usize, h: usize, color: Rgb332) {
+    let ext_color = RGB_332_TO_565[color.into_usize()];
 
     let effective_width = min(w, (LCD_WIDTH as i32 - x0) as usize);
     let effective_height = min(h, (LCD_HEIGHT as i32 - y0) as usize);
@@ -102,21 +102,21 @@ pub fn fill_rect(x0: i32, y0: i32, w: usize, h: usize, color: u8) {
     }
 }
 
-pub fn h_solid_line(x0: i32, y0: i32, w: usize, color: u8) {
+pub fn h_solid_line(x0: i32, y0: i32, w: usize, color: Rgb332) {
     if y0 < 0 || y0 >= LCD_HEIGHT as i32 {
         return;
     }
     fill_rect(x0, y0, w, 1, color)
 }
 
-pub fn v_solid_line(x0: i32, y0: i32, h: usize, color: u8) {
+pub fn v_solid_line(x0: i32, y0: i32, h: usize, color: Rgb332) {
     if x0 < 0 || x0 >= LCD_WIDTH as i32 {
         return;
     }
     fill_rect(x0, y0, 1, h, color)
 }
 
-pub fn solid_line_rect(x0: i32, y0: i32, w: usize, h: usize, color: u8) {
+pub fn solid_line_rect(x0: i32, y0: i32, w: usize, h: usize, color: Rgb332) {
     h_solid_line(x0, y0, w, color);
     h_solid_line(x0, y0 + h as i32 - 1, w, color);
 
@@ -124,12 +124,12 @@ pub fn solid_line_rect(x0: i32, y0: i32, w: usize, h: usize, color: u8) {
     v_solid_line(x0 + w as i32 - 1, y0, h, color);
 }
 
-pub fn h_dithered_line(x0: i32, y0: i32, w: usize, color: u8, inverted: bool) {
+pub fn h_dithered_line(x0: i32, y0: i32, w: usize, color: Rgb332, inverted: bool) {
     if y0 < 0 || y0 >= LCD_HEIGHT as i32 {
         return;
     }
     let inverted_int = inverted as i32;
-    let ext_color = RGB_332_TO_565[color as usize];
+    let ext_color = RGB_332_TO_565[color.into_usize()];
     let (mut x0, w) = if (y0 + x0) % 2 == inverted_int {
         (x0 + 1, w.saturating_sub(1))
     } else {
@@ -147,12 +147,12 @@ pub fn h_dithered_line(x0: i32, y0: i32, w: usize, color: u8, inverted: bool) {
     }
 }
 
-pub fn v_dithered_line(x0: i32, y0: i32, h: usize, color: u8, inverted: bool) {
+pub fn v_dithered_line(x0: i32, y0: i32, h: usize, color: Rgb332, inverted: bool) {
     if x0 < 0 || x0 >= LCD_WIDTH as i32 {
         return;
     }
     let inverted_int = inverted as i32;
-    let ext_color = RGB_332_TO_565[color as usize];
+    let ext_color = RGB_332_TO_565[color.into_usize()];
     let (mut y0, h) = if (y0 + x0) % 2 == inverted_int {
         (y0 + 1, h.saturating_sub(1))
     } else {
@@ -170,19 +170,8 @@ pub fn v_dithered_line(x0: i32, y0: i32, h: usize, color: u8, inverted: bool) {
     }
 }
 
-pub fn dithered_line_rect(x0: i32, y0: i32, w: usize, h: usize, color: u8, inverted: bool) {
-    h_dithered_line(x0, y0, w, color, inverted);
-    h_dithered_line(x0, y0 + h as i32 - 1, w, color, inverted);
-
-    v_dithered_line(x0, y0, h, color, inverted);
-    v_dithered_line(x0 + w as i32 - 1, y0, h, color, inverted);
-}
-
 const FANCY_BORDER_THICKNESS: usize = 4;
 const FANCY_BORDER_CORNER_SIZE: usize = 7;
-const FANCY_BORDER_CORNER_COLOR: u8 = 0b000_000_10;
-const FANCY_BORDER_EDGE_COLOR: u8 = 0b000_000_11;
-const FANCY_BORDER_EDGE_FILL_COLOR: u8 = 0b101_101_11;
 
 enum FancyBorderCornerOrientation {
     TopLeft,
@@ -199,7 +188,7 @@ fn fancy_border_corner(x: i32, y: i32, orientation: FancyBorderCornerOrientation
                     x,
                     y + i as i32,
                     FANCY_BORDER_CORNER_SIZE - i,
-                    FANCY_BORDER_CORNER_COLOR,
+                    Rgb332::FANCY_BORDER_CORNER_COLOR,
                 );
             }
             FancyBorderCornerOrientation::TopRight => {
@@ -207,7 +196,7 @@ fn fancy_border_corner(x: i32, y: i32, orientation: FancyBorderCornerOrientation
                     x - (FANCY_BORDER_CORNER_SIZE - i) as i32,
                     y + i as i32,
                     FANCY_BORDER_CORNER_SIZE - i,
-                    FANCY_BORDER_CORNER_COLOR,
+                    Rgb332::FANCY_BORDER_CORNER_COLOR,
                 );
             }
             FancyBorderCornerOrientation::BottomLeft => {
@@ -215,7 +204,7 @@ fn fancy_border_corner(x: i32, y: i32, orientation: FancyBorderCornerOrientation
                     x,
                     y - (FANCY_BORDER_CORNER_SIZE - i) as i32,
                     i,
-                    FANCY_BORDER_CORNER_COLOR,
+                    Rgb332::FANCY_BORDER_CORNER_COLOR,
                 );
             }
             FancyBorderCornerOrientation::BottomRight => {
@@ -223,7 +212,7 @@ fn fancy_border_corner(x: i32, y: i32, orientation: FancyBorderCornerOrientation
                     x - i as i32,
                     y - (FANCY_BORDER_CORNER_SIZE - i) as i32,
                     i,
-                    FANCY_BORDER_CORNER_COLOR,
+                    Rgb332::FANCY_BORDER_CORNER_COLOR,
                 );
             }
         }
@@ -239,28 +228,28 @@ fn fancy_border_edge(x0: i32, y0: i32, length: usize, orientation: FancyBorderEd
     match orientation {
         FancyBorderEdgeOrientation::Horizontal => {
             let y1 = y0 + FANCY_BORDER_THICKNESS as i32 - 1;
-            h_solid_line(x0, y0, length, FANCY_BORDER_EDGE_COLOR);
-            h_solid_line(x0, y1, length, FANCY_BORDER_EDGE_COLOR);
+            h_solid_line(x0, y0, length, Rgb332::FANCY_BORDER_EDGE_COLOR);
+            h_solid_line(x0, y1, length, Rgb332::FANCY_BORDER_EDGE_COLOR);
             for i in 1..(FANCY_BORDER_THICKNESS - 1) {
                 h_dithered_line(
                     x0,
                     y0 + i as i32,
                     length,
-                    FANCY_BORDER_EDGE_FILL_COLOR,
+                    Rgb332::FANCY_BORDER_EDGE_FILL_COLOR,
                     false,
                 );
             }
         }
         FancyBorderEdgeOrientation::Vertical => {
             let x1 = x0 + FANCY_BORDER_THICKNESS as i32 - 1;
-            v_solid_line(x0, y0, length, FANCY_BORDER_EDGE_COLOR);
-            v_solid_line(x1, y0, length, FANCY_BORDER_EDGE_COLOR);
+            v_solid_line(x0, y0, length, Rgb332::FANCY_BORDER_EDGE_COLOR);
+            v_solid_line(x1, y0, length, Rgb332::FANCY_BORDER_EDGE_COLOR);
             for i in 1..(FANCY_BORDER_THICKNESS - 1) {
                 v_dithered_line(
                     x0 + i as i32,
                     y0,
                     length,
-                    FANCY_BORDER_EDGE_FILL_COLOR,
+                    Rgb332::FANCY_BORDER_EDGE_FILL_COLOR,
                     false,
                 );
             }

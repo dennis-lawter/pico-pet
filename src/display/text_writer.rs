@@ -1,7 +1,8 @@
-use super::{
-    font::{Font, FontFactory},
-    render,
-};
+use crate::color::Rgb332;
+
+use super::font::Font;
+use super::font::FontFactory;
+use super::render;
 
 static mut SMALL_FONT: Option<Font> = None;
 static mut ICON_FONT: Option<Font> = None;
@@ -30,20 +31,20 @@ pub fn init_singleton_fonts() {
 }
 
 // TODO: center each line
-pub fn draw_text_centered(x: i32, y: i32, style: FontStyle, color: u8, text: &str) {
+pub fn draw_text_centered(x: i32, y: i32, style: FontStyle, color: Rgb332, text: &str) {
     let font = get_font(style);
     let (width, _) = font.size.get_glyph_dimensions();
     let x = x - ((width * text.len()) as i32 / 2);
     font.draw_text(x, y, color, text, false);
 }
 
-pub fn draw_text(x: i32, y: i32, style: FontStyle, color: u8, text: &str) {
+pub fn draw_text(x: i32, y: i32, style: FontStyle, color: Rgb332, text: &str) {
     let font = get_font(style);
 
     font.draw_text(x, y, color, text, false)
 }
 
-pub fn draw_text_wrapped(x: i32, y: i32, style: FontStyle, color: u8, text: &str) {
+pub fn draw_text_wrapped(x: i32, y: i32, style: FontStyle, color: Rgb332, text: &str) {
     let font = get_font(style);
 
     font.draw_text(x, y, color, text, true)
@@ -62,27 +63,38 @@ fn get_font(style: FontStyle) -> &'static Font<'static> {
     }
 }
 
-#[allow(dead_code)]
 pub fn bottom_dialog_box(text: &str) {
     let height = 18usize;
     let box_x: i32 = 0;
     let box_y = 128 - 24 - height as i32;
-    let text_x = 5;
+    let text_x = 128 / 2;
     let text_y = 128 - 24 + 4 - height as i32;
 
-    render::fill_rect(box_x, box_y, 128, height, 0b111_111_11);
-    render::fancy_border(0, box_y, 128, height);
+    render::fill_rect(box_x, box_y, 128, height, Rgb332::WHITE);
+    render::fancy_border(box_x, box_y, 128, height);
 
-    draw_text(text_x, text_y, FontStyle::Small, 0b000_000_11, text)
+    draw_text_centered(text_x, text_y, FontStyle::Small, Rgb332::BLUE, text)
+}
+pub fn bottom_big_dialog_box(text: &str) {
+    let height = 24usize;
+    let box_x: i32 = 24;
+    let box_y = 128 - height as i32;
+    let text_x = 128 / 2;
+    let text_y = 128 + 4 + 2 - height as i32;
+
+    render::fill_rect(box_x, box_y, 128 - (24 * 2), height, Rgb332::WHITE);
+    render::fancy_border(box_x, box_y, 128 - (24 * 2), height);
+
+    draw_text_centered(text_x, text_y, FontStyle::BigBold, Rgb332::BLUE, text)
 }
 
 pub fn full_dialog_box(title: &str, text: &str) {
     let title_width = 8 * title.len() as i32;
     let title_x = 64 - (title_width / 2);
 
-    render::flood(0b111_111_11);
+    render::flood(Rgb332::WHITE);
     render::fancy_border(0, 0, 128, 128);
 
-    draw_text(title_x, 5, FontStyle::BigBold, 0b000_000_00, title);
-    draw_text(5, 18, FontStyle::Small, 0b000_000_11, text);
+    draw_text(title_x, 5, FontStyle::BigBold, Rgb332::BLACK, title);
+    draw_text(5, 18, FontStyle::Small, Rgb332::BLUE, text);
 }

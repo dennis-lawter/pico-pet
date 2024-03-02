@@ -1,7 +1,12 @@
-use super::{page_canon::PageCanon, NVM_BLANK};
+use super::page_canon::PageCanon;
+use super::NVM_BLANK;
 
 const DEFAULT_BRIGHTNESS: u8 = 15;
 const DEFAULT_VOLUME: u8 = 2;
+const DEFAULT_POMO_TIME: u8 = 25;
+const DEFAULT_SHORT_REST_TIME: u8 = 5;
+const DEFAULT_LONG_REST_TIME: u8 = 15;
+const DEFAULT_POMO_CYCLE: u8 = 4;
 
 pub struct NvmSettings {
     pub data: [u8; 8],
@@ -12,10 +17,10 @@ impl Default for NvmSettings {
             data: [
                 DEFAULT_BRIGHTNESS,
                 DEFAULT_VOLUME,
-                NVM_BLANK,
-                NVM_BLANK,
-                NVM_BLANK,
-                NVM_BLANK,
+                DEFAULT_POMO_TIME,
+                DEFAULT_SHORT_REST_TIME,
+                DEFAULT_LONG_REST_TIME,
+                DEFAULT_POMO_CYCLE,
                 NVM_BLANK,
                 NVM_BLANK,
             ],
@@ -40,10 +45,18 @@ impl NvmSettings {
     pub fn apply_to_globals(&self) {
         unsafe { &mut crate::globals::BRIGHTNESS_SETTING }.value = self.data[0];
         unsafe { &mut crate::globals::VOLUME_SETTING }.value = self.data[1];
+        unsafe { &mut crate::globals::POMO_TIME_SETTING }.value = self.data[2];
+        unsafe { &mut crate::globals::SHORT_REST_TIME_SETTING }.value = self.data[3];
+        unsafe { &mut crate::globals::LONG_REST_TIME_SETTING }.value = self.data[4];
+        unsafe { &mut crate::globals::POMO_CYCLE_SETTING }.value = self.data[5];
     }
 
     pub fn update_from_globals(&mut self) {
         self.data[0] = unsafe { &mut crate::globals::BRIGHTNESS_SETTING }.value;
         self.data[1] = unsafe { &mut crate::globals::VOLUME_SETTING }.value;
+        self.data[2] = unsafe { &mut crate::globals::POMO_TIME_SETTING }.value;
+        self.data[3] = unsafe { &mut crate::globals::SHORT_REST_TIME_SETTING }.value;
+        self.data[4] = unsafe { &mut crate::globals::LONG_REST_TIME_SETTING }.value;
+        self.data[5] = unsafe { &mut crate::globals::POMO_CYCLE_SETTING }.value;
     }
 }

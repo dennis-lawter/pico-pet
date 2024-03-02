@@ -1,18 +1,37 @@
-use crate::{
-    hardware::{hardware::HardwareComponents, input::InputHandler},
-    nvm::{inventory::NvmInventory, Nvm},
-    rand::Lcg,
-    setting_value::Setting,
-    states::farm_state::farm_garden::FarmGarden,
-};
+use crate::hardware::hardware::HardwareComponents;
+use crate::hardware::input::InputHandler;
+use crate::nvm::Nvm;
+use crate::setting_value::Setting;
 
 pub static mut BRIGHTNESS_SETTING: Setting = Setting {
     value: 15,
+    min_value: 0,
     max_value: 15,
 };
 pub static mut VOLUME_SETTING: Setting = Setting {
     value: 2,
+    min_value: 0,
     max_value: 4,
+};
+pub static mut POMO_TIME_SETTING: Setting = Setting {
+    value: 25,
+    min_value: 1,
+    max_value: 90,
+};
+pub static mut SHORT_REST_TIME_SETTING: Setting = Setting {
+    value: 5,
+    min_value: 1,
+    max_value: 90,
+};
+pub static mut LONG_REST_TIME_SETTING: Setting = Setting {
+    value: 15,
+    min_value: 1,
+    max_value: 90,
+};
+pub static mut POMO_CYCLE_SETTING: Setting = Setting {
+    value: 4,
+    min_value: 1,
+    max_value: 9,
 };
 
 pub static mut HARDWARE: Option<HardwareComponents> = None;
@@ -37,32 +56,4 @@ pub fn init_nvm() {
 }
 pub fn get_nvm() -> &'static mut Nvm {
     unsafe { self::NVM.as_mut().unwrap() }
-}
-
-pub static mut GARDEN: Option<FarmGarden> = None;
-pub fn init_garden() {
-    unsafe { self::GARDEN = Some(FarmGarden::default()) }
-}
-pub fn get_garden() -> &'static mut FarmGarden<'static> {
-    unsafe { self::GARDEN.as_mut().unwrap() }
-}
-
-pub static mut RNG: Option<Lcg> = None;
-pub fn init_rng() {
-    unsafe { self::RNG = Some(Lcg::default()) }
-}
-pub fn get_rng() -> &'static mut Lcg {
-    unsafe { self::RNG.as_mut().unwrap() }
-}
-
-// pub static mut INVENTORY: Option<NvmInventory> = None;
-// pub fn init_inv() {
-//     unsafe { self::INVENTORY = Some(NvmInventory::default()) }
-// }
-// pub fn get_inv() -> &'static mut NvmInventory {
-//     unsafe { self::INVENTORY.as_mut().unwrap() }
-// }
-pub fn get_inv() -> &'static mut NvmInventory {
-    let nvm = get_nvm();
-    &mut nvm.inventory
 }
