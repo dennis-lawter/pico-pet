@@ -91,6 +91,7 @@ impl PomoState<'_> {
                             PomoPhase::ShortBreak => self.timer = short_break_seconds,
                             PomoPhase::LongBreak => self.timer = long_break_seconds,
                         }
+                        self.phase_complete = false;
                     }
                 }
                 self.pre_timer = PRE_TIMER_WAIT;
@@ -212,19 +213,31 @@ impl State for PomoState<'_> {
                 frame = 0
             }
             TimerStatus::Stopped => {
-                if !self.phase_complete {
-                    text_writer::bottom_dialog_box("Let's begin!");
-                } else {
+                if self.phase_complete {
                     match self.phase {
                         PomoPhase::Pomodoro => text_writer::bottom_dialog_box("Ready for a break?"),
                         PomoPhase::ShortBreak => {
                             text_writer::bottom_dialog_box("Let's get back to work!")
                         }
                         PomoPhase::LongBreak => {
-                            text_writer::bottom_dialog_box("What a long break!")
+                            text_writer::bottom_dialog_box("Refreshing! Again?")
+                        }
+                    }
+                } else {
+                    match self.phase {
+                        PomoPhase::Pomodoro => {
+                            if self.cycles_elapsed == 0 {
+                                text_writer::bottom_dialog_box("Let's get to work!")
+                            } else {
+                                text_writer::bottom_dialog_box("Let's get back to work!")
+                            }
+                        }
+                        PomoPhase::ShortBreak | PomoPhase::LongBreak => {
+                            text_writer::bottom_dialog_box("Ready for a break?")
                         }
                     }
                 }
+
                 frame = 0;
             }
         }
