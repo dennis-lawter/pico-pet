@@ -5,15 +5,23 @@ use crate::display::text_writer;
 use crate::display::text_writer::FontStyle;
 use crate::globals;
 use crate::hardware::hardware::LCD_WIDTH;
-use crate::hardware::input::KeyNames;
 
+use super::adjust_setting;
+use super::check_if_confirming;
+use super::check_if_exiting;
 use super::SettingComponentTrait;
 
-pub struct PomoCycleSettingComponent {}
+pub struct PomoCycleSettingComponent {
+    will_be_deselected: bool,
+    pub initial_value: Option<u8>,
+}
 
 impl Default for PomoCycleSettingComponent {
     fn default() -> Self {
-        Self {}
+        Self {
+            will_be_deselected: false,
+            initial_value: None,
+        }
     }
 }
 
@@ -59,21 +67,28 @@ impl SettingComponentTrait for PomoCycleSettingComponent {
     fn tick(&mut self) {}
 
     fn input(&mut self) {
-        let input = crate::globals::get_input();
         let setting = unsafe { &mut globals::POMO_CYCLE_SETTING };
-
-        if input.get_state(&KeyNames::Left).is_down && input.get_state(&KeyNames::Right).is_down {
-            return;
+        if self.initial_value.is_none() {
+            self.initial_value = Some(setting.get_value());
         }
 
-        if input.get_state(&KeyNames::Left).key_repeat_triggered {
-            setting.dec();
-        } else if input.get_state(&KeyNames::Right).key_repeat_triggered {
-            setting.inc();
+        if check_if_confirming() {
+            self.will_be_deselected = true;
+        }
+        if check_if_exiting() {
+            self.will_be_deselected = true;
+            setting.set_value(self.initial_value.unwrap()).unwrap();
+        } else {
+            adjust_setting(setting);
         }
     }
 
     fn is_deselected(&mut self) -> bool {
-        false
+        self.will_be_deselected
+    }
+
+    fn reset(&mut self) {
+        self.will_be_deselected = false;
+        self.initial_value = None;
     }
 }

@@ -170,13 +170,13 @@ pub fn v_dithered_line(x0: i32, y0: i32, h: usize, color: Rgb332, inverted: bool
     }
 }
 
-pub fn dithered_line_rect(x0: i32, y0: i32, w: usize, h: usize, color: Rgb332, inverted: bool) {
-    h_dithered_line(x0, y0, w, color, inverted);
-    h_dithered_line(x0, y0 + h as i32 - 1, w, color, inverted);
+// pub fn dithered_line_rect(x0: i32, y0: i32, w: usize, h: usize, color: Rgb332, inverted: bool) {
+//     h_dithered_line(x0, y0, w, color, inverted);
+//     h_dithered_line(x0, y0 + h as i32 - 1, w, color, inverted);
 
-    v_dithered_line(x0, y0, h, color, inverted);
-    v_dithered_line(x0 + w as i32 - 1, y0, h, color, inverted);
-}
+//     v_dithered_line(x0, y0, h, color, inverted);
+//     v_dithered_line(x0 + w as i32 - 1, y0, h, color, inverted);
+// }
 
 const FANCY_BORDER_THICKNESS: usize = 4;
 const FANCY_BORDER_CORNER_SIZE: usize = 7;

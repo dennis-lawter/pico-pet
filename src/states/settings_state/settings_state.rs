@@ -12,10 +12,7 @@ use super::setting_components::SettingComponent;
 use super::setting_selected::SettingSelected;
 use super::song;
 
-const FRAMES_TO_RESET: u8 = 5 * 16 - 2;
 const SETTING_HEIGHT_OFFSET: i32 = 10;
-const SCROLL_AMOUNT: i32 = 16;
-const SCROLL_LIMIT: i32 = SCROLL_AMOUNT * 8;
 const SETTINGS_DRAWN: i32 = 5;
 
 pub struct SettingsState {
@@ -30,8 +27,6 @@ pub struct SettingsState {
     setting_components: [SettingComponent; SettingSelected::MAX_VALUE as usize + 1],
 
     scroll_offset: i32,
-
-    frames_reset_button_held: u8,
 }
 impl Default for SettingsState {
     fn default() -> Self {
@@ -66,8 +61,6 @@ impl Default for SettingsState {
             setting_components,
 
             scroll_offset: 0,
-
-            frames_reset_button_held: 0,
         }
     }
 }
@@ -124,22 +117,24 @@ impl State for SettingsState {
             }
         }
 
-        if self.check_for_setting_deselected() {
-            return; // our action this frame will be to deselect, prevents auto-exit menu
-        }
-
         match self.setting_selected {
             SettingSelected::None => {
                 if input.get_state(&KeyNames::Back).just_released {
                     self.next_state = Some(AppState::GamePlay);
                     return;
                 }
-                self.check_for_setting_selected();
+                if self.check_for_new_setting_selected() {
+                    return;
+                }
                 self.check_for_move_highlight();
             }
 
             setting => {
                 self.setting_components[setting as usize].input();
+                if self.setting_components[setting as usize].is_deselected() {
+                    self.setting_components[setting as usize].reset();
+                    self.setting_selected = SettingSelected::None;
+                }
             }
         }
     }
@@ -150,36 +145,15 @@ impl State for SettingsState {
 }
 
 impl SettingsState {
-    fn check_for_setting_selected(&mut self) {
-        let input = crate::globals::get_input();
-
+    fn check_for_new_setting_selected(&mut self) -> bool {
         if self.setting_selected != SettingSelected::None {
-            return;
+            return false;
         }
+
+        let input = crate::globals::get_input();
 
         if input.get_state(&KeyNames::Confirm).just_released {
             self.setting_selected = self.setting_highlighted.clone();
-        }
-    }
-
-    fn check_for_setting_deselected(&mut self) -> bool {
-        let input = crate::globals::get_input();
-
-        if self.setting_selected != SettingSelected::None
-            && input.get_state(&KeyNames::Back).just_released
-        {
-            match self.setting_selected {
-                SettingSelected::Brightness
-                | SettingSelected::Volume
-                | SettingSelected::PomoTime
-                | SettingSelected::PomoCycle => {
-                    crate::globals::get_nvm().settings.write();
-                }
-                _ => {}
-            }
-            // self.new_time = None;
-            self.setting_selected = SettingSelected::None;
-
             true
         } else {
             false
@@ -212,8 +186,6 @@ impl SettingsState {
             }
         }
     }
-
-    fn adjust_time(&mut self) {}
 
     fn setting_to_y_offset(&self, setting: &SettingSelected) -> i32 {
         match setting {

@@ -171,7 +171,14 @@ impl SettingComponentTrait for TimeSettingComponent {
         }
         let new_time_mut = self.new_time.as_mut().unwrap();
 
-        if input.get_state(&KeyNames::Left).just_pressed {
+        if input.get_state(&KeyNames::Back).just_released {
+            match self.new_time_selection {
+                0 => self.will_be_deselected = true,
+                1 => self.new_time_selection = 0,
+                2 => self.new_time_selection = 1,
+                _ => {}
+            }
+        } else if input.get_state(&KeyNames::Left).just_pressed {
             match self.new_time_selection {
                 0 => {
                     if new_time_mut.hr == 00 {
@@ -234,5 +241,12 @@ impl SettingComponentTrait for TimeSettingComponent {
 
     fn is_deselected(&mut self) -> bool {
         self.will_be_deselected
+    }
+
+    fn reset(&mut self) {
+        self.will_be_deselected = false;
+        self.time = None;
+        self.new_time = None;
+        self.new_time_selection = 0;
     }
 }

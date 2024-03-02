@@ -1,17 +1,20 @@
 pub mod brightness_setting_component;
-pub mod long_rest_time_setting_component;
+pub mod long_rest_setting_component;
 pub mod pomo_cycle_setting_component;
 pub mod pomo_time_setting_component;
 pub mod reset_setting_component;
-pub mod short_rest_time_setting_component;
+pub mod short_rest_setting_component;
 pub mod time_setting_component;
 pub mod volume_setting_component;
+use crate::hardware::input::KeyNames;
+use crate::setting_value::Setting;
+
 pub use self::brightness_setting_component::BrightnessSettingComponent;
-pub use self::long_rest_time_setting_component::LongRestSettingComponent;
+pub use self::long_rest_setting_component::LongRestSettingComponent;
 pub use self::pomo_cycle_setting_component::PomoCycleSettingComponent;
 pub use self::pomo_time_setting_component::PomoTimeSettingComponent;
 pub use self::reset_setting_component::ResetSettingComponent;
-pub use self::short_rest_time_setting_component::ShortRestSettingComponent;
+pub use self::short_rest_setting_component::ShortRestSettingComponent;
 pub use self::time_setting_component::TimeSettingComponent;
 pub use self::volume_setting_component::VolumeSettingComponent;
 
@@ -77,6 +80,19 @@ impl SettingComponent {
             SettingComponent::Reset(component) => component.is_deselected(),
         }
     }
+
+    pub fn reset(&mut self) {
+        match self {
+            SettingComponent::Brightness(component) => component.reset(),
+            SettingComponent::Volume(component) => component.reset(),
+            SettingComponent::Time(component) => component.reset(),
+            SettingComponent::PomoTime(component) => component.reset(),
+            SettingComponent::ShortRest(component) => component.reset(),
+            SettingComponent::LongRest(component) => component.reset(),
+            SettingComponent::PomoCycle(component) => component.reset(),
+            SettingComponent::Reset(component) => component.reset(),
+        }
+    }
 }
 
 trait SettingComponentTrait {
@@ -84,4 +100,26 @@ trait SettingComponentTrait {
     fn tick(&mut self);
     fn input(&mut self);
     fn is_deselected(&mut self) -> bool;
+    fn reset(&mut self);
+}
+
+fn adjust_setting(setting: &mut Setting) {
+    let input = crate::globals::get_input();
+    if input.get_state(&KeyNames::Left).key_repeat_triggered
+        && !input.get_state(&KeyNames::Right).is_down
+    {
+        setting.dec();
+    } else if input.get_state(&KeyNames::Right).key_repeat_triggered
+        && !input.get_state(&KeyNames::Left).is_down
+    {
+        setting.inc();
+    }
+}
+fn check_if_confirming() -> bool {
+    let input = crate::globals::get_input();
+    input.get_state(&KeyNames::Confirm).just_released
+}
+fn check_if_exiting() -> bool {
+    let input = crate::globals::get_input();
+    input.get_state(&KeyNames::Back).just_released
 }

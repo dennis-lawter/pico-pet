@@ -1,7 +1,7 @@
 use crate::hardware::hardware::HardwareComponents;
 use crate::hardware::input::InputHandler;
 use crate::nvm::Nvm;
-use crate::rand::Lcg;
+// use crate::rand::Lcg;
 use crate::setting_value::Setting;
 
 pub static mut BRIGHTNESS_SETTING: Setting = Setting {
@@ -59,10 +59,10 @@ pub fn get_nvm() -> &'static mut Nvm {
     unsafe { self::NVM.as_mut().unwrap() }
 }
 
-pub static mut RNG: Option<Lcg> = None;
-pub fn init_rng() {
-    unsafe { self::RNG = Some(Lcg::default()) }
-}
-pub fn get_rng() -> &'static mut Lcg {
-    unsafe { self::RNG.as_mut().unwrap() }
-}
+// pub static mut RNG: Option<Lcg> = None;
+// pub fn init_rng() {
+//     unsafe { self::RNG = Some(Lcg::default()) }
+// }
+// pub fn get_rng() -> &'static mut Lcg {
+//     unsafe { self::RNG.as_mut().unwrap() }
+// }

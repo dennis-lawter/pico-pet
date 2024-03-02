@@ -1,17 +1,27 @@
 #[derive(Clone, Copy)]
 pub struct Rgb332(u8);
 impl Rgb332 {
+    #[allow(dead_code)]
     pub const INVISIBLE: Rgb332 = Rgb332(0b111_000_11);
 
+    #[allow(dead_code)]
     pub const BLACK: Rgb332 = Rgb332(0b000_000_00);
+    #[allow(dead_code)]
     pub const WHITE: Rgb332 = Rgb332(0b111_111_11);
+    #[allow(dead_code)]
     pub const RED: Rgb332 = Rgb332(0b111_000_00);
+    #[allow(dead_code)]
     pub const GREEN: Rgb332 = Rgb332(0b000_111_00);
+    #[allow(dead_code)]
     pub const BLUE: Rgb332 = Rgb332(0b000_000_11);
+    #[allow(dead_code)]
     pub const YELLOW: Rgb332 = Rgb332(0b111_111_00);
 
+    #[allow(dead_code)]
     pub const FANCY_BORDER_CORNER_COLOR: Rgb332 = Rgb332(0b000_000_10);
+    #[allow(dead_code)]
     pub const FANCY_BORDER_EDGE_COLOR: Rgb332 = Rgb332(0b000_000_11);
+    #[allow(dead_code)]
     pub const FANCY_BORDER_EDGE_FILL_COLOR: Rgb332 = Rgb332(0b101_101_11);
 
     pub fn into_usize(self) -> usize {

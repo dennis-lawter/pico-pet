@@ -54,6 +54,9 @@ impl SettingComponentTrait for ResetSettingComponent {
         let input = crate::globals::get_input();
         let nvm = crate::globals::get_nvm();
 
+        if input.get_state(&KeyNames::Back).just_released {
+            self.will_be_deselected = true;
+        }
         if input.get_state(&KeyNames::Confirm).is_down {
             if self.frames_reset_button_held < FRAMES_TO_RESET {
                 self.frames_reset_button_held += 1;
@@ -71,5 +74,10 @@ impl SettingComponentTrait for ResetSettingComponent {
 
     fn is_deselected(&mut self) -> bool {
         self.will_be_deselected
+    }
+
+    fn reset(&mut self) {
+        self.will_be_deselected = false;
+        self.frames_reset_button_held = 0;
     }
 }

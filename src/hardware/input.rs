@@ -1,5 +1,5 @@
 const KEY_REPEAT_FRAMES: usize = 5;
-#[allow(dead_code)]
+
 #[derive(Default)]
 pub struct KeyState {
     pub is_down: bool,
@@ -42,7 +42,6 @@ impl Into<usize> for KeyNames {
     }
 }
 
-#[allow(dead_code)]
 #[derive(Default)]
 pub struct InputHandler {
     pub keys: [KeyState; KeyNames::Count as usize],

@@ -1,8 +1,6 @@
 #![no_std]
 #![no_main]
 #![feature(iter_advance_by)]
-// TODO (RELEASE): remove dead_code
-#![allow(dead_code)]
 
 extern crate cortex_m;
 extern crate cortex_m_rt;
@@ -32,7 +30,7 @@ use waveshare_rp2040_lcd_0_96::entry;
 fn init_globals() {
     globals::init_hardware();
     globals::init_nvm();
-    globals::init_rng();
+    // globals::init_rng();
     // globals::init_inv();
     globals::init_input();
     display::text_writer::init_singleton_fonts();

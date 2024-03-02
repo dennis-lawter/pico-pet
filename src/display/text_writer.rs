@@ -63,6 +63,7 @@ fn get_font(style: FontStyle) -> &'static Font<'static> {
     }
 }
 
+// TODO (RELEASE): remove if unused
 #[allow(dead_code)]
 pub fn bottom_dialog_box(text: &str) {
     let height = 18usize;
