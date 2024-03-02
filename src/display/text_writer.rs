@@ -63,19 +63,30 @@ fn get_font(style: FontStyle) -> &'static Font<'static> {
     }
 }
 
-// TODO (RELEASE): remove if unused
-#[allow(dead_code)]
 pub fn bottom_dialog_box(text: &str) {
     let height = 18usize;
     let box_x: i32 = 0;
     let box_y = 128 - 24 - height as i32;
-    let text_x = 5;
+    // let text_x = 5;
+    let text_x = 128 / 2;
     let text_y = 128 - 24 + 4 - height as i32;
 
     render::fill_rect(box_x, box_y, 128, height, Rgb332::WHITE);
-    render::fancy_border(0, box_y, 128, height);
+    render::fancy_border(box_x, box_y, 128, height);
 
-    draw_text(text_x, text_y, FontStyle::Small, Rgb332::BLUE, text)
+    draw_text_centered(text_x, text_y, FontStyle::Small, Rgb332::BLUE, text)
+}
+pub fn bottom_big_dialog_box(text: &str) {
+    let height = 24usize;
+    let box_x: i32 = 24;
+    let box_y = 128 - height as i32;
+    let text_x = 128 / 2;
+    let text_y = 128 + 4 + 2 - height as i32;
+
+    render::fill_rect(box_x, box_y, 128 - (24 * 2), height, Rgb332::WHITE);
+    render::fancy_border(box_x, box_y, 128 - (24 * 2), height);
+
+    draw_text_centered(text_x, text_y, FontStyle::BigBold, Rgb332::BLUE, text)
 }
 
 pub fn full_dialog_box(title: &str, text: &str) {

@@ -13,7 +13,7 @@ impl State for StateNyi {
     fn input(&mut self) {
         let input = crate::globals::get_input();
         if input.get_state(&KeyNames::Back).just_released {
-            self.next_state = Some(AppState::GamePlay);
+            self.next_state = Some(AppState::Main);
         }
     }
 

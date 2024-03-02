@@ -1,10 +1,11 @@
-pub mod game_play_state;
+pub mod main_state;
+pub mod pomo_state;
 pub mod settings_state;
 pub mod state_nyi;
 
 #[derive(Clone)]
 pub enum AppState {
-    GamePlay,
+    Main,
 
     PomoState,
     EatState,
@@ -14,7 +15,7 @@ pub enum AppState {
 }
 impl Default for AppState {
     fn default() -> Self {
-        Self::GamePlay
+        Self::Main
     }
 }
 

@@ -1,5 +1,6 @@
 build:
 	cargo build --release
+run: build
 	echo "Searching for Raspberry Pi Pico..."
 	@while [ ! -d "/media/$$USER/RPI-RP2" ]; do \
         sleep 1; \

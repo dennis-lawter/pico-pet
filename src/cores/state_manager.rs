@@ -1,4 +1,5 @@
-use crate::states::game_play_state::GamePlayState;
+use crate::states::main_state::MainState;
+use crate::states::pomo_state::PomoState;
 use crate::states::settings_state::SettingsState;
 use crate::states::state_nyi::StateNyi;
 use crate::states::AppState;
@@ -6,8 +7,8 @@ use crate::states::State;
 
 #[derive(Default)]
 pub struct StateManager<'a> {
-    pub game_play_state: Option<GamePlayState<'a>>,
-    pub pomo_state: Option<StateNyi>,
+    pub game_play_state: Option<MainState<'a>>,
+    pub pomo_state: Option<PomoState<'a>>,
     pub eat_state: Option<StateNyi>,
     pub stat_state: Option<StateNyi>,
     pub cosmetic_state: Option<StateNyi>,
@@ -18,7 +19,7 @@ pub struct StateManager<'a> {
 impl StateManager<'static> {
     fn get_state(&mut self) -> &mut dyn State {
         match self.active_state {
-            AppState::GamePlay => self.game_play_state.as_mut().unwrap(),
+            AppState::Main => self.game_play_state.as_mut().unwrap(),
             AppState::SettingsState => self.settings_state.as_mut().unwrap(),
             AppState::PomoState => self.pomo_state.as_mut().unwrap(),
             AppState::EatState => self.eat_state.as_mut().unwrap(),
@@ -48,8 +49,8 @@ impl StateManager<'static> {
                 self.settings_state = None;
 
                 match next_state {
-                    AppState::GamePlay => self.game_play_state = Some(GamePlayState::default()),
-                    AppState::PomoState => self.pomo_state = Some(StateNyi::default()),
+                    AppState::Main => self.game_play_state = Some(MainState::default()),
+                    AppState::PomoState => self.pomo_state = Some(PomoState::default()),
                     AppState::EatState => self.eat_state = Some(StateNyi::default()),
                     AppState::StatState => self.stat_state = Some(StateNyi::default()),
                     AppState::CosmeticState => self.cosmetic_state = Some(StateNyi::default()),

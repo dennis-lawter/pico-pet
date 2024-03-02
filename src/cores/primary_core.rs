@@ -1,12 +1,12 @@
-use crate::states::game_play_state::GamePlayState;
+use crate::states::main_state::MainState;
 use crate::states::AppState;
 
 use super::state_manager::StateManager;
 
 pub fn primary_main_loop() -> ! {
     let mut state_manager = StateManager::default();
-    state_manager.game_play_state = Some(GamePlayState::default());
-    state_manager.active_state = AppState::GamePlay;
+    state_manager.game_play_state = Some(MainState::default());
+    state_manager.active_state = AppState::Main;
 
     loop {
         let input = crate::globals::get_input();

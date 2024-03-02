@@ -1,3 +1,4 @@
+// TODO: refactor this to more cleanly integrate with setting_components
 #[derive(Clone, Copy, PartialEq)]
 pub enum SettingSelected {
     Brightness = 0,
@@ -26,8 +27,8 @@ impl SettingSelected {
     }
     pub fn next(&self) -> Self {
         match self {
-            Self::None => Self::Brightness,
-            Self::Reset => Self::Brightness,
+            Self::None => Self::Brightness,  // first press to first option
+            Self::Reset => Self::Brightness, // loop to top
             _ => {
                 let val = *self as u8;
                 let next_val = val.wrapping_add(1);

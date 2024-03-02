@@ -120,7 +120,7 @@ impl State for SettingsState {
         match self.setting_selected {
             SettingSelected::None => {
                 if input.get_state(&KeyNames::Back).just_released {
-                    self.next_state = Some(AppState::GamePlay);
+                    self.next_state = Some(AppState::Main);
                     return;
                 }
                 if self.check_for_new_setting_selected() {

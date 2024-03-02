@@ -9,7 +9,7 @@ use crate::states::State;
 
 use super::menu_selection::MenuSelection;
 
-pub struct GamePlayState<'a> {
+pub struct MainState<'a> {
     ferris: Sprite<'a>,
     menu_sprite: Sprite<'a>,
     frame_count: u32,
@@ -17,7 +17,7 @@ pub struct GamePlayState<'a> {
     menu_item_selected: MenuSelection,
     menu_select_tone_timer: u8,
 }
-impl State for GamePlayState<'static> {
+impl State for MainState<'static> {
     fn tick(&mut self) {
         self.frame_count += 1;
         if self.frame_count % 80 == 20 || self.frame_count % 80 == 0 {
@@ -90,7 +90,7 @@ impl State for GamePlayState<'static> {
     }
 }
 
-impl GamePlayState<'static> {
+impl MainState<'static> {
     fn menu_button_confirmed(&mut self) {
         match self.menu_item_selected {
             MenuSelection::Pomo => self.next_state = Some(AppState::PomoState),
@@ -103,7 +103,7 @@ impl GamePlayState<'static> {
     }
 }
 
-impl Default for GamePlayState<'static> {
+impl Default for MainState<'static> {
     fn default() -> Self {
         let ferris = SpriteFactory::new_ferris_sprite(
             (128 - SpriteFactory::FERRIS_DIMENSIONS.0 as i32) / 2,
