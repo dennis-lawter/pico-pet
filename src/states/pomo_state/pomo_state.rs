@@ -163,9 +163,14 @@ impl State for PomoState<'_> {
     fn draw(&mut self) {
         render::flood(Rgb332::BLACK);
 
+        let frame = match self.timer_status {
+            TimerStatus::Stopped => 2,
+            TimerStatus::Paused => 3,
+            TimerStatus::Running => 3,
+        };
         self.menu_sprite.x = 0;
         self.menu_sprite.y = (LCD_HEIGHT - self.menu_sprite.h) as i32;
-        self.menu_sprite.draw(2);
+        self.menu_sprite.draw(frame);
 
         let frame;
         match self.timer_status {
@@ -207,7 +212,19 @@ impl State for PomoState<'_> {
                 frame = 0
             }
             TimerStatus::Stopped => {
-                text_writer::bottom_dialog_box("Ready?");
+                if !self.phase_complete {
+                    text_writer::bottom_dialog_box("Let's begin!");
+                } else {
+                    match self.phase {
+                        PomoPhase::Pomodoro => text_writer::bottom_dialog_box("Ready for a break?"),
+                        PomoPhase::ShortBreak => {
+                            text_writer::bottom_dialog_box("Let's get back to work!")
+                        }
+                        PomoPhase::LongBreak => {
+                            text_writer::bottom_dialog_box("What a long break!")
+                        }
+                    }
+                }
                 frame = 0;
             }
         }
