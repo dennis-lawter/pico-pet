@@ -65,7 +65,7 @@ impl PomoState<'_> {
             }
             TimerStatus::Running => {
                 match self.timer_status {
-                    TimerStatus::Running => {} // ???
+                    TimerStatus::Running => {}
                     TimerStatus::Paused => {
                         self.pre_timer = PRE_TIMER_WAIT;
                     }

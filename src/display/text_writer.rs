@@ -67,7 +67,6 @@ pub fn bottom_dialog_box(text: &str) {
     let height = 18usize;
     let box_x: i32 = 0;
     let box_y = 128 - 24 - height as i32;
-    // let text_x = 5;
     let text_x = 128 / 2;
     let text_y = 128 - 24 + 4 - height as i32;
 
