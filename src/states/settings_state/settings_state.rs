@@ -121,6 +121,10 @@ impl State for SettingsState {
             SettingSelected::None => {
                 if input.get_state(&KeyNames::Back).just_released {
                     self.next_state = Some(AppState::Main);
+                    let nvm = crate::globals::get_nvm();
+                    nvm.settings.update_from_globals();
+                    nvm.settings.write();
+
                     return;
                 }
                 if self.check_for_new_setting_selected() {

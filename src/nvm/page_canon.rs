@@ -1,6 +1,6 @@
 pub enum PageCanon {
     Header = 0x000,
-    Settings,
+    Settings = 0x002, // moved past bad sector...
 
     PagesInUse,
 }

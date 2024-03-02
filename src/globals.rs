@@ -16,7 +16,7 @@ pub static mut VOLUME_SETTING: Setting = Setting {
 };
 pub static mut POMO_TIME_SETTING: Setting = Setting {
     value: 25,
-    min_value: 5,
+    min_value: 1,
     max_value: 90,
 };
 pub static mut SHORT_REST_TIME_SETTING: Setting = Setting {

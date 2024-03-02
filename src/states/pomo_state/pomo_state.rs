@@ -11,11 +11,11 @@ use crate::hardware::input::KeyNames;
 use crate::states::AppState;
 use crate::states::State;
 
+#[derive(Clone, Copy)]
 enum PomoPhase {
     Pomodoro,
     ShortBreak,
     LongBreak,
-    None,
 }
 
 enum TimerStatus {
@@ -32,6 +32,7 @@ pub struct PomoState<'a> {
     pre_timer: u16,
     timer: u16,
     phase: PomoPhase,
+    phase_complete: bool,
     cycles_elapsed: u8,
 }
 impl Default for PomoState<'static> {
@@ -42,7 +43,8 @@ impl Default for PomoState<'static> {
             timer_status: TimerStatus::Stopped,
             pre_timer: 0,
             timer: 0,
-            phase: PomoPhase::None,
+            phase: PomoPhase::Pomodoro,
+            phase_complete: false,
             cycles_elapsed: 0,
         }
     }
@@ -68,17 +70,19 @@ impl PomoState<'_> {
                         self.pre_timer = PRE_TIMER_WAIT;
                     }
                     TimerStatus::Stopped => {
-                        let next_phase = match self.phase {
-                            PomoPhase::Pomodoro => {
-                                if self.cycles_elapsed < cycles {
-                                    PomoPhase::ShortBreak
-                                } else {
-                                    PomoPhase::LongBreak
+                        let next_phase = if self.phase_complete {
+                            match self.phase {
+                                PomoPhase::Pomodoro => {
+                                    if self.cycles_elapsed + 1 < cycles {
+                                        PomoPhase::ShortBreak
+                                    } else {
+                                        PomoPhase::LongBreak
+                                    }
                                 }
+                                PomoPhase::ShortBreak | PomoPhase::LongBreak => PomoPhase::Pomodoro,
                             }
-                            PomoPhase::ShortBreak | PomoPhase::LongBreak | PomoPhase::None => {
-                                PomoPhase::Pomodoro
-                            }
+                        } else {
+                            self.phase
                         };
                         self.phase = next_phase;
                         match self.phase {
@@ -86,9 +90,6 @@ impl PomoState<'_> {
                             PomoPhase::Pomodoro => self.timer = pomo_seconds,
                             PomoPhase::ShortBreak => self.timer = short_break_seconds,
                             PomoPhase::LongBreak => self.timer = long_break_seconds,
-                            PomoPhase::None => {
-                                self.timer = 0;
-                            }
                         }
                     }
                 }
@@ -137,6 +138,19 @@ impl State for PomoState<'_> {
                 self.pre_timer -= 1;
             } else if self.timer > 0 {
                 self.timer -= 1;
+                if self.timer == 0 {
+                    self.phase_complete = true;
+                    self.set_timer_status(TimerStatus::Stopped);
+                    match self.phase {
+                        PomoPhase::Pomodoro => {}
+                        PomoPhase::ShortBreak => {
+                            self.cycles_elapsed += 1;
+                        }
+                        PomoPhase::LongBreak => {
+                            self.cycles_elapsed = 0;
+                        }
+                    }
+                }
             }
         }
     }
@@ -156,14 +170,26 @@ impl State for PomoState<'_> {
         let frame;
         match self.timer_status {
             TimerStatus::Running => {
-                text_writer::bottom_dialog_box("Do your best!");
+                match self.phase {
+                    PomoPhase::Pomodoro => text_writer::bottom_dialog_box(&str_format!(
+                        fixedstr::str16,
+                        "Pomodoro #{}",
+                        self.cycles_elapsed + 1
+                    )),
+                    PomoPhase::ShortBreak => text_writer::bottom_dialog_box(&str_format!(
+                        fixedstr::str16,
+                        "Short Break #{}",
+                        self.cycles_elapsed + 1
+                    )),
+                    PomoPhase::LongBreak => text_writer::bottom_dialog_box("Long Break"),
+                }
                 if self.pre_timer > 0 {
                     text_writer::bottom_big_dialog_box(&str_format!(
                         fixedstr::str8,
                         "{}...",
                         self.pre_timer
                     ))
-                } else {
+                } else if self.timer > 0 {
                     let time_left = self.timer;
                     text_writer::bottom_big_dialog_box(&str_format!(
                         fixedstr::str8,
@@ -171,6 +197,8 @@ impl State for PomoState<'_> {
                         time_left / 60,
                         time_left % 60,
                     ));
+                } else {
+                    text_writer::bottom_big_dialog_box("FINISHED");
                 }
                 frame = 1;
             }
