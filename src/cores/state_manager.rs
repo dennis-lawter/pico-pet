@@ -12,7 +12,7 @@ pub struct StateManager<'a> {
     pub eat_state: Option<StateNyi>,
     pub stat_state: Option<StateNyi>,
     pub cosmetic_state: Option<StateNyi>,
-    pub settings_state: Option<SettingsState>,
+    pub settings_state: Option<SettingsState<'a>>,
 
     pub active_state: AppState,
 }

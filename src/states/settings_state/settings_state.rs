@@ -15,10 +15,10 @@ use super::song;
 const SETTING_HEIGHT_OFFSET: i32 = 10;
 const SETTINGS_DRAWN: i32 = 5;
 
-pub struct SettingsState {
+pub struct SettingsState<'a> {
     frame_count: u32,
     next_state: Option<AppState>,
-    song: [AudioFrequency; 396],
+    song: &'a [AudioFrequency],
     current_frequency: AudioFrequency,
     pub setting_selected: SettingSelected,
     setting_highlighted: SettingSelected,
@@ -28,7 +28,7 @@ pub struct SettingsState {
 
     scroll_offset: i32,
 }
-impl Default for SettingsState {
+impl Default for SettingsState<'_> {
     fn default() -> Self {
         let setting_components = [
             SettingComponent::Brightness(
@@ -53,7 +53,7 @@ impl Default for SettingsState {
         Self {
             frame_count: 0,
             next_state: None,
-            song: song::BALL_GAME,
+            song: &song::BALL_GAME,
             current_frequency: AudioFrequency::None,
             setting_selected: SettingSelected::None,
             setting_highlighted: SettingSelected::None,
@@ -65,7 +65,7 @@ impl Default for SettingsState {
     }
 }
 
-impl State for SettingsState {
+impl State for SettingsState<'_> {
     fn tick(&mut self) {
         for component in self.setting_components.iter_mut() {
             component.tick();
@@ -148,7 +148,7 @@ impl State for SettingsState {
     }
 }
 
-impl SettingsState {
+impl SettingsState<'_> {
     fn check_for_new_setting_selected(&mut self) -> bool {
         if self.setting_selected != SettingSelected::None {
             return false;
