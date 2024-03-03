@@ -75,7 +75,8 @@ pub fn bottom_dialog_box(text: &str) {
 
     draw_text_centered(text_x, text_y, FontStyle::Small, Rgb332::BLUE, text)
 }
-pub fn bottom_big_dialog_box(text: &str) {
+
+pub fn bottom_big_dialog_box_custom_color(text: &str, color: Rgb332) {
     let height = 24usize;
     let box_x: i32 = 24;
     let box_y = 128 - height as i32;
@@ -85,7 +86,7 @@ pub fn bottom_big_dialog_box(text: &str) {
     render::fill_rect(box_x, box_y, 128 - (24 * 2), height, Rgb332::WHITE);
     render::fancy_border(box_x, box_y, 128 - (24 * 2), height);
 
-    draw_text_centered(text_x, text_y, FontStyle::BigBold, Rgb332::BLUE, text)
+    draw_text_centered(text_x, text_y, FontStyle::BigBold, color, text)
 }
 
 pub fn full_dialog_box(title: &str, text: &str) {
