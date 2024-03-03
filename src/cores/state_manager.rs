@@ -1,3 +1,4 @@
+use crate::states::eat_state::EatState;
 use crate::states::main_state::MainState;
 use crate::states::pomo_state::PomoState;
 use crate::states::settings_state::SettingsState;
@@ -9,7 +10,7 @@ use crate::states::State;
 pub struct StateManager<'a> {
     pub game_play_state: Option<MainState<'a>>,
     pub pomo_state: Option<PomoState<'a>>,
-    pub eat_state: Option<StateNyi>,
+    pub eat_state: Option<EatState<'a>>,
     pub stat_state: Option<StateNyi>,
     pub cosmetic_state: Option<StateNyi>,
     pub settings_state: Option<SettingsState<'a>>,
@@ -51,7 +52,7 @@ impl StateManager<'static> {
                 match next_state {
                     AppState::Main => self.game_play_state = Some(MainState::default()),
                     AppState::PomoState => self.pomo_state = Some(PomoState::default()),
-                    AppState::EatState => self.eat_state = Some(StateNyi::default()),
+                    AppState::EatState => self.eat_state = Some(EatState::default()),
                     AppState::StatState => self.stat_state = Some(StateNyi::default()),
                     AppState::CosmeticState => self.cosmetic_state = Some(StateNyi::default()),
                     AppState::SettingsState => self.settings_state = Some(SettingsState::default()),

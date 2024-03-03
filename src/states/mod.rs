@@ -1,3 +1,4 @@
+pub mod eat_state;
 pub mod main_state;
 pub mod pomo_state;
 pub mod settings_state;
