@@ -3,6 +3,7 @@ use crate::display::render;
 use crate::display::sprite::Sprite;
 use crate::display::sprite::SpriteFactory;
 use crate::display::text_writer;
+use crate::display::text_writer::FontStyle;
 use crate::hardware::audio::AudioFrequency as Freq;
 use crate::hardware::hardware::LCD_HEIGHT;
 use crate::hardware::hardware::LCD_WIDTH;
@@ -54,10 +55,20 @@ impl PomoScene<'_> {
     pub fn start_break_sound(&mut self) {
         self.break_finished_index = Some(0);
     }
+    pub fn is_playing_alert(&self) -> bool {
+        match (self.break_finished_index, self.pomo_finished_index) {
+            (Some(_), _) => true,
+            (_, Some(_)) => true,
+            _ => false,
+        }
+    }
 }
 
 impl SceneBehavior for PomoScene<'_> {
     fn input(&mut self) {
+        if self.is_playing_alert() {
+            return;
+        }
         let input = crate::globals::get_input();
         if input.get_state(&KeyNames::Back).just_released {
             self.timer.back_pressed();
@@ -131,6 +142,17 @@ impl SceneBehavior for PomoScene<'_> {
 
     fn draw(&mut self) {
         render::flood(Rgb332::BLACK);
+
+        if self.is_playing_alert() {
+            text_writer::full_dialog_box("", "");
+            let x = LCD_WIDTH as i32 / 2;
+            let y = LCD_HEIGHT as i32 / 2 - 7;
+            let style = FontStyle::BigBold;
+            let color = Rgb332::RED;
+            let text = "TIME'S UP!!!";
+            text_writer::draw_text_centered(x, y, style, color, text);
+            return;
+        }
 
         let back_sprite_frame = self.timer.get_back_sprite_frame();
         self.menu_sprite.x = 0;

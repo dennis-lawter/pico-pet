@@ -12,8 +12,8 @@ pub enum FontSize {
 type GlyphDimensions = (usize, usize);
 
 impl FontSize {
-    const SMALL_FONT_DIMENSIONS: GlyphDimensions = (5, 8);
-    const BIG_FONT_DIMENSIONS: GlyphDimensions = (8, 13);
+    pub const SMALL_FONT_DIMENSIONS: GlyphDimensions = (5, 8);
+    pub const BIG_FONT_DIMENSIONS: GlyphDimensions = (8, 13);
 
     pub fn get_glyph_dimensions(&self) -> GlyphDimensions {
         match *self {
