@@ -145,6 +145,14 @@ graph LR
 
 
 
+    subgraph VIBRATION
+        MOTOR
+    end
+    Pin9[Pin9 GP6] --> MOTOR
+    MOTOR --> TinyPin6[TinyPin6 GP6]
+
+
+
     subgraph LCD
         LCD_KEY2
         LCD_KEY3
