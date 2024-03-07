@@ -100,24 +100,29 @@ impl SceneBehavior for PomoScene<'_> {
                 self.pomo_finished_index = None;
                 self.break_finished_index = None;
                 hardware.end_tone();
+                hardware.stop_vibrating();
             }
             (Some(index), None) => {
+                hardware.start_vibrating();
                 if self.current_frequency != self.break_finished_sound[*index] {
                     hardware.start_tone(&self.break_finished_sound[*index]);
                 }
                 *index += 1;
                 if *index >= self.break_finished_sound.len() {
                     self.break_finished_index = None;
+                    hardware.stop_vibrating();
                     hardware.end_tone();
                 }
             }
             (None, Some(index)) => {
+                hardware.start_vibrating();
                 if self.current_frequency != self.pomo_finished_sound[*index] {
                     hardware.start_tone(&self.pomo_finished_sound[*index]);
                 }
                 *index += 1;
                 if *index >= self.pomo_finished_sound.len() {
                     self.pomo_finished_index = None;
+                    hardware.stop_vibrating();
                     hardware.end_tone();
                 }
             }

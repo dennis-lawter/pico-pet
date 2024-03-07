@@ -33,6 +33,11 @@ pub static mut POMO_CYCLE_SETTING: Setting = Setting {
     min_value: 1,
     max_value: 9,
 };
+pub static mut VIBE_SETTING: Setting = Setting {
+    value: 1,
+    min_value: 0,
+    max_value: 1,
+};
 
 pub static mut HARDWARE: Option<HardwareComponents> = None;
 pub fn init_hardware() {

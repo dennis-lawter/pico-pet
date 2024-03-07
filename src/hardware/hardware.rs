@@ -5,6 +5,7 @@ use embedded_graphics::pixelcolor::Rgb565;
 use embedded_graphics::prelude::DrawTarget;
 use embedded_graphics::prelude::RgbColor;
 use embedded_hal::digital::v2::InputPin;
+use embedded_hal::digital::v2::OutputPin;
 use embedded_hal::prelude::_embedded_hal_blocking_i2c_Read;
 use embedded_hal::prelude::_embedded_hal_blocking_i2c_Write;
 use embedded_hal::PwmPin;
@@ -51,6 +52,8 @@ type Key2Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio2, hal::gpio::Input<hal::gpi
 type Key3Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio3, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key5Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio5, hal::gpio::Input<hal::gpio::PullUp>>;
 
+type VibePin = hal::gpio::Pin<hal::gpio::bank0::Gpio6, hal::gpio::Output<hal::gpio::PushPull>>;
+
 type I2CBus = hal::I2C<
     pac::I2C0,
     (
@@ -72,6 +75,7 @@ pub struct HardwareComponents {
     pub key2: Key2Pin,
     pub key3: Key3Pin,
     pub second_clock: Key5Pin,
+    pub vibe: VibePin,
     pub psm_ptr: *mut PSM,
     pub ppb_ptr: *mut PPB,
     pub fifo_ptr: *mut SioFifo,
@@ -148,6 +152,9 @@ impl HardwareComponents {
 
             let second_clock = pins.gpio5.into_pull_up_input();
 
+            let mut vibe = pins.gpio6.into_push_pull_output();
+            vibe.set_low().unwrap();
+
             let sys_freq = clocks.system_clock.freq().to_Hz();
             let mut delay = Delay::new(core.SYST, sys_freq);
 
@@ -220,6 +227,7 @@ impl HardwareComponents {
                 key2,
                 key3,
                 second_clock,
+                vibe,
                 psm_ptr,
                 ppb_ptr,
                 fifo_ptr,
@@ -289,6 +297,19 @@ impl HardwareComponents {
 
     pub fn end_tone(&mut self) {
         self.start_tone(&AudioFrequency::None);
+    }
+
+    pub fn start_vibrating(&mut self) {
+        let enabled = unsafe { &globals::VIBE_SETTING };
+        if enabled.get_value() == 1 {
+            self.vibe.set_high().unwrap()
+        } else {
+            self.vibe.set_low().unwrap()
+        }
+    }
+
+    pub fn stop_vibrating(&mut self) {
+        self.vibe.set_low().unwrap()
     }
 
     fn write_sqw_pin_mode(&mut self, mode: u8) -> () {
