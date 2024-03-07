@@ -2,7 +2,7 @@ use fixedstr::str_format;
 
 use crate::color::Rgb332;
 
-use super::pomo_state::PomoMenuFrame;
+use super::pomo_scene::PomoMenuFrame;
 
 #[derive(Clone, Copy)]
 pub enum PomoPhase {
@@ -19,7 +19,7 @@ pub enum TimerStatus {
 }
 
 #[derive(Clone, Copy)]
-pub enum Event {
+pub enum TimerEvent {
     Paused,
     PomoFinished,
     ShortBreakFinished,
@@ -38,7 +38,7 @@ pub struct PomoTimer {
     phase_complete: bool,
     cycles_elapsed: u8,
     timer_values: TimerValues,
-    event_queue: Event,
+    event_queue: TimerEvent,
 }
 impl Default for PomoTimer {
     fn default() -> Self {
@@ -51,7 +51,7 @@ impl Default for PomoTimer {
             phase_complete: false,
             cycles_elapsed: 0,
             timer_values: TimerValues::new(),
-            event_queue: Event::None,
+            event_queue: TimerEvent::None,
         }
     }
 }
@@ -78,9 +78,9 @@ impl TimerValues {
 }
 
 impl PomoTimer {
-    pub fn pop_event(&mut self) -> Event {
+    pub fn pop_event(&mut self) -> TimerEvent {
         let event = self.event_queue;
-        self.event_queue = Event::None;
+        self.event_queue = TimerEvent::None;
         event
     }
 
@@ -112,15 +112,15 @@ impl PomoTimer {
         self.phase_complete = false;
     }
 
-    fn set_timer_status(&mut self, new_pomo_state: TimerStatus) {
-        match (self.timer_status, new_pomo_state) {
+    fn set_timer_status(&mut self, new_timer_status: TimerStatus) {
+        match (self.timer_status, new_timer_status) {
             // no change
             (TimerStatus::Running, TimerStatus::Running) => {}
             (TimerStatus::Stopped, TimerStatus::Stopped) => {}
             (TimerStatus::Paused, TimerStatus::Paused) => {}
 
             (_, TimerStatus::Paused) => {
-                self.event_queue = Event::Paused;
+                self.event_queue = TimerEvent::Paused;
             }
 
             (TimerStatus::Paused, TimerStatus::Running) => {
@@ -136,7 +136,7 @@ impl PomoTimer {
             }
         }
 
-        self.timer_status = new_pomo_state;
+        self.timer_status = new_timer_status;
     }
 
     pub fn back_pressed(&mut self) {
@@ -285,9 +285,9 @@ impl PomoTimer {
 
     fn set_event_based_on_phase(&mut self) {
         self.event_queue = match self.phase {
-            PomoPhase::Pomodoro => Event::PomoFinished,
-            PomoPhase::ShortBreak => Event::ShortBreakFinished,
-            PomoPhase::LongBreak => Event::LongBreakFinished,
+            PomoPhase::Pomodoro => TimerEvent::PomoFinished,
+            PomoPhase::ShortBreak => TimerEvent::ShortBreakFinished,
+            PomoPhase::LongBreak => TimerEvent::LongBreakFinished,
         }
     }
 

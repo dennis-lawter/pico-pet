@@ -4,20 +4,20 @@ use crate::display::sprite::Sprite;
 use crate::display::sprite::SpriteFactory;
 use crate::hardware::audio::AudioFrequency;
 use crate::hardware::input::KeyNames;
-use crate::states::AppState;
-use crate::states::State;
+use crate::scenes::SceneBehavior;
+use crate::scenes::SceneType;
 
 use super::menu_selection::MenuSelection;
 
-pub struct MainState<'a> {
+pub struct MainScene<'a> {
     ferris: Sprite<'a>,
     menu_sprite: Sprite<'a>,
     frame_count: u32,
-    next_state: Option<AppState>,
+    next_scene: Option<SceneType>,
     menu_item_selected: MenuSelection,
     menu_select_tone_timer: u8,
 }
-impl State for MainState<'static> {
+impl SceneBehavior for MainScene<'static> {
     fn tick(&mut self) {
         self.frame_count += 1;
         if self.frame_count % 80 == 20 || self.frame_count % 80 == 0 {
@@ -80,25 +80,25 @@ impl State for MainState<'static> {
         }
     }
 
-    fn next_state(&self) -> &Option<AppState> {
-        &self.next_state
+    fn next_scene(&self) -> &Option<SceneType> {
+        &self.next_scene
     }
 }
 
-impl MainState<'static> {
+impl MainScene<'static> {
     fn menu_button_confirmed(&mut self) {
         match self.menu_item_selected {
-            MenuSelection::Pomo => self.next_state = Some(AppState::PomoState),
-            MenuSelection::Eat => self.next_state = Some(AppState::EatState),
-            MenuSelection::Stat => self.next_state = Some(AppState::StatState),
-            MenuSelection::Cosmetic => self.next_state = Some(AppState::CosmeticState),
-            MenuSelection::Settings => self.next_state = Some(AppState::SettingsState),
+            MenuSelection::Pomo => self.next_scene = Some(SceneType::Pomo),
+            MenuSelection::Eat => self.next_scene = Some(SceneType::Eat),
+            MenuSelection::Stat => self.next_scene = Some(SceneType::Stat),
+            MenuSelection::Cosmetic => self.next_scene = Some(SceneType::Cosmetics),
+            MenuSelection::Settings => self.next_scene = Some(SceneType::Settings),
             MenuSelection::None => {}
         }
     }
 }
 
-impl Default for MainState<'static> {
+impl Default for MainScene<'static> {
     fn default() -> Self {
         let ferris = SpriteFactory::new_ferris_sprite(
             (128 - SpriteFactory::FERRIS_DIMENSIONS.0 as i32) / 2,
@@ -111,7 +111,7 @@ impl Default for MainState<'static> {
             ferris,
             menu_sprite,
             frame_count: 0,
-            next_state: None,
+            next_scene: None,
             menu_item_selected: MenuSelection::Pomo,
             menu_select_tone_timer: 0,
         }

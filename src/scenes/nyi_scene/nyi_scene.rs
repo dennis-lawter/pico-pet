@@ -2,18 +2,18 @@ use crate::color::Rgb332;
 use crate::display::render;
 use crate::display::text_writer;
 use crate::hardware::input::KeyNames;
-use crate::states::AppState;
-use crate::states::State;
+use crate::scenes::SceneBehavior;
+use crate::scenes::SceneType;
 
-pub struct StateNyi {
-    next_state: Option<AppState>,
+pub struct NyiScene {
+    next_scene: Option<SceneType>,
 }
 
-impl State for StateNyi {
+impl SceneBehavior for NyiScene {
     fn input(&mut self) {
         let input = crate::globals::get_input();
         if input.get_state(&KeyNames::Back).just_released {
-            self.next_state = Some(AppState::Main);
+            self.next_scene = Some(SceneType::Main);
         }
     }
 
@@ -31,12 +31,12 @@ impl State for StateNyi {
         text_writer::full_dialog_box("NOT IMPL", "todo!()");
     }
 
-    fn next_state(&self) -> &Option<AppState> {
-        &self.next_state
+    fn next_scene(&self) -> &Option<SceneType> {
+        &self.next_scene
     }
 }
-impl Default for StateNyi {
+impl Default for NyiScene {
     fn default() -> Self {
-        Self { next_state: None }
+        Self { next_scene: None }
     }
 }

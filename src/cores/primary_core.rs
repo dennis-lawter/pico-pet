@@ -1,21 +1,21 @@
-use crate::states::main_state::MainState;
-use crate::states::AppState;
+use crate::scenes::main_scene::MainScene;
+use crate::scenes::SceneType;
 
-use super::state_manager::StateManager;
+use super::scene_manager::SceneManager;
 
 pub fn primary_main_loop() -> ! {
-    let mut state_manager = StateManager::default();
-    state_manager.game_play_state = Some(MainState::default());
-    state_manager.active_state = AppState::Main;
+    let mut scene_manager = SceneManager::default();
+    scene_manager.game_play_scene = Some(MainScene::default());
+    scene_manager.active_scene = SceneType::Main;
 
     loop {
         let input = crate::globals::get_input();
         input.update();
-        state_manager.update_and_draw();
+        scene_manager.update_and_draw();
 
         swap();
 
-        state_manager.advance_state();
+        scene_manager.advance_scene();
     }
 }
 

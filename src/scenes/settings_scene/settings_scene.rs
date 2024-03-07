@@ -5,8 +5,8 @@ use crate::display::text_writer::{self};
 use crate::hardware::audio::AudioFrequency;
 use crate::hardware::hardware::LCD_WIDTH;
 use crate::hardware::input::KeyNames;
-use crate::states::AppState;
-use crate::states::State;
+use crate::scenes::SceneBehavior;
+use crate::scenes::SceneType;
 
 use super::setting_components::SettingComponent;
 use super::setting_selected::SettingSelected;
@@ -15,9 +15,9 @@ use super::song;
 const SETTING_HEIGHT_OFFSET: i32 = 10;
 const SETTINGS_DRAWN: i32 = 5;
 
-pub struct SettingsState<'a> {
+pub struct SettingsScene<'a> {
     frame_count: u32,
-    next_state: Option<AppState>,
+    next_scene: Option<SceneType>,
     song: &'a [AudioFrequency],
     current_frequency: AudioFrequency,
     pub setting_selected: SettingSelected,
@@ -28,7 +28,7 @@ pub struct SettingsState<'a> {
 
     scroll_offset: i32,
 }
-impl Default for SettingsState<'_> {
+impl Default for SettingsScene<'_> {
     fn default() -> Self {
         let setting_components = [
             SettingComponent::Brightness(
@@ -52,7 +52,7 @@ impl Default for SettingsState<'_> {
         ];
         Self {
             frame_count: 0,
-            next_state: None,
+            next_scene: None,
             song: &song::BALL_GAME,
             current_frequency: AudioFrequency::None,
             setting_selected: SettingSelected::None,
@@ -65,7 +65,7 @@ impl Default for SettingsState<'_> {
     }
 }
 
-impl State for SettingsState<'_> {
+impl SceneBehavior for SettingsScene<'_> {
     fn tick(&mut self) {
         for component in self.setting_components.iter_mut() {
             component.tick();
@@ -120,7 +120,7 @@ impl State for SettingsState<'_> {
         match self.setting_selected {
             SettingSelected::None => {
                 if input.get_state(&KeyNames::Back).just_released {
-                    self.next_state = Some(AppState::Main);
+                    self.next_scene = Some(SceneType::Main);
                     let nvm = crate::globals::get_nvm();
                     nvm.settings.update_from_globals();
                     nvm.settings.write();
@@ -143,12 +143,12 @@ impl State for SettingsState<'_> {
         }
     }
 
-    fn next_state(&self) -> &Option<AppState> {
-        &self.next_state
+    fn next_scene(&self) -> &Option<SceneType> {
+        &self.next_scene
     }
 }
 
-impl SettingsState<'_> {
+impl SettingsScene<'_> {
     fn check_for_new_setting_selected(&mut self) -> bool {
         if self.setting_selected != SettingSelected::None {
             return false;

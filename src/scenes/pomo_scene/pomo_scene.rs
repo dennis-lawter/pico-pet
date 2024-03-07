@@ -7,15 +7,17 @@ use crate::hardware::audio::AudioFrequency as Freq;
 use crate::hardware::hardware::LCD_HEIGHT;
 use crate::hardware::hardware::LCD_WIDTH;
 use crate::hardware::input::KeyNames;
-use crate::states::AppState;
-use crate::states::State;
+use crate::scenes::SceneBehavior;
+use crate::scenes::SceneType;
+
+use super::timer::TimerEvent;
 
 use super::sounds;
 use super::timer::PomoTimer;
 
-pub struct PomoState<'a> {
+pub struct PomoScene<'a> {
     menu_sprite: Sprite<'a>,
-    next_state: Option<AppState>,
+    next_scene: Option<SceneType>,
     timer: PomoTimer,
     current_frequency: Freq,
     pomo_finished_sound: &'a [Freq],
@@ -23,10 +25,10 @@ pub struct PomoState<'a> {
     break_finished_sound: &'a [Freq],
     break_finished_index: Option<usize>,
 }
-impl Default for PomoState<'static> {
+impl Default for PomoScene<'static> {
     fn default() -> Self {
         Self {
-            next_state: None,
+            next_scene: None,
             menu_sprite: SpriteFactory::new_pomo_menu_sprite(0, 0),
             timer: PomoTimer::default(),
             current_frequency: Freq::None,
@@ -45,7 +47,7 @@ pub enum PomoMenuFrame {
     Stop = 3,
 }
 
-impl PomoState<'_> {
+impl PomoScene<'_> {
     pub fn start_pomo_sound(&mut self) {
         self.pomo_finished_index = Some(0);
     }
@@ -54,13 +56,13 @@ impl PomoState<'_> {
     }
 }
 
-impl State for PomoState<'_> {
+impl SceneBehavior for PomoScene<'_> {
     fn input(&mut self) {
         let input = crate::globals::get_input();
         if input.get_state(&KeyNames::Back).just_released {
             self.timer.back_pressed();
             if self.timer.is_exiting {
-                self.next_state = Some(AppState::Main);
+                self.next_scene = Some(SceneType::Main);
             }
         } else if input.get_state(&KeyNames::Confirm).just_released {
             self.timer.confirm_pressed();
@@ -73,15 +75,14 @@ impl State for PomoState<'_> {
             self.timer.timer_interrupt();
         }
         match self.timer.pop_event() {
-            crate::states::pomo_state::timer::Event::Paused => {}
-            crate::states::pomo_state::timer::Event::PomoFinished => {
+            TimerEvent::Paused => {}
+            TimerEvent::PomoFinished => {
                 self.start_pomo_sound();
             }
-            crate::states::pomo_state::timer::Event::ShortBreakFinished
-            | crate::states::pomo_state::timer::Event::LongBreakFinished => {
+            TimerEvent::ShortBreakFinished | TimerEvent::LongBreakFinished => {
                 self.start_break_sound();
             }
-            crate::states::pomo_state::timer::Event::None => {}
+            TimerEvent::None => {}
         }
     }
 
@@ -143,7 +144,7 @@ impl State for PomoState<'_> {
         text_writer::bottom_big_dialog_box_custom_color(&timer_text, color);
     }
 
-    fn next_state(&self) -> &Option<AppState> {
-        &self.next_state
+    fn next_scene(&self) -> &Option<SceneType> {
+        &self.next_scene
     }
 }

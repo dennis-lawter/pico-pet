@@ -9,8 +9,7 @@ A virtual pet that requires the user to complete pomodoros for the health of the
 - [DS3231](https://www.amazon.com/dp/B09KPC8JZQ/)
 - Any 5v to 3v3 shifter for the DS3231, [for example](https://www.amazon.com/dp/B07LG646VS/)
 - Any 5v speaker or buzzer, [for example](https://www.amazon.com/dp/B07P6X9YX7/)
-<!-- devices below proposed but not implemented -->
-<!-- - Any 3v vibrating motor, [for example](https://www.amazon.com/dp/B073YFR5WR)-->
+- Any 3v vibrating motor, [for example](https://www.amazon.com/dp/B073YFR5WR)
 
 ## NVM Utilization
 The NVM (Non-Volatile Memory) module included with the DS3231 provides 4KiB arranged in 512 pages of 8 bytes each.

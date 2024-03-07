@@ -21,8 +21,8 @@ mod exit;
 mod globals;
 mod hardware;
 mod nvm;
+mod scenes;
 mod setting_value;
-mod states;
 
 use waveshare_rp2040_lcd_0_96::entry;
 

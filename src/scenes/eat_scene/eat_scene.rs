@@ -3,27 +3,27 @@ use crate::display::render;
 use crate::display::sprite::Sprite;
 use crate::display::sprite::SpriteFactory;
 use crate::hardware::input::KeyNames;
-use crate::states::AppState;
-use crate::states::State;
+use crate::scenes::SceneBehavior;
+use crate::scenes::SceneType;
 
-pub struct EatState<'a> {
-    next_state: Option<AppState>,
+pub struct EatScene<'a> {
+    next_scene: Option<SceneType>,
     inv_sprite: Sprite<'a>,
 }
-impl Default for EatState<'_> {
+impl Default for EatScene<'_> {
     fn default() -> Self {
         Self {
-            next_state: None,
+            next_scene: None,
             inv_sprite: SpriteFactory::new_inventory_sprite(0, 0),
         }
     }
 }
 
-impl State for EatState<'_> {
+impl SceneBehavior for EatScene<'_> {
     fn input(&mut self) {
         let input = crate::globals::get_input();
         if input.get_state(&KeyNames::Back).just_released {
-            self.next_state = Some(AppState::Main);
+            self.next_scene = Some(SceneType::Main);
         }
     }
 
@@ -56,7 +56,7 @@ impl State for EatState<'_> {
         self.inv_sprite.draw(4);
     }
 
-    fn next_state(&self) -> &Option<AppState> {
-        &self.next_state
+    fn next_scene(&self) -> &Option<SceneType> {
+        &self.next_scene
     }
 }

@@ -1,6 +1,6 @@
 pub mod primary_core;
+pub mod scene_manager;
 pub mod secondary_core;
-pub mod state_manager;
 
 use self::primary_core::primary_main_loop;
 use self::secondary_core::secondary_main_loop;
