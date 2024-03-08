@@ -19,6 +19,17 @@ pub enum FontStyle {
     BigItalic,
     Icon,
 }
+impl FontStyle {
+    pub fn get_glyph_dimensions(&self) -> (u8, u8) {
+        match self {
+            FontStyle::Small => (5, 8),
+            FontStyle::Icon => (5, 8),
+            FontStyle::Big => (8, 13),
+            FontStyle::BigBold => (8, 13),
+            FontStyle::BigItalic => (8, 13),
+        }
+    }
+}
 
 pub fn init_singleton_fonts() {
     unsafe {

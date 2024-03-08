@@ -1,5 +1,3 @@
-use crate::color::Rgb332;
-use crate::display::render;
 use crate::display::text_writer;
 use crate::hardware::input::KeyNames;
 use crate::scenes::SceneBehavior;
@@ -27,7 +25,6 @@ impl SceneBehavior for NyiScene {
     }
 
     fn draw(&mut self) {
-        render::flood(Rgb332::BLACK);
         text_writer::full_dialog_box("NOT IMPL", "todo!()");
     }
 

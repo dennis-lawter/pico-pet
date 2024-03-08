@@ -1,5 +1,4 @@
 use crate::color::Rgb332;
-use crate::display::render;
 use crate::display::sprite::Sprite;
 use crate::display::sprite::SpriteFactory;
 use crate::display::text_writer;
@@ -141,8 +140,6 @@ impl SceneBehavior for PomoScene<'_> {
     }
 
     fn draw(&mut self) {
-        render::flood(Rgb332::BLACK);
-
         if self.is_playing_alert() {
             text_writer::full_dialog_box("", "");
             let x = LCD_WIDTH as i32 / 2;

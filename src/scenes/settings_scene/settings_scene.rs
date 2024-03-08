@@ -1,5 +1,4 @@
 use crate::color::Rgb332;
-use crate::display::render;
 use crate::display::text_writer::FontStyle;
 use crate::display::text_writer::{self};
 use crate::hardware::audio::AudioFrequency;
@@ -84,8 +83,6 @@ impl SceneBehavior for SettingsScene<'_> {
     }
 
     fn draw(&mut self) {
-        render::flood(Rgb332::BLACK);
-
         let title = "SETTINGS";
         let menu_body = "";
         text_writer::full_dialog_box(title, menu_body);

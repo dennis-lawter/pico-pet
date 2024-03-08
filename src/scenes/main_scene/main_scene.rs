@@ -1,4 +1,3 @@
-use crate::color::Rgb332;
 use crate::display::render;
 use crate::display::sprite::Sprite;
 use crate::display::sprite::SpriteFactory;
@@ -48,7 +47,7 @@ impl SceneBehavior for MainScene<'static> {
     }
 
     fn draw(&mut self) {
-        render::flood(Rgb332::from_u8(0b000_000_01));
+        // render::flood(Rgb332::from_u8(0b000_000_01));
         self.ferris.draw(((self.frame_count / 20) % 2) as usize);
 
         for column in 0..5 {
