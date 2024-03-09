@@ -39,9 +39,23 @@ impl NvmInventory {
         hardware.write_nvm_page(PageCanon::Inventory.into(), &self.data);
     }
 
-    // fn update_from_globals(&mut self) {
-    //     let inventory = crate::globals::get_inventory();
-    //     self.data[0] = inventory.tomatoes;
-    //     self.data[1] = inventory.raspberries;
+    pub fn get_tomatoes(&self) -> u8 {
+        self.data[0]
+    }
+    pub fn get_raspberries(&self) -> u8 {
+        self.data[1]
+    }
+    // pub fn set_tomatoes(&mut self, tomatoes: u8) {
+    //     self.data[0] = tomatoes;
     // }
+    // pub fn set_raspberries(&mut self, raspberries: u8) {
+    //     self.data[1] = raspberries;
+    // }
+
+    pub fn inc_tomatoes(&mut self) {
+        self.data[0] += 1;
+    }
+    pub fn inc_raspberries(&mut self) {
+        self.data[1] += 1;
+    }
 }

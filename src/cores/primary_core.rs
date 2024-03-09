@@ -42,8 +42,8 @@ fn draw_top_bar() {
     text_writer::draw_text(0, 0, FontStyle::Icon, Rgb332::WHITE, food_icon_str);
     let nvm = crate::globals::get_nvm();
     let inventory = &nvm.inventory;
-    let tomatoes = inventory.data[0];
-    let raspberries = inventory.data[1];
+    let tomatoes = inventory.get_tomatoes();
+    let raspberries = inventory.get_raspberries();
     let inventory_str = str_format!(fixedstr::str16, "   {:<3}    {:<3}", tomatoes, raspberries);
     text_writer::draw_text(
         0,

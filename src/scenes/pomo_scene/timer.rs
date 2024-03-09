@@ -36,7 +36,7 @@ pub struct PomoTimer {
     pre_timer: u16,
     timer: u16,
     phase_complete: bool,
-    cycles_elapsed: u8,
+    pub cycles_elapsed: u8,
     timer_values: TimerValues,
     event_queue: TimerEvent,
 }

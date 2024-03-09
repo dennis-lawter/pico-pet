@@ -89,8 +89,12 @@ impl SceneBehavior for PomoScene<'_> {
             TimerEvent::PomoFinished => {
                 self.start_pomo_sound();
                 let nvm = crate::globals::get_nvm();
+                let cycles = unsafe { &crate::globals::POMO_CYCLE_SETTING }.get_value();
                 let inventory = &mut nvm.inventory;
-                inventory.data[0] += 1;
+                inventory.inc_tomatoes();
+                if self.timer.cycles_elapsed == cycles {
+                    inventory.inc_raspberries();
+                }
                 inventory.write();
             }
             TimerEvent::ShortBreakFinished | TimerEvent::LongBreakFinished => {
