@@ -1,7 +1,7 @@
 use super::page_canon::PageCanon;
 use super::NVM_BLANK;
 
-const NVM_SENTINEL: u8 = 0x69;
+const NVM_SENTINEL: u8 = 0x68;
 
 pub struct NvmHeader {
     pub data: [u8; 8],
