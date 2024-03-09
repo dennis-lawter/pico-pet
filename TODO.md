@@ -7,12 +7,6 @@ Done items should be removed from the list.
 - Misc
   - Vibe setting
   - BUG: Sometimes the reboot sequence stalls
-- Top bar
-  - Tomato & Raspberry count
-  - Displays health meter?
-  - Displays time to next feeding?
-    - probably 30h since the last feeding
-  - A battery meter would be nice, but difficult.
 - Idle Scene
   - Entered from the main scene
   - Setting to control time before idle
@@ -29,9 +23,7 @@ Done items should be removed from the list.
   - Finalize by saving to NVM and pet greeting scene
   - Remove the current code which checks for invalid NVM then autowrites
 - Pomodoro Scene
-  - Reward player with tomato
   - Reward player with tomato juice for pomo chains
-  - Reward player with raspberry for cycle completion
 - Eating Scene
   - Opening the scene after eating today says the pet cannot eat again.
     > I need to confirm this is how I want to do this.
