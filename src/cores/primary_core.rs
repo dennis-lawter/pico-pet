@@ -18,7 +18,7 @@ pub fn primary_main_loop() -> ! {
     loop {
         let input = crate::globals::get_input();
 
-        render::flood(Rgb332::DARKEST_BLUE);
+        render::flood(Rgb332::DARKEST_BLUE); // Can't be black or the app crashes...
         input.update();
         draw_top_bar();
         scene_manager.update_and_draw();
@@ -40,9 +40,10 @@ fn draw_top_bar() {
 
     let food_icon_str = "tu vvv rs vvv";
     text_writer::draw_text(0, 0, FontStyle::Icon, Rgb332::WHITE, food_icon_str);
-    let inventory = crate::globals::get_inventory();
-    let tomatoes = inventory.tomatoes;
-    let raspberries = inventory.raspberries;
+    let nvm = crate::globals::get_nvm();
+    let inventory = &nvm.inventory;
+    let tomatoes = inventory.data[0];
+    let raspberries = inventory.data[1];
     let inventory_str = str_format!(fixedstr::str16, "   {:<3}    {:<3}", tomatoes, raspberries);
     text_writer::draw_text(
         0,

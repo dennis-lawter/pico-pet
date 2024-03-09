@@ -34,14 +34,14 @@ impl NvmInventory {
     pub fn write(&mut self) {
         let hardware = crate::globals::get_hardware();
 
-        self.update_from_globals();
+        // self.update_from_globals();
 
         hardware.write_nvm_page(PageCanon::Inventory.into(), &self.data);
     }
 
-    fn update_from_globals(&mut self) {
-        let inventory = crate::globals::get_inventory();
-        self.data[0] = inventory.tomatoes;
-        self.data[1] = inventory.raspberries;
-    }
+    // fn update_from_globals(&mut self) {
+    //     let inventory = crate::globals::get_inventory();
+    //     self.data[0] = inventory.tomatoes;
+    //     self.data[1] = inventory.raspberries;
+    // }
 }

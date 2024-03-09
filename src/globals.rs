@@ -1,7 +1,7 @@
 use crate::display;
 use crate::hardware::hardware::HardwareComponents;
 use crate::hardware::input::InputHandler;
-use crate::inventory::Inventory;
+// use crate::inventory::Inventory;
 use crate::nvm::Nvm;
 use crate::setting_value::Setting;
 
@@ -65,18 +65,18 @@ pub fn get_nvm() -> &'static mut Nvm {
     unsafe { self::NVM.as_mut().unwrap() }
 }
 
-pub static mut INV: Option<Inventory> = None;
-pub fn init_inventory() {
-    unsafe { self::INV = Some(Inventory::load_or_write_default()) }
-}
-pub fn get_inventory() -> &'static mut Inventory {
-    unsafe { self::INV.as_mut().unwrap() }
-}
+// pub static mut INV: Option<Inventory> = None;
+// pub fn init_inventory() {
+//     unsafe { self::INV = Some(Inventory::load_or_write_default()) }
+// }
+// pub fn get_inventory() -> &'static mut Inventory {
+//     unsafe { self::INV.as_mut().unwrap() }
+// }
 
 pub fn init_globals() {
     self::init_hardware();
     self::init_nvm();
     self::init_input();
-    self::init_inventory();
+    // self::init_inventory();
     display::text_writer::init_singleton_fonts();
 }

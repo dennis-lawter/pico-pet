@@ -88,6 +88,10 @@ impl SceneBehavior for PomoScene<'_> {
             TimerEvent::Paused => {}
             TimerEvent::PomoFinished => {
                 self.start_pomo_sound();
+                let nvm = crate::globals::get_nvm();
+                let inventory = &mut nvm.inventory;
+                inventory.data[0] += 1;
+                inventory.write();
             }
             TimerEvent::ShortBreakFinished | TimerEvent::LongBreakFinished => {
                 self.start_break_sound();
