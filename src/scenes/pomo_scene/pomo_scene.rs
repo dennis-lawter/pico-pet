@@ -92,8 +92,11 @@ impl SceneBehavior for PomoScene<'_> {
                 let cycles = unsafe { &crate::globals::POMO_CYCLE_SETTING }.get_value();
                 let inventory = &mut nvm.inventory;
                 inventory.inc_tomatoes();
-                if self.timer.cycles_elapsed == cycles {
+                if self.timer.cycles_elapsed + 1 == cycles {
                     inventory.inc_raspberries();
+                    inventory.inc_juice();
+                } else if self.timer.cycles_elapsed > 0 {
+                    inventory.inc_juice();
                 }
                 inventory.write();
             }

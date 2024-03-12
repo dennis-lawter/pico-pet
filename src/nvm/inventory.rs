@@ -3,6 +3,8 @@ use super::NVM_BLANK;
 
 const DEFAULT_TOMATOES: u8 = 0;
 const DEFAULT_RASPBERRIES: u8 = 0;
+const DEFAULT_JUICE_UPPER: u8 = 0;
+const DEFAULT_JUICE_LOWER: u8 = 0;
 
 pub struct NvmInventory {
     pub data: [u8; 8],
@@ -13,8 +15,8 @@ impl Default for NvmInventory {
             data: [
                 DEFAULT_TOMATOES,    //
                 DEFAULT_RASPBERRIES, //
-                NVM_BLANK,           //
-                NVM_BLANK,           //
+                DEFAULT_JUICE_LOWER, //
+                DEFAULT_JUICE_UPPER, //
                 NVM_BLANK,           //
                 NVM_BLANK,           //
                 NVM_BLANK,           //
@@ -45,6 +47,13 @@ impl NvmInventory {
     pub fn get_raspberries(&self) -> u8 {
         self.data[1]
     }
+    pub fn get_juice(&self) -> u16 {
+        (self.data[2] as u16) << 8 | self.data[3] as u16
+    }
+    pub fn set_juice(&mut self, juice: u16) {
+        self.data[2] = (juice >> 8) as u8;
+        self.data[3] = juice as u8;
+    }
     // pub fn set_tomatoes(&mut self, tomatoes: u8) {
     //     self.data[0] = tomatoes;
     // }
@@ -57,5 +66,10 @@ impl NvmInventory {
     }
     pub fn inc_raspberries(&mut self) {
         self.data[1] += 1;
+    }
+    pub fn inc_juice(&mut self) {
+        let mut juice = self.get_juice();
+        juice += 1;
+        self.set_juice(juice);
     }
 }

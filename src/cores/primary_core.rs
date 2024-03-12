@@ -38,13 +38,20 @@ fn draw_top_bar() {
     let x = LCD_WIDTH as i32 - FontStyle::Small.get_glyph_dimensions().0 as i32 * 5;
     text_writer::draw_text(x, 0, FontStyle::Small, Rgb332::WHITE, time_str.as_str());
 
-    let food_icon_str = "tu vvv rs vvv";
+    let food_icon_str = "tu vv rs v w vvvvv";
     text_writer::draw_text(0, 0, FontStyle::Icon, Rgb332::WHITE, food_icon_str);
     let nvm = crate::globals::get_nvm();
     let inventory = &nvm.inventory;
     let tomatoes = inventory.get_tomatoes();
     let raspberries = inventory.get_raspberries();
-    let inventory_str = str_format!(fixedstr::str16, "   {:<3}    {:<3}", tomatoes, raspberries);
+    let juice = inventory.get_juice();
+    let inventory_str = str_format!(
+        fixedstr::str32,
+        "   {:<2}    {}   {:<5}",
+        tomatoes,
+        raspberries,
+        juice
+    );
     text_writer::draw_text(
         0,
         0,
