@@ -22,10 +22,11 @@ impl<'a> Sprite<'a> {
 pub struct SpriteFactory;
 
 impl SpriteFactory {
-    pub const FERRIS_DIMENSIONS: (usize, usize) = (40, 24);
-    pub const MENU_DIMENSIONS: (usize, usize) = (24, 24);
-    pub const POMO_MENU_DIMENSIONS: (usize, usize) = (24, 24);
-    pub const INVENTORY_DIMENSIONS: (usize, usize) = (24, 24);
+    pub const FERRIS_DIMENSIONS: (usize, usize, usize) = (40, 24, 2);
+    pub const MENU_DIMENSIONS: (usize, usize, usize) = (24, 24, 5);
+    pub const POMO_MENU_DIMENSIONS: (usize, usize, usize) = (24, 24, 4);
+    pub const INVENTORY_DIMENSIONS: (usize, usize, usize) = (24, 24, 5);
+    pub const LOFI_DIMENSIONS: (usize, usize, usize) = (128, 80, 180);
 
     pub fn new_ferris_sprite(x: i32, y: i32) -> Sprite<'static> {
         Sprite::new(
@@ -64,6 +65,16 @@ impl SpriteFactory {
             Self::INVENTORY_DIMENSIONS.0,
             Self::INVENTORY_DIMENSIONS.1,
             include_bytes!("../../sprite_raw/inventory.data"),
+        )
+    }
+
+    pub fn new_lofi_sprite(x: i32, y: i32) -> Sprite<'static> {
+        Sprite::new(
+            x,
+            y,
+            Self::LOFI_DIMENSIONS.0,
+            Self::LOFI_DIMENSIONS.1,
+            include_bytes!("../../sprite_raw/lofi.data"),
         )
     }
 }

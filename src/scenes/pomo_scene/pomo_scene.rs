@@ -15,8 +15,11 @@ use super::timer::TimerEvent;
 use super::sounds;
 use super::timer::PomoTimer;
 
+const ANIM_ON_RATE: usize = 3;
+
 pub struct PomoScene<'a> {
     menu_sprite: Sprite<'a>,
+    lofi_sprite: Sprite<'a>,
     next_scene: Option<SceneType>,
     timer: PomoTimer,
     current_frequency: Freq,
@@ -24,18 +27,21 @@ pub struct PomoScene<'a> {
     pomo_finished_index: Option<usize>,
     break_finished_sound: &'a [Freq],
     break_finished_index: Option<usize>,
+    frame_count: usize,
 }
 impl Default for PomoScene<'static> {
     fn default() -> Self {
         Self {
             next_scene: None,
             menu_sprite: SpriteFactory::new_pomo_menu_sprite(0, 0),
+            lofi_sprite: SpriteFactory::new_lofi_sprite(0, 8),
             timer: PomoTimer::default(),
             current_frequency: Freq::None,
             pomo_finished_sound: &sounds::POMO_FINISHED,
             break_finished_sound: &sounds::BREAK_FINISHED,
             pomo_finished_index: None,
             break_finished_index: None,
+            frame_count: 0,
         }
     }
 }
@@ -80,6 +86,10 @@ impl SceneBehavior for PomoScene<'_> {
     }
 
     fn tick(&mut self) {
+        self.frame_count += 1;
+        if self.frame_count > SpriteFactory::LOFI_DIMENSIONS.2 * ANIM_ON_RATE {
+            self.frame_count = 0;
+        }
         let input = crate::globals::get_input();
         if input.get_state(&KeyNames::Clock).just_pressed {
             self.timer.timer_interrupt();
@@ -161,6 +171,9 @@ impl SceneBehavior for PomoScene<'_> {
             text_writer::draw_text_centered(x, y, style, color, text);
             return;
         }
+
+        self.lofi_sprite
+            .draw((self.frame_count / ANIM_ON_RATE) % 180);
 
         let back_sprite_frame = self.timer.get_back_sprite_frame();
         self.menu_sprite.x = 0;

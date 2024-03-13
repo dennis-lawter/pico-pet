@@ -186,3 +186,6 @@ graph LR
     Pin22[Pin22 GP17] --> LCD_KEY1
     LCD_KEY1 --> TinyPin19[TinyPin19 GP29]
 ```
+
+## Attributions
+Placeholder artwork (lofi.png) copyright belongs to Juan Pablo Machado.

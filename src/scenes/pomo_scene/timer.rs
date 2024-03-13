@@ -34,7 +34,7 @@ pub struct PomoTimer {
     pub timer_status: TimerStatus,
     pub is_exiting: bool,
     pre_timer: u16,
-    timer: u16,
+    pub timer: u16,
     phase_complete: bool,
     pub cycles_elapsed: u8,
     timer_values: TimerValues,
