@@ -20,7 +20,6 @@ mod display;
 mod exit;
 mod globals;
 mod hardware;
-mod inventory;
 mod nvm;
 mod scenes;
 mod setting_value;

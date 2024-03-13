@@ -17,9 +17,4 @@ impl<'a> Sprite<'a> {
         let offset = frame * self.w * self.h;
         render::blit_from_offset(self.x, self.y, offset, self.w, self.h, self.data)
     }
-
-    // pub fn draw_dithered(&self, frame: usize) {
-    //     let offset = frame * self.w * self.h;
-    //     render::blit_dithered_from_offset(self.x, self.y, offset, self.w, self.h, self.data)
-    // }
 }

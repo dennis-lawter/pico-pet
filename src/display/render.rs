@@ -71,55 +71,6 @@ pub fn blit_from_offset(x0: i32, y0: i32, offset: usize, w: usize, h: usize, spr
     }
 }
 
-// pub fn blit_dithered_from_offset(
-//     x0: i32,
-//     y0: i32,
-//     offset: usize,
-//     w: usize,
-//     h: usize,
-//     sprite_data: &[u8],
-// ) {
-//     for y in 0..h {
-//         if y as i32 + y0 >= LCD_HEIGHT as i32 {
-//             return;
-//         } else if y as i32 + y0 < 0 {
-//             continue;
-//         }
-//         for x in 0..w {
-//             if x as i32 + x0 >= LCD_WIDTH as i32 {
-//                 break;
-//             } else if x as i32 + x0 < 0 {
-//                 continue;
-//             }
-//             // else if (x + y) % 4 == 0 {
-//             //     // TODO: stop using manual dithering
-//             //     continue;
-//             // }
-//             // if y == 11 || y == 12 {
-//             //     continue;
-//             // }
-//             let src_coord = y * w + x;
-//             let mut pixel = sprite_data[src_coord + offset];
-//             if pixel == Rgb332::INVISIBLE.into_u8() {
-//                 continue;
-//             }
-//             let mut red = pixel & 0b111_000_00 >> 5;
-//             let mut green = pixel & 0b000_111_00 >> 2;
-//             let mut blue = pixel & 0b000_000_11;
-//             red = red.saturating_sub(2);
-//             green = green.saturating_sub(2);
-//             blue = blue.saturating_sub(1);
-//             pixel = (red << 5) | (green << 2) | blue;
-//             let pixel_index: usize = pixel.into();
-//             let dst_coord: i32 = (y as i32 + y0) * LCD_WIDTH as i32 + (x as i32 + x0);
-//             unsafe {
-//                 let dst_coord_usize: usize = dst_coord as usize;
-//                 BUFFER[dst_coord_usize] = RGB_332_TO_565[pixel_index];
-//             }
-//         }
-//     }
-// }
-
 pub fn flood(color: Rgb332) {
     let color_index = color.into_usize();
     let mapped_color = RGB_332_TO_565[color_index];
