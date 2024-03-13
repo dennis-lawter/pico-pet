@@ -30,34 +30,60 @@ pub fn primary_main_loop() -> ! {
 }
 
 fn draw_top_bar() {
-    render::fill_rect(0, 0, 128, 8, Rgb332::DARK_GREY);
-    let hardware = crate::globals::get_hardware();
+    render::fill_rect(0, 0, LCD_WIDTH, 8, Rgb332::DARK_GREY);
 
+    draw_top_bar_clock();
+
+    draw_top_bar_inventory();
+}
+
+fn draw_top_bar_clock() {
+    let hardware = crate::globals::get_hardware();
     let time = hardware.get_time();
     let time_str = str_format!(fixedstr::str8, "{:02}:{:02}", time.hr, time.min);
     let x = LCD_WIDTH as i32 - FontStyle::Small.get_glyph_dimensions().0 as i32 * 5;
     text_writer::draw_text(x, 0, FontStyle::Small, Rgb332::WHITE, time_str.as_str());
+}
 
-    let food_icon_str = "tu vv rs v w vvvvv";
-    text_writer::draw_text(0, 0, FontStyle::Icon, Rgb332::WHITE, food_icon_str);
+fn draw_top_bar_inventory() {
     let nvm = crate::globals::get_nvm();
     let inventory = &nvm.inventory;
     let tomatoes = inventory.get_tomatoes();
     let raspberries = inventory.get_raspberries();
     let juice = inventory.get_juice();
-    let inventory_str = str_format!(
-        fixedstr::str32,
-        "   {:<2}    {}   {:<5}",
-        tomatoes,
-        raspberries,
-        juice
-    );
+    let text_offset = if tomatoes > 9 { 5 } else { 0 };
+
+    let tomato_icon = "tu";
+    text_writer::draw_text(0, 0, FontStyle::Icon, Rgb332::RED, tomato_icon);
+    let display_tomatoes = str_format!(fixedstr::str4, "{}", tomatoes);
+    text_writer::draw_text(12, 0, FontStyle::Small, Rgb332::WHITE, &display_tomatoes);
+
+    let rasp_icon = "rs";
+    text_writer::draw_text(17 + text_offset, 0, FontStyle::Icon, Rgb332::RED, rasp_icon);
+    let display_raspberries = str_format!(fixedstr::str4, "{}", raspberries);
     text_writer::draw_text(
-        0,
+        28 + text_offset,
         0,
         FontStyle::Small,
         Rgb332::WHITE,
-        inventory_str.as_str(),
+        &display_raspberries,
+    );
+
+    let juice_icon = "w";
+    text_writer::draw_text(
+        35 + text_offset,
+        0,
+        FontStyle::Icon,
+        Rgb332::RED,
+        juice_icon,
+    );
+    let display_juice = str_format!(fixedstr::str8, "{}ml", juice);
+    text_writer::draw_text(
+        43 + text_offset,
+        0,
+        FontStyle::Small,
+        Rgb332::WHITE,
+        &display_juice,
     );
 }
 

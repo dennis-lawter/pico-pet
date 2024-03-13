@@ -56,17 +56,17 @@ impl SceneBehavior for MainScene<'static> {
         let next_item = self.menu_item_selected.next() as usize;
 
         self.menu_sprite.x = MENU_DIMENSIONS.w as i32 + 4;
-        self.menu_sprite.y = (LCD_HEIGHT - MENU_DIMENSIONS.h) as i32;
+        self.menu_sprite.y = (LCD_HEIGHT - MENU_DIMENSIONS.h) as i32 + 4;
         self.menu_sprite.draw(5);
         self.menu_sprite.draw(prev_item);
 
         self.menu_sprite.x = (MENU_DIMENSIONS.w * 3) as i32 + 4;
-        self.menu_sprite.y = (LCD_HEIGHT - MENU_DIMENSIONS.h) as i32;
+        self.menu_sprite.y = (LCD_HEIGHT - MENU_DIMENSIONS.h) as i32 + 4;
         self.menu_sprite.draw(5);
         self.menu_sprite.draw(next_item);
 
         self.menu_sprite.x = (MENU_DIMENSIONS.w * 2) as i32 + 4;
-        self.menu_sprite.y = (LCD_HEIGHT - MENU_DIMENSIONS.h) as i32 - 2;
+        self.menu_sprite.y = (LCD_HEIGHT - MENU_DIMENSIONS.h) as i32;
         self.menu_sprite.draw(6);
         self.menu_sprite.draw(sel_item);
     }

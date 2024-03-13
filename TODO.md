@@ -6,7 +6,21 @@ Done items should be removed from the list.
 
 - Misc
   - Vibe setting
+  - 24hr clock setting (maybe just use `a` and `p` since space is limited)
   - BUG: Sometimes the reboot sequence stalls
+  - Store the `MainScene::menu_item_selected` as a static/global for reloading the scene
+  - Deep sleep the second CPU core
+- Sound System
+  - Create a consolidated solution to playing audio
+  - Audio struct:
+    - One-off or loop
+    - Reference to `&[Freq]`
+    - `fn start()`
+    - `fn tick()`
+    - `fn is_playing()`
+    - Use a bpm multiplier to reduce size of audio arrays
+    - Consider a global lock to ensure audio player exclusivity since we have 1 audio channel
+  - Possibly create a sound editor as a rust helper...
 - Idle Scene
   - Entered from the main scene
   - Setting to control time before idle
@@ -41,6 +55,7 @@ Done items should be removed from the list.
     - Performed outside of scene maintenance
 - Pet rework
   - Switch from Ferris to a custom designed pet
+  - Switch from lofi girl to custom animations
 
 
 ## General Ideas
