@@ -1,6 +1,6 @@
 use crate::display::render;
 use crate::display::sprite::Sprite;
-use crate::display::sprite::SpriteFactory;
+use crate::display::sprite_factory;
 use crate::hardware::audio::AudioFrequency;
 use crate::hardware::input::KeyNames;
 use crate::scenes::SceneBehavior;
@@ -99,12 +99,12 @@ impl MainScene<'static> {
 
 impl Default for MainScene<'static> {
     fn default() -> Self {
-        let ferris = SpriteFactory::new_ferris_sprite(
-            (128 - SpriteFactory::FERRIS_DIMENSIONS.0 as i32) / 2,
+        let ferris = sprite_factory::new_ferris_sprite(
+            (128 - sprite_factory::FERRIS_DIMENSIONS.w as i32) / 2,
             128 - 64,
         );
 
-        let menu_sprite = SpriteFactory::new_menu_sprite(0, 0);
+        let menu_sprite = sprite_factory::new_menu_sprite(0, 0);
 
         Self {
             ferris,

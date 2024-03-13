@@ -1,6 +1,6 @@
 use crate::color::Rgb332;
 use crate::display::sprite::Sprite;
-use crate::display::sprite::SpriteFactory;
+use crate::display::sprite_factory;
 use crate::display::text_writer;
 use crate::display::text_writer::FontStyle;
 use crate::hardware::audio::AudioFrequency as Freq;
@@ -33,8 +33,8 @@ impl Default for PomoScene<'static> {
     fn default() -> Self {
         Self {
             next_scene: None,
-            menu_sprite: SpriteFactory::new_pomo_menu_sprite(0, 0),
-            lofi_sprite: SpriteFactory::new_lofi_sprite(0, 8),
+            menu_sprite: sprite_factory::new_pomo_menu_sprite(0, 0),
+            lofi_sprite: sprite_factory::new_lofi_sprite(0, 8),
             timer: PomoTimer::default(),
             current_frequency: Freq::None,
             pomo_finished_sound: &sounds::POMO_FINISHED,
@@ -87,7 +87,7 @@ impl SceneBehavior for PomoScene<'_> {
 
     fn tick(&mut self) {
         self.frame_count += 1;
-        if self.frame_count > SpriteFactory::LOFI_DIMENSIONS.2 * ANIM_ON_RATE {
+        if self.frame_count > sprite_factory::LOFI_DIMENSIONS.frames * ANIM_ON_RATE {
             self.frame_count = 0;
         }
         let input = crate::globals::get_input();

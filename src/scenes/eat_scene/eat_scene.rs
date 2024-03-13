@@ -1,7 +1,7 @@
 use crate::color::Rgb332;
 use crate::display::render;
 use crate::display::sprite::Sprite;
-use crate::display::sprite::SpriteFactory;
+use crate::display::sprite_factory;
 use crate::hardware::input::KeyNames;
 use crate::scenes::SceneBehavior;
 use crate::scenes::SceneType;
@@ -14,7 +14,7 @@ impl Default for EatScene<'_> {
     fn default() -> Self {
         Self {
             next_scene: None,
-            inv_sprite: SpriteFactory::new_inventory_sprite(0, 0),
+            inv_sprite: sprite_factory::new_inventory_sprite(0, 0),
         }
     }
 }
