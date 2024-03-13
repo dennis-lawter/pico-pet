@@ -1,7 +1,8 @@
-use crate::display::render;
 use crate::display::sprite::Sprite;
 use crate::display::sprite_factory;
+use crate::display::sprite_factory::MENU_DIMENSIONS;
 use crate::hardware::audio::AudioFrequency;
+use crate::hardware::hardware::LCD_HEIGHT;
 use crate::hardware::input::KeyNames;
 use crate::scenes::SceneBehavior;
 use crate::scenes::SceneType;
@@ -50,16 +51,24 @@ impl SceneBehavior for MainScene<'static> {
         // render::flood(Rgb332::from_u8(0b000_000_01));
         self.ferris.draw(((self.frame_count / 20) % 2) as usize);
 
-        for column in 0..5 {
-            self.menu_sprite.x = column * 24 + 4;
-            self.menu_sprite.y = 128 - 24;
+        let sel_item = self.menu_item_selected as usize;
+        let prev_item = self.menu_item_selected.prev() as usize;
+        let next_item = self.menu_item_selected.next() as usize;
 
-            self.menu_sprite.draw((column) as usize);
-        }
+        self.menu_sprite.x = MENU_DIMENSIONS.w as i32 + 4;
+        self.menu_sprite.y = (LCD_HEIGHT - MENU_DIMENSIONS.h) as i32;
+        self.menu_sprite.draw(5);
+        self.menu_sprite.draw(prev_item);
 
-        let sel_x: i32 = self.menu_item_selected as u8 as i32 * 24 + 4;
-        let sel_y: i32 = 128 - 24;
-        render::fancy_border(sel_x as i32, sel_y as i32, 24, 24);
+        self.menu_sprite.x = (MENU_DIMENSIONS.w * 3) as i32 + 4;
+        self.menu_sprite.y = (LCD_HEIGHT - MENU_DIMENSIONS.h) as i32;
+        self.menu_sprite.draw(5);
+        self.menu_sprite.draw(next_item);
+
+        self.menu_sprite.x = (MENU_DIMENSIONS.w * 2) as i32 + 4;
+        self.menu_sprite.y = (LCD_HEIGHT - MENU_DIMENSIONS.h) as i32 - 2;
+        self.menu_sprite.draw(6);
+        self.menu_sprite.draw(sel_item);
     }
 
     fn input(&mut self) {
