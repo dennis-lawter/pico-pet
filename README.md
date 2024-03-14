@@ -22,6 +22,7 @@ Pages are addressed from hexidecimal 0x000 to 0x1ff.
 | --- | --- | --- |
 | 000 | 000 | Header |
 | 001 | 001 | Settings |
+| 002 | 002 | Inventory |
 
 *note: If the NVM becomes corrupted, try changing the const `NVM_SENTINEL` to force a header guard check failure. This will factory reset the device, and all data will be lost.*
 |  | **Header** |
@@ -35,17 +36,39 @@ Pages are addressed from hexidecimal 0x000 to 0x1ff.
 | 6 |  |
 | 7 |  |
 
-|  | **Settings** |
+|  | **Settings** | min | max |
+| --- | --- | --- | --- |
+| 0 | User brightness | 0 | 15 |
+| 1 | User volume | 0 | 4 |
+| 2 | Pomodoro length in minutes | 1 | 90 |
+| 3 | Short break length in minutes | 1 | 90 |
+| 4 | Long break length in minutes | 1 | 90 |
+| 5 | Cycles, aka number of pomodoros before a long rest | 1 | 9 |
+| 6 |  |  |  |
+| 7 | Bitmask |  |  |
+
+*NYI*
+| Bit | Setting 7 Meaning |
 | --- | --- |
-| 0 | User brightness | 
-| 1 | User volume |
-| 2 | Pomodoro length in minutes |
-| 3 | Short break length in minutes |
-| 4 | Long break length in minutes |
-| 5 | Cycles, aka number of pomodoros before a long rest |
+| 0 | 1: AM/PM, 0: 24hr |
+| 1 | vibration on/off |
+| 2 |  |
+| 3 |  |
+| 4 |  |
+| 5 |  |
 | 6 |  |
 | 7 |  |
 
+|  | **Inventory** |
+| --- | --- |
+| 0 | Tomatoes |
+| 1 | Raspberries |
+| 2 | Lower byte of juice value |
+| 3 | Higher byte of juice value |
+| 4 |  |
+| 5 |  |
+| 6 |  |
+| 7 |  |
 
 ## Pin Out
 
