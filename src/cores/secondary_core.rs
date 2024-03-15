@@ -7,6 +7,7 @@ pub fn secondary_main_loop(sys_freq: u32) -> ! {
 
     let mut delay = cortex_m::delay::Delay::new(core.SYST, sys_freq);
     loop {
+        cortex_m::asm::wfi();
         delay.delay_ms(1000);
     }
 }

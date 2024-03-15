@@ -21,8 +21,8 @@ Pages are addressed from hexidecimal 0x000 to 0x1ff.
 | Page Start | Page End | Module |
 | --- | --- | --- |
 | 000 | 000 | Header |
-| 001 | 001 | Settings |
-| 002 | 002 | Inventory |
+| 001 | 002 | Settings |
+| 003 | 003 | Inventory |
 
 *note: If the NVM becomes corrupted, try changing the const `NVM_SENTINEL` to force a header guard check failure. This will factory reset the device, and all data will be lost.*
 |  | **Header** |
@@ -36,7 +36,7 @@ Pages are addressed from hexidecimal 0x000 to 0x1ff.
 | 6 |  |
 | 7 |  |
 
-|  | **Settings** | min | max |
+|  | **Settings Page 1** | min | max |
 | --- | --- | --- | --- |
 | 0 | User brightness | 0 | 15 |
 | 1 | User volume | 0 | 4 |
@@ -44,8 +44,19 @@ Pages are addressed from hexidecimal 0x000 to 0x1ff.
 | 3 | Short break length in minutes | 1 | 90 |
 | 4 | Long break length in minutes | 1 | 90 |
 | 5 | Cycles, aka number of pomodoros before a long rest | 1 | 9 |
+| 6 | *nyi*Pet feeding deadline hr | 0 | 23 |
+| 7 | *nyi*Pet feeding deadline min | 0 | 59 |
+
+|  | **Settings Page 2** | min | max |
+| --- | --- | --- | --- |
+| 0 |  |  |  |
+| 1 |  |  |  |
+| 2 |  |  |  |
+| 3 |  |  |  |
+| 4 |  |  |  |
+| 5 |  |  |  |
 | 6 |  |  |  |
-| 7 | Bitmask |  |  |
+| 7 |  |  |  |
 
 *NYI*
 | Bit | Setting 7 Meaning |

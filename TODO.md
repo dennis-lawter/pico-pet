@@ -6,10 +6,9 @@ Done items should be removed from the list.
 
 - Misc
   - Vibe setting
-  - 24hr clock setting (maybe just use `a` and `p` since space is limited)
-  - BUG: Sometimes the reboot sequence stalls
+  - 24 hr clock setting
   - Store the `MainScene::menu_item_selected` as a static/global for reloading the scene
-  - Deep sleep the second CPU core
+  - Feeding deadline setting (u8 hr u8 min)
 - Sound System
   - Create a consolidated solution to playing audio
   - Audio struct:

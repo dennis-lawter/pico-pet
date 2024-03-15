@@ -1,3 +1,5 @@
+use core::cmp::min;
+
 use fixedstr::str_format;
 
 use crate::color::Rgb332;
@@ -34,57 +36,64 @@ fn draw_top_bar() {
 
     draw_top_bar_clock();
 
-    draw_top_bar_inventory();
+    draw_top_bar_alert_if_necessary();
+
+    draw_top_bar_inventory(10);
+}
+
+fn draw_top_bar_alert_if_necessary() {
+    // TODO: add alert conditions (feeding time, sick, etc...)
+    text_writer::draw_text(0, 0, FontStyle::Icon, Rgb332::YELLOW, "!\"");
 }
 
 fn draw_top_bar_clock() {
     let hardware = crate::globals::get_hardware();
     let time = hardware.get_time();
-    let time_str = str_format!(fixedstr::str8, "{:02}:{:02}", time.hr, time.min);
-    let x = LCD_WIDTH as i32 - FontStyle::Small.get_glyph_dimensions().0 as i32 * 5;
+    let meridian = if time.hr > 11 || time.hr == 0 {
+        "PM"
+    } else {
+        "AM"
+    };
+    let time_str = str_format!(fixedstr::str8, "{:02}:{:02}{}", time.hr, time.min, meridian);
+    let x = LCD_WIDTH as i32 - FontStyle::Small.get_glyph_dimensions().0 as i32 * (5 + 2);
     text_writer::draw_text(x, 0, FontStyle::Small, Rgb332::WHITE, time_str.as_str());
 }
 
-fn draw_top_bar_inventory() {
+fn draw_top_bar_inventory(offset: i32) {
     let nvm = crate::globals::get_nvm();
     let inventory = &nvm.inventory;
-    let tomatoes = inventory.get_tomatoes();
-    let raspberries = inventory.get_raspberries();
-    let juice = inventory.get_juice();
-    let text_offset = if tomatoes > 9 { 5 } else { 0 };
+
+    let tomatoes = min(99, inventory.get_tomatoes());
+    let raspberries = min(9, inventory.get_raspberries());
+    let juice = min(9999, inventory.get_juice());
+
+    // max values for testing
+    // let tomatoes = 99;
+    // let raspberries = 9;
+    // let juice = 9999;
+
+    let tomato_offset = if tomatoes > 9 { 5 } else { 0 };
 
     let tomato_icon = "tu";
-    text_writer::draw_text(0, 0, FontStyle::Icon, Rgb332::RED, tomato_icon);
+    let x = offset;
+    text_writer::draw_text(x, 0, FontStyle::Icon, Rgb332::RED, tomato_icon);
     let display_tomatoes = str_format!(fixedstr::str4, "{}", tomatoes);
-    text_writer::draw_text(12, 0, FontStyle::Small, Rgb332::WHITE, &display_tomatoes);
+    let x = 12 + offset;
+    text_writer::draw_text(x, 0, FontStyle::Small, Rgb332::WHITE, &display_tomatoes);
 
     let rasp_icon = "rs";
-    text_writer::draw_text(17 + text_offset, 0, FontStyle::Icon, Rgb332::RED, rasp_icon);
+    let x = 17 + offset + tomato_offset;
+    text_writer::draw_text(x, 0, FontStyle::Icon, Rgb332::RED, rasp_icon);
     let display_raspberries = str_format!(fixedstr::str4, "{}", raspberries);
-    text_writer::draw_text(
-        28 + text_offset,
-        0,
-        FontStyle::Small,
-        Rgb332::WHITE,
-        &display_raspberries,
-    );
+    let x = 28 + offset + tomato_offset;
+    text_writer::draw_text(x, 0, FontStyle::Small, Rgb332::WHITE, &display_raspberries);
 
     let juice_icon = "w";
-    text_writer::draw_text(
-        35 + text_offset,
-        0,
-        FontStyle::Icon,
-        Rgb332::RED,
-        juice_icon,
-    );
+    let x = 35 + offset + tomato_offset;
+    text_writer::draw_text(x, 0, FontStyle::Icon, Rgb332::RED, juice_icon);
     let display_juice = str_format!(fixedstr::str8, "{}ml", juice);
-    text_writer::draw_text(
-        43 + text_offset,
-        0,
-        FontStyle::Small,
-        Rgb332::WHITE,
-        &display_juice,
-    );
+    let x = 43 + offset + tomato_offset;
+    text_writer::draw_text(x, 0, FontStyle::Small, Rgb332::WHITE, &display_juice);
 }
 
 fn swap() {
