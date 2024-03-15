@@ -40,19 +40,19 @@ Pages are addressed from hexidecimal 0x000 to 0x1ff.
 | --- | --- | --- | --- |
 | 0 | User brightness | 0 | 15 |
 | 1 | User volume | 0 | 4 |
-| 2 | Pomodoro length in minutes | 1 | 90 |
-| 3 | Short break length in minutes | 1 | 90 |
-| 4 | Long break length in minutes | 1 | 90 |
-| 5 | Cycles, aka number of pomodoros before a long rest | 1 | 9 |
-| 6 | *nyi*Pet feeding deadline hr | 0 | 23 |
-| 7 | *nyi*Pet feeding deadline min | 0 | 59 |
+| 2 | *nyi*Pet feeding deadline hr | 0 | 23 |
+| 3 | *nyi*Pet feeding deadline min | 0 | 59 |
+| 4 |  |  |  |
+| 5 |  |  |  |
+| 6 |  |  |  |
+| 7 |  |  |  |
 
 |  | **Settings Page 2** | min | max |
 | --- | --- | --- | --- |
-| 0 |  |  |  |
-| 1 |  |  |  |
-| 2 |  |  |  |
-| 3 |  |  |  |
+| 0 | Pomodoro length in minutes | 1 | 90 |
+| 1 | Short break length in minutes | 1 | 90 |
+| 2 | Long break length in minutes | 1 | 90 |
+| 3 | Cycles, aka number of pomodoros before a long rest | 1 | 9 |
 | 4 |  |  |  |
 | 5 |  |  |  |
 | 6 |  |  |  |

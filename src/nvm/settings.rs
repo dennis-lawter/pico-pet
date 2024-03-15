@@ -9,18 +9,29 @@ const DEFAULT_LONG_REST_TIME: u8 = 15;
 const DEFAULT_POMO_CYCLE: u8 = 4;
 
 pub struct NvmSettings {
-    pub data: [u8; 8],
+    pub system_data: [u8; 8],
+    pub pomo_data: [u8; 8],
 }
 impl Default for NvmSettings {
     fn default() -> Self {
         Self {
-            data: [
+            system_data: [
                 DEFAULT_BRIGHTNESS,
                 DEFAULT_VOLUME,
+                NVM_BLANK,
+                NVM_BLANK,
+                NVM_BLANK,
+                NVM_BLANK,
+                NVM_BLANK,
+                NVM_BLANK,
+            ],
+            pomo_data: [
                 DEFAULT_POMO_TIME,
                 DEFAULT_SHORT_REST_TIME,
                 DEFAULT_LONG_REST_TIME,
                 DEFAULT_POMO_CYCLE,
+                NVM_BLANK,
+                NVM_BLANK,
                 NVM_BLANK,
                 NVM_BLANK,
             ],
@@ -30,8 +41,13 @@ impl Default for NvmSettings {
 impl NvmSettings {
     pub fn load() -> Self {
         let hardware = crate::globals::get_hardware();
-        let data = hardware.get_nvm_page(PageCanon::Settings.into());
-        Self { data }
+        let system_data = hardware.get_nvm_page(PageCanon::Settings as u16);
+
+        let pomo_data = hardware.get_nvm_page(PageCanon::Settings as u16 + 1);
+        Self {
+            system_data,
+            pomo_data,
+        }
     }
 
     pub fn write(&mut self) {
@@ -39,24 +55,27 @@ impl NvmSettings {
 
         self.update_from_globals();
 
-        hardware.write_nvm_page(PageCanon::Settings.into(), &self.data);
+        hardware.write_nvm_page(PageCanon::Settings as u16, &self.system_data);
+        hardware.write_nvm_page(PageCanon::Settings as u16 + 1, &self.pomo_data);
     }
 
     pub fn apply_to_globals(&self) {
-        unsafe { &mut crate::globals::BRIGHTNESS_SETTING }.value = self.data[0];
-        unsafe { &mut crate::globals::VOLUME_SETTING }.value = self.data[1];
-        unsafe { &mut crate::globals::POMO_TIME_SETTING }.value = self.data[2];
-        unsafe { &mut crate::globals::SHORT_REST_TIME_SETTING }.value = self.data[3];
-        unsafe { &mut crate::globals::LONG_REST_TIME_SETTING }.value = self.data[4];
-        unsafe { &mut crate::globals::POMO_CYCLE_SETTING }.value = self.data[5];
+        unsafe { &mut crate::globals::BRIGHTNESS_SETTING }.value = self.system_data[0];
+        unsafe { &mut crate::globals::VOLUME_SETTING }.value = self.system_data[1];
+
+        unsafe { &mut crate::globals::POMO_TIME_SETTING }.value = self.pomo_data[0];
+        unsafe { &mut crate::globals::SHORT_REST_TIME_SETTING }.value = self.pomo_data[1];
+        unsafe { &mut crate::globals::LONG_REST_TIME_SETTING }.value = self.pomo_data[2];
+        unsafe { &mut crate::globals::POMO_CYCLE_SETTING }.value = self.pomo_data[3];
     }
 
     pub fn update_from_globals(&mut self) {
-        self.data[0] = unsafe { &mut crate::globals::BRIGHTNESS_SETTING }.value;
-        self.data[1] = unsafe { &mut crate::globals::VOLUME_SETTING }.value;
-        self.data[2] = unsafe { &mut crate::globals::POMO_TIME_SETTING }.value;
-        self.data[3] = unsafe { &mut crate::globals::SHORT_REST_TIME_SETTING }.value;
-        self.data[4] = unsafe { &mut crate::globals::LONG_REST_TIME_SETTING }.value;
-        self.data[5] = unsafe { &mut crate::globals::POMO_CYCLE_SETTING }.value;
+        self.system_data[0] = unsafe { &mut crate::globals::BRIGHTNESS_SETTING }.value;
+        self.system_data[1] = unsafe { &mut crate::globals::VOLUME_SETTING }.value;
+
+        self.pomo_data[0] = unsafe { &mut crate::globals::POMO_TIME_SETTING }.value;
+        self.pomo_data[1] = unsafe { &mut crate::globals::SHORT_REST_TIME_SETTING }.value;
+        self.pomo_data[2] = unsafe { &mut crate::globals::LONG_REST_TIME_SETTING }.value;
+        self.pomo_data[3] = unsafe { &mut crate::globals::POMO_CYCLE_SETTING }.value;
     }
 }
