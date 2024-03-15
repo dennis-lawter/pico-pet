@@ -40,9 +40,9 @@ Pages are addressed from hexidecimal 0x000 to 0x1ff.
 | --- | --- | --- | --- |
 | 0 | User brightness | 0 | 15 |
 | 1 | User volume | 0 | 4 |
-| 2 | *nyi*Pet feeding deadline hr | 0 | 23 |
-| 3 | *nyi*Pet feeding deadline min | 0 | 59 |
-| 4 |  |  |  |
+| 2 | *nyi* Vibration enabled | 0 | 1 |
+| 3 | *nyi* 24hr clock enabled | 0 | 1 |
+| 4 | *nyi* minutes before device sleeps | 1 | 90 |
 | 5 |  |  |  |
 | 6 |  |  |  |
 | 7 |  |  |  |
@@ -53,22 +53,11 @@ Pages are addressed from hexidecimal 0x000 to 0x1ff.
 | 1 | Short break length in minutes | 1 | 90 |
 | 2 | Long break length in minutes | 1 | 90 |
 | 3 | Cycles, aka number of pomodoros before a long rest | 1 | 9 |
-| 4 |  |  |  |
-| 5 |  |  |  |
+| 4 | *nyi*Pet feeding deadline hr | 0 | 23 |
+| 5 | *nyi*Pet feeding deadline min | 0 | 59 |
 | 6 |  |  |  |
 | 7 |  |  |  |
 
-*NYI*
-| Bit | Setting 7 Meaning |
-| --- | --- |
-| 0 | 1: AM/PM, 0: 24hr |
-| 1 | vibration on/off |
-| 2 |  |
-| 3 |  |
-| 4 |  |
-| 5 |  |
-| 6 |  |
-| 7 |  |
 
 |  | **Inventory** |
 | --- | --- |
