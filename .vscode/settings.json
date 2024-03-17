@@ -8,5 +8,6 @@
     "rust-analyzer.check.allTargets": false,
     "rust-analyzer.files.excludeDirs": [
         "/helpers/**"
-    ]
+    ],
+    "rust-analyzer.showUnlinkedFileNotification": false
 }

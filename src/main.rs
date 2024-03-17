@@ -14,6 +14,7 @@ extern crate fugit;
 extern crate st7735_lcd;
 extern crate waveshare_rp2040_lcd_0_96;
 
+mod audio;
 mod color;
 mod cores;
 mod display;

@@ -1,7 +1,8 @@
+use crate::audio::audio_library::AudioId;
+use crate::audio::audio_player::AudioPlayer;
 use crate::color::Rgb332;
 use crate::display::text_writer::FontStyle;
 use crate::display::text_writer::{self};
-use crate::hardware::audio::AudioFrequency;
 use crate::hardware::hardware::LCD_WIDTH;
 use crate::hardware::input::KeyNames;
 use crate::scenes::SceneBehavior;
@@ -9,7 +10,6 @@ use crate::scenes::SceneType;
 
 use super::setting_components::SettingComponent;
 use super::setting_selected::SettingSelected;
-use super::song;
 
 const SETTING_HEIGHT_OFFSET: i32 = 10;
 const SETTINGS_DRAWN: i32 = 5;
@@ -17,8 +17,7 @@ const SETTINGS_DRAWN: i32 = 5;
 pub struct SettingsScene<'a> {
     frame_count: u32,
     next_scene: Option<SceneType>,
-    song: &'a [AudioFrequency],
-    current_frequency: AudioFrequency,
+    song: AudioPlayer<'a>,
     pub setting_selected: SettingSelected,
     setting_highlighted: SettingSelected,
     input_enabled: bool,
@@ -52,8 +51,7 @@ impl Default for SettingsScene<'_> {
         Self {
             frame_count: 0,
             next_scene: None,
-            song: &song::BALL_GAME,
-            current_frequency: AudioFrequency::None,
+            song: AudioPlayer::new(AudioId::BallGame, true, true),
             setting_selected: SettingSelected::None,
             setting_highlighted: SettingSelected::None,
             input_enabled: false,
@@ -73,13 +71,7 @@ impl SceneBehavior for SettingsScene<'_> {
     }
 
     fn sound(&mut self) {
-        let hardware = crate::globals::get_hardware();
-        let song_index = (self.frame_count / 2) as usize % self.song.len();
-        let indexed_frequency = &self.song[song_index];
-        if indexed_frequency != &self.current_frequency {
-            hardware.start_tone(&self.song[song_index]);
-            self.current_frequency = indexed_frequency.clone();
-        }
+        self.song.tick();
     }
 
     fn draw(&mut self) {

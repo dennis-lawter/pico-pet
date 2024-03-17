@@ -1,6 +1,6 @@
 use crate::hardware::audio::AudioFrequency as Freq;
 
-// let mut song_str = "C4q D4q | F4q F4q F4q F4e F4e | F4e F4e F4q C4q D4q | F4q F4q F4q F4e F4e | F4e F4e F4q C4q D4q";
+pub const BALL_GAME_PLAYBACK_RATE: usize = 2;
 pub const BALL_GAME: [Freq; 396] = [
     Freq::C4, // take
     Freq::C4,

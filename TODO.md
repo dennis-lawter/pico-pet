@@ -10,15 +10,7 @@ Done items should be removed from the list.
   - Store the `MainScene::menu_item_selected` as a static/global for reloading the scene
   - Feeding deadline setting (u8 hr u8 min)
 - Sound System
-  - Create a consolidated solution to playing audio
-  - Audio struct:
-    - One-off or loop
-    - Reference to `&[Freq]`
-    - `fn start()`
-    - `fn tick()`
-    - `fn is_playing()`
-    - Use a bpm multiplier to reduce size of audio arrays
-    - Consider a global lock to ensure audio player exclusivity since we have 1 audio channel
+  - Update all current audio players to the new system
   - Possibly create a sound editor as a rust helper...
 - Idle Scene
   - Entered from the main scene
