@@ -20,17 +20,17 @@ fixedstr = { version = "0.4.3", default-features = false }
 name = "pico-pet"
 path = "src/main.rs"
 
-# [[bin]]
-# name = "rng_profiler"
-# path = "helpers/rng_profiler.rs"
+[[bin]]
+name = "rng_profiler"
+path = "helpers/rng_profiler.rs"
 
-# [[bin]]
-# name = "frequency_finder"
-# path = "helpers/frequency_finder.rs"
+[[bin]]
+name = "frequency_finder"
+path = "helpers/frequency_finder.rs"
 
-# [[bin]]
-# name = "log_scale"
-# path = "helpers/log_scale.rs"
+[[bin]]
+name = "log_scale"
+path = "helpers/log_scale.rs"
 
 [profile.release]
 # s-level optimization breaks the reboot() function???

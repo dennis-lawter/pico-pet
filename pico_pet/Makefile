@@ -1,5 +1,5 @@
 build:
-	cargo build --release
+	cargo build --bin pico-pet --release
 run: build
 	echo "Searching for Raspberry Pi Pico..."
 	@while [ ! -d "/media/$$USER/RPI-RP2" ]; do \
