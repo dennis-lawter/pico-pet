@@ -130,45 +130,5 @@ pub fn tui() {
             .expect("Could not focus on element 'root'");
     });
 
-    // siv.add_global_callback('i', move |s| {
-    //     // println!("Pressed 'i'");
-    //     let mut should_focus = false;
-    //     s.call_on_name("editor", |editor: &mut TextArea| {
-    //         if editor.is_enabled() {
-    //             // println!("Disabling editor");
-    //             editor.disable();
-    //         } else {
-    //             // println!("Enabling and focusing editor");
-    //             editor.enable();
-    //             editor
-    //                 .take_focus(cursive::direction::Direction::right())
-    //                 .unwrap();
-    //             should_focus = true;
-    //         }
-    //     });
-
-    //     if should_focus {
-    //         if let Err(e) = s.focus_name("root.editor") {
-    //             println!("Error focusing editor: {:?}", e);
-    //         }
-    //     }
-    // });
-
-    // siv.add_global_callback('p', {
-    //     let play_state = play_state.clone();
-    //     move |_| {
-    //         let state = play_state.lock().unwrap();
-    //         if state.load(Ordering::SeqCst) {
-    //             // Stop playback
-    //             state.store(false, Ordering::SeqCst);
-    //         } else {
-    //             // Start playback
-    //             let play_state = play_state.clone();
-    //             play_preview(play_state);
-    //         }
-    //     }
-    // });
-    // siv.add_global_callback('q', |s| s.quit());
-
     siv.run();
 }

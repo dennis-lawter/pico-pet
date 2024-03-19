@@ -6,7 +6,7 @@ use rodio::OutputStream;
 use rodio::Sink;
 
 use crate::freq::FREQ_TABLE;
-use crate::PlayState;
+use crate::prelude::*;
 
 const SAMPLE_RATE: u32 = 44_100;
 
