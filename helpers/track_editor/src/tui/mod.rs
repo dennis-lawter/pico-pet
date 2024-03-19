@@ -108,6 +108,7 @@ fn editor() -> NamedView<ScrollView<ResizedView<ResizedView<TextArea>>>> {
 pub fn tui() {
     let speed_multiplier = Arc::new(Mutex::new(1u8));
     let mut siv = Cursive::default();
+    // siv.run_crossterm().unwrap();
     siv.load_toml(include_str!("../../assets/cursive.toml"))
         .unwrap();
 

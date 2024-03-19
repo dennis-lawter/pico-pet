@@ -6,5 +6,5 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-cursive = { version = "0.20.0", features = ["toml"] }
+cursive = { version = "0.20.0", default-features = false, features = ["toml", "termion-backend", "term_size"] }
 rodio = "0.17.3"
