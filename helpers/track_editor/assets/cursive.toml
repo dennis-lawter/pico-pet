@@ -1,0 +1,18 @@
+
+shadow = true
+borders = "none"
+
+[colors]
+    background = "black"
+    shadow     = "#111111"
+    view       = "#222222"
+
+    primary   = "#ff1111"
+    secondary = "#222222"
+    tertiary  = "#333333"
+
+    title_primary   = "#ff5555"
+    title_secondary = "#ffff55"
+
+    highlight          = "#F00"
+    highlight_inactive = "#5555FF"
