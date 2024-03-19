@@ -15,7 +15,6 @@ use cursive::views::ResizedView;
 use cursive::views::ScrollView;
 use cursive::views::TextArea;
 use cursive::views::TextView;
-use cursive::View;
 
 use cursive::Cursive;
 use cursive::CursiveExt;
@@ -55,7 +54,7 @@ fn action_bar(
     let speed_label = TextView::new(format!("{}x", *initial_multiplier)).with_name("speed_label");
 
     let play_button = Button::new("PLAY", move |s| {
-        let mut state = play_state.lock().unwrap();
+        let state = play_state.lock().unwrap();
         if state.load(Ordering::SeqCst) {
             // Stop playback
             state.store(false, Ordering::SeqCst);
@@ -73,7 +72,7 @@ fn action_bar(
     });
     let play_button = play_button.with_name("play_button");
 
-    let save_button = Button::new("SAVE", move |s| {
+    let save_button = Button::new("SAVE", move |_s| {
         // TODO
         ()
     });
