@@ -23,7 +23,6 @@ fn action_bar(
     speed_multiplier: Arc<Mutex<u8>>,
     play_state: Arc<Mutex<AtomicBool>>,
 ) -> LinearLayout {
-    // Clone Arc for decrease button closure
     let decrease_multiplier = Arc::clone(&speed_multiplier);
     let decrease_button = Button::new("-", move |s| {
         let mut multiplier = decrease_multiplier.lock().unwrap();
@@ -34,9 +33,7 @@ fn action_bar(
             });
         }
     });
-    // decrease_button.set_label_raw(" < ");
 
-    // Clone Arc for increase button closure
     let increase_multiplier = Arc::clone(&speed_multiplier);
     let increase_button = Button::new("+", move |s| {
         let mut multiplier = increase_multiplier.lock().unwrap();
@@ -47,22 +44,18 @@ fn action_bar(
             });
         }
     });
-    // increase_button.set_label_raw(" > ");
 
-    // Initial label setup with cloned Arc
     let initial_multiplier = speed_multiplier.lock().unwrap();
     let speed_label = TextView::new(format!("{}x", *initial_multiplier)).with_name("speed_label");
 
     let play_button = Button::new("PLAY", move |s| {
         let state = play_state.lock().unwrap();
         if state.load(Ordering::SeqCst) {
-            // Stop playback
             state.store(false, Ordering::SeqCst);
             s.call_on_name("play_button", |button: &mut Button| {
                 button.set_label("PLAY");
             });
         } else {
-            // Start playback
             state.store(true, Ordering::SeqCst);
             play_preview(Arc::clone(&play_state));
             s.call_on_name("play_button", |button: &mut Button| {
@@ -108,7 +101,6 @@ fn editor() -> NamedView<ScrollView<ResizedView<ResizedView<TextArea>>>> {
 pub fn tui() {
     let speed_multiplier = Arc::new(Mutex::new(1u8));
     let mut siv = Cursive::default();
-    // siv.run_crossterm().unwrap();
     siv.load_toml(include_str!("../../assets/cursive.toml"))
         .unwrap();
 
