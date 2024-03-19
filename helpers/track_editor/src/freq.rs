@@ -37,6 +37,8 @@ pub const FREQ_TABLE: [(&str, f32); 37] = [
     ("B6", 1975.53),
     ("C7", 2093.0),
 ];
+
+#[allow(dead_code)]
 pub fn get_freq(name: &str) -> Option<f32> {
     FREQ_TABLE.iter().find(|(n, _)| *n == name).map(|(_, f)| *f)
 }

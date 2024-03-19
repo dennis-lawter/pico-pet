@@ -1,10 +1,16 @@
 mod audio;
 mod freq;
+mod model;
 mod prelude;
-mod tui;
+mod view;
 
-use tui::tui;
+use cursive::Cursive;
+
+use view::setup_ui;
 
 fn main() {
-    tui();
+    let mut track = model::Track::new();
+
+    let mut siv = Cursive::default();
+    setup_ui(&mut siv, &mut track);
 }
