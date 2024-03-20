@@ -8,8 +8,6 @@ pub struct AudioPlayer {
     tracker: Option<usize>,
     current_freq: Freq,
     audio_track: AudioTrack,
-    // data: &'a [Freq],
-    // playback_rate: usize,
 }
 impl AudioPlayer {
     pub fn new(audio_id: AudioId, repeat: bool, autoplay: bool) -> Self {
@@ -18,8 +16,6 @@ impl AudioPlayer {
             tracker: if autoplay { Some(0) } else { None },
             current_freq: Freq::None,
             audio_track: audio_id.get_track(),
-            // data: audio_id.get_sound_source(),
-            // playback_rate: audio_id.get_playback_rate(),
         }
     }
 
