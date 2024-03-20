@@ -1,22 +1,25 @@
 use crate::hardware::audio::AudioFrequency as Freq;
 
 use super::audio_library::AudioId;
+use super::audio_track::AudioTrack;
 
-pub struct AudioPlayer<'a> {
+pub struct AudioPlayer {
     repeat: bool,
     tracker: Option<usize>,
     current_freq: Freq,
-    data: &'a [Freq],
-    playback_rate: usize,
+    audio_track: AudioTrack,
+    // data: &'a [Freq],
+    // playback_rate: usize,
 }
-impl AudioPlayer<'_> {
+impl AudioPlayer {
     pub fn new(audio_id: AudioId, repeat: bool, autoplay: bool) -> Self {
         Self {
             repeat,
             tracker: if autoplay { Some(0) } else { None },
             current_freq: Freq::None,
-            data: audio_id.get_sound_source(),
-            playback_rate: audio_id.get_playback_rate(),
+            audio_track: audio_id.get_track(),
+            // data: audio_id.get_sound_source(),
+            // playback_rate: audio_id.get_playback_rate(),
         }
     }
 
@@ -37,7 +40,9 @@ impl AudioPlayer<'_> {
 
     pub fn tick(&mut self) {
         if let Some(tracker) = self.tracker {
-            let note = self.data[tracker / self.playback_rate];
+            let note = Freq::from_byte(
+                self.audio_track.source[tracker / self.audio_track.playback_rate as usize],
+            );
 
             let hardware = crate::globals::get_hardware();
             if note != self.current_freq {
@@ -45,7 +50,9 @@ impl AudioPlayer<'_> {
                 hardware.start_tone(&note);
             }
 
-            if (tracker + 1) / self.playback_rate < self.data.len() {
+            if (tracker + 1) / (self.audio_track.playback_rate as usize)
+                < self.audio_track.source.len()
+            {
                 self.tracker = Some(tracker + 1);
             } else if self.repeat {
                 self.tracker = Some(0);

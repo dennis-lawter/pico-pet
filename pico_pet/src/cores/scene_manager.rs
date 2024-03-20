@@ -13,7 +13,7 @@ pub struct SceneManager<'a> {
     pub eat_scene: Option<EatScene<'a>>,
     pub stat_scene: Option<NyiScene>,
     pub cosmetic_scene: Option<NyiScene>,
-    pub settings_scene: Option<SettingsScene<'a>>,
+    pub settings_scene: Option<SettingsScene>,
 
     pub active_scene: SceneType,
 }

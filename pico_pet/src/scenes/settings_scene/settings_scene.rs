@@ -14,10 +14,10 @@ use super::setting_selected::SettingSelected;
 const SETTING_HEIGHT_OFFSET: i32 = 10;
 const SETTINGS_DRAWN: i32 = 5;
 
-pub struct SettingsScene<'a> {
+pub struct SettingsScene {
     frame_count: u32,
     next_scene: Option<SceneType>,
-    song: AudioPlayer<'a>,
+    song: AudioPlayer,
     pub setting_selected: SettingSelected,
     setting_highlighted: SettingSelected,
     input_enabled: bool,
@@ -26,7 +26,7 @@ pub struct SettingsScene<'a> {
 
     scroll_offset: i32,
 }
-impl Default for SettingsScene<'_> {
+impl Default for SettingsScene {
     fn default() -> Self {
         let setting_components = [
             SettingComponent::Brightness(
@@ -62,7 +62,7 @@ impl Default for SettingsScene<'_> {
     }
 }
 
-impl SceneBehavior for SettingsScene<'_> {
+impl SceneBehavior for SettingsScene {
     fn tick(&mut self) {
         for component in self.setting_components.iter_mut() {
             component.tick();
@@ -137,7 +137,7 @@ impl SceneBehavior for SettingsScene<'_> {
     }
 }
 
-impl SettingsScene<'_> {
+impl SettingsScene {
     fn check_for_new_setting_selected(&mut self) -> bool {
         if self.setting_selected != SettingSelected::None {
             return false;
