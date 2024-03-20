@@ -14,25 +14,47 @@ use cursive::views::TextView;
 use cursive::Cursive;
 use cursive::CursiveExt;
 
+use clap::Parser;
+
 use prelude::*;
 
-fn load_model_from_args() {
-    let args = std::env::args().collect::<Vec<String>>();
-    assert_eq!(args.len(), 2, "Usage: {} <file>", args[0]);
-
-    let text = std::fs::read_to_string(&args[1]).unwrap();
+fn load_model_from_filename(filename: &str) {
+    let text = std::fs::read_to_string(filename).expect("Could not read file");
 
     let mut model = crate::model::TRACK_INSTANCE.lock().unwrap();
     model.load_text(&text);
     drop(model);
 }
 
+/// TUI audio player for the .peat format
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
+struct Args {
+    /// Input file
+    #[arg(value_name = "INPUT_FILE")]
+    input: String,
+
+    /// Autoplay
+    #[arg(short = 'a', long = "autoplay", action = clap::ArgAction::SetTrue)]
+    autoplay: bool,
+}
+
 fn main() {
-    load_model_from_args();
+    let args = Args::parse();
+
+    if args.input.ends_with(".peat") {
+        load_model_from_filename(&args.input);
+    } else {
+        panic!("Input must be a .peat file");
+    }
 
     let mut siv = Cursive::default();
 
     build_ui(&mut siv);
+
+    if args.autoplay {
+        play_handler(&mut siv);
+    }
 
     siv.run();
 }
