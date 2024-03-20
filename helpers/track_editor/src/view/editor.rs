@@ -10,9 +10,9 @@ pub fn editor_row() -> ScrollView<LinearLayout> {
     let track = crate::model::TRACK_INSTANCE.lock().unwrap();
     let editor = TextArea::new()
         .content(track.text.clone())
+        .with_name("editor")
         .full_height()
-        .fixed_width(4)
-        .with_name("editor");
+        .fixed_width(40);
     let track_follower = TextView::new("▶️");
     LinearLayout::horizontal()
         .child(track_follower)

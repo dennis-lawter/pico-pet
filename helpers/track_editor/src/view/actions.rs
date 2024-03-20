@@ -41,7 +41,16 @@ pub fn action_bar() -> LinearLayout {
                 button.set_label("PLAY");
             });
         } else {
+            let text = s
+                .call_on_name("editor", |view: &mut cursive::views::TextArea| {
+                    view.get_content().to_string()
+                })
+                .unwrap_or_default();
+
             model.playing = true;
+            model.text = text.clone();
+
+            drop(model);
             crate::audio::play_preview();
             s.call_on_name("play_button", |button: &mut Button| {
                 button.set_label("STOP");

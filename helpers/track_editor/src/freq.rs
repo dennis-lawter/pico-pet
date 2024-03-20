@@ -1,4 +1,4 @@
-pub const FREQ_TABLE: [(&str, f32); 37] = [
+pub const FREQ_TABLE: [(&str, f32); 38] = [
     ("C4", 261.63),
     ("Cs4", 277.18),
     ("D4", 293.66),
@@ -36,9 +36,15 @@ pub const FREQ_TABLE: [(&str, f32); 37] = [
     ("As6", 1864.66),
     ("B6", 1975.53),
     ("C7", 2093.0),
+    ("_", 0.0),
 ];
 
 #[allow(dead_code)]
 pub fn get_freq(name: &str) -> Option<f32> {
-    FREQ_TABLE.iter().find(|(n, _)| *n == name).map(|(_, f)| *f)
+    for (key, freq) in FREQ_TABLE {
+        if key == name {
+            return Some(freq);
+        }
+    }
+    None
 }
