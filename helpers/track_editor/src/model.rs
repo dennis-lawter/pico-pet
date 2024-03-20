@@ -6,6 +6,7 @@ pub struct Track {
     pub speed_divisor: u8,
     pub text: String,
     pub playing: bool,
+    pub notes_played: u32,
 }
 impl Track {
     fn new() -> Self {
@@ -13,6 +14,7 @@ impl Track {
             speed_divisor: 1,
             text: "".to_string(),
             playing: false,
+            notes_played: 0,
         }
     }
 }

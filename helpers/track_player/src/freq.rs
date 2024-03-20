@@ -50,12 +50,3 @@ lazy_static! {
 pub fn get_freq(name: &str) -> Option<f32> {
     FREQ_TABLE.get(name).copied()
 }
-
-// pub fn get_freq(name: &str) -> Option<f32> {
-//     for (key, freq) in FREQ_TABLE {
-//         if key == name {
-//             return Some(freq);
-//         }
-//     }
-//     None
-// }

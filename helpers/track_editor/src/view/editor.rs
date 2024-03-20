@@ -12,8 +12,8 @@ pub fn editor_row() -> ScrollView<LinearLayout> {
         .content(track.text.clone())
         .with_name("editor")
         .full_height()
-        .fixed_width(40);
-    let track_follower = TextView::new("▶️");
+        .full_width();
+    let track_follower = TextView::new("▶️").with_name("track_follower");
     LinearLayout::horizontal()
         .child(track_follower)
         .child(editor)
