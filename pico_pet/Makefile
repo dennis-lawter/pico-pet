@@ -6,7 +6,7 @@ run: build
         sleep 1; \
     done; \
     echo "Raspberry Pi Pico mounted."
-	cargo run --release
+	cargo run --bin pico-pet --release
 sprites:
 	rgba8888-to-rgb332 -m 0b111_000_11 -i ./sprite_png/ -o ./sprite_raw/
 fonts:
