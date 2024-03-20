@@ -1,0 +1,3 @@
+[submodule "helpers/rgba8888-to-rgb332"]
+	path = helpers/rgba8888-to-rgb332
+	url = https://github.com/dennis-lawter/rgba8888-to-rgb332.git
