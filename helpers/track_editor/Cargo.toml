@@ -6,5 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-cursive = { version = "0.20.0", default-features = false, features = ["toml", "crossterm-backend", "term_size"] }
+cursive = { version = "0.20.0", default-features = false, features = ["toml", "termion-backend", "term_size"] }
+lazy_static = "1.4.0"
 rodio = "0.17.3"
