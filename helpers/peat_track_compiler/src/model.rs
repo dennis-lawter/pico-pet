@@ -10,11 +10,8 @@ pub struct Track {
     pub notes: Vec<u8>,
 }
 impl Track {
-    pub fn from_args() -> Self {
-        let args = std::env::args().collect::<Vec<String>>();
-        assert_eq!(args.len(), 2, "Usage: {} <file.peat>", args[0]);
-
-        let text = std::fs::read_to_string(&args[1]).expect("Could not read file");
+    pub fn from_filename(filename: &str) -> Self {
+        let text = std::fs::read_to_string(filename).expect("Could not read file");
 
         let mut model = Self {
             speed_divisor: 1,
@@ -24,11 +21,8 @@ impl Track {
 
         model
     }
-    pub fn write(&self) {
-        let args = std::env::args().collect::<Vec<String>>();
-        assert_eq!(args.len(), 2, "Usage: {} <file.peat>", args[0]);
-        let new_file_name = format!("{}.beat", args[1].split('.').next().unwrap());
-        let mut file = File::create(new_file_name).expect("Could not create file");
+    pub fn write(&self, filename: &str) {
+        let mut file = File::create(filename).expect("Could not create file");
         let mut writer = BufWriter::new(&mut file);
         writer
             .write_all(&[self.speed_divisor])

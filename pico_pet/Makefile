@@ -11,3 +11,5 @@ sprites:
 	rgba8888-to-rgb332 -m 0b111_000_11 -i ./sprite_png/ -o ./sprite_raw/
 fonts:
 	rgba8888-to-rgb332 --monochrome -i ./font_png/ -o ./font_raw/
+tracks:
+	peat_track_compiler -i ./sound_peat/ -o ./sound_raw/
