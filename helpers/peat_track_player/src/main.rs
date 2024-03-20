@@ -63,32 +63,50 @@ fn build_ui(siv: &mut cursive::Cursive) {
 
     let track_title_view = TextView::new(track_title_styled).center();
 
+    let help_view = TextView::new("[SPACE] to toggle play/pause    [Q] to quit");
+
     let layout = LinearLayout::vertical()
         .child(track_title_view)
-        .child(progress_bar_view);
+        .child(progress_bar_view)
+        .child(help_view);
 
-    let dialog = cursive::views::Dialog::around(layout)
-        .title("PEAT AUDIO PLAYER")
-        .button("PLAY", |s| {
-            let mut model = crate::model::TRACK_INSTANCE.lock().unwrap();
-            if !model.playing {
-                model.playing = true;
-                drop(model);
-                crate::audio::play_preview(s);
-                s.call_on_name("play_button", |button: &mut cursive::views::Button| {
-                    button.set_label("STOP");
-                });
-            }
-        })
-        .button("STOP", |s| {
-            let mut model = crate::model::TRACK_INSTANCE.lock().unwrap();
-            model.playing = false;
-            s.call_on_name("play_button", |button: &mut cursive::views::Button| {
-                button.set_label("PLAY");
-            });
-        })
-        .button("QUIT", |s| {
-            s.quit();
-        });
+    let dialog = cursive::views::Dialog::around(layout).title("PEAT AUDIO PLAYER");
     siv.add_layer(dialog);
+
+    siv.add_global_callback('q', |s| {
+        s.quit();
+    });
+    siv.add_global_callback(' ', toggle_handler);
+}
+
+fn play_handler(siv: &mut cursive::Cursive) {
+    let mut model = crate::model::TRACK_INSTANCE.lock().unwrap();
+    if !model.playing {
+        model.playing = true;
+        drop(model);
+        crate::audio::play_preview(siv);
+        siv.call_on_name("play_button", |button: &mut cursive::views::Button| {
+            button.set_label("STOP");
+        });
+    }
+}
+
+fn stop_handler(siv: &mut cursive::Cursive) {
+    let mut model = crate::model::TRACK_INSTANCE.lock().unwrap();
+    model.playing = false;
+    siv.call_on_name("play_button", |button: &mut cursive::views::Button| {
+        button.set_label("PLAY");
+    });
+}
+
+fn toggle_handler(siv: &mut cursive::Cursive) {
+    let playing = {
+        let model = crate::model::TRACK_INSTANCE.lock().unwrap();
+        model.playing
+    };
+    if playing {
+        stop_handler(siv);
+    } else {
+        play_handler(siv);
+    }
 }

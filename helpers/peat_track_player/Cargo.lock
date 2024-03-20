@@ -766,6 +766,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "peat_track_player"
+version = "0.1.0"
+dependencies = [
+ "cursive",
+ "lazy_static",
+ "rodio",
+]
+
+[[package]]
 name = "pkg-config"
 version = "0.3.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1038,15 +1047,6 @@ dependencies = [
  "indexmap",
  "toml_datetime",
  "winnow",
-]
-
-[[package]]
-name = "track_player"
-version = "0.1.0"
-dependencies = [
- "cursive",
- "lazy_static",
- "rodio",
 ]
 
 [[package]]
