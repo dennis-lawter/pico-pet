@@ -60,19 +60,12 @@ pub enum PomoMenuFrame {
 impl PomoScene<'_> {
     pub fn start_pomo_sound(&mut self) {
         self.pomo_finished_track.play()
-        // self.pomo_finished_index = Some(0);
     }
     pub fn start_break_sound(&mut self) {
         self.break_finished_track.play()
-        // self.break_finished_index = Some(0);
     }
     pub fn is_playing_alert(&self) -> bool {
         self.pomo_finished_track.is_playing() || self.break_finished_track.is_playing()
-        // match (self.break_finished_index, self.pomo_finished_index) {
-        //     (Some(_), _) => true,
-        //     (_, Some(_)) => true,
-        //     _ => false,
-        // }
     }
 }
 
