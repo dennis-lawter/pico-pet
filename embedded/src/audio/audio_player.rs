@@ -38,7 +38,7 @@ pub struct AudioPlayer {
 impl AudioPlayer {
     pub fn new(audio_id: AudioId, repeat: RepeatMode, autoplay: AutoPlayMode) -> Self {
         Self {
-            repeat : repeat.into(),
+            repeat: repeat.into(),
             tracker: match autoplay {
                 AutoPlayMode::On => Some(0),
                 AutoPlayMode::Off => None,
@@ -81,6 +81,9 @@ impl AudioPlayer {
                 self.tracker = Some(tracker + 1);
             } else if self.repeat {
                 self.tracker = Some(0);
+            } else {
+                self.tracker = None;
+                hardware.end_tone();
             }
         }
     }

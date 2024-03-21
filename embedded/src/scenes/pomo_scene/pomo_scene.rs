@@ -1,9 +1,12 @@
+use crate::audio::audio_library::AudioId;
+use crate::audio::audio_player::AudioPlayer;
+use crate::audio::audio_player::AutoPlayMode;
+use crate::audio::audio_player::RepeatMode;
 use crate::color::Rgb332;
 use crate::display::sprite::Sprite;
 use crate::display::sprite_factory;
 use crate::display::text_writer;
 use crate::display::text_writer::FontStyle;
-use crate::hardware::audio::AudioFrequency as Freq;
 use crate::hardware::hardware::LCD_HEIGHT;
 use crate::hardware::hardware::LCD_WIDTH;
 use crate::hardware::input::KeyNames;
@@ -12,7 +15,6 @@ use crate::scenes::SceneType;
 
 use super::timer::TimerEvent;
 
-use super::sounds;
 use super::timer::PomoTimer;
 
 const ANIM_ON_RATE: usize = 3;
@@ -22,11 +24,8 @@ pub struct PomoScene<'a> {
     lofi_sprite: Sprite<'a>,
     next_scene: Option<SceneType>,
     timer: PomoTimer,
-    current_frequency: Freq,
-    pomo_finished_sound: &'a [Freq],
-    pomo_finished_index: Option<usize>,
-    break_finished_sound: &'a [Freq],
-    break_finished_index: Option<usize>,
+    pomo_finished_track: AudioPlayer,
+    break_finished_track: AudioPlayer,
     frame_count: usize,
 }
 impl Default for PomoScene<'static> {
@@ -36,11 +35,16 @@ impl Default for PomoScene<'static> {
             menu_sprite: sprite_factory::new_pomo_menu_sprite(0, 0),
             lofi_sprite: sprite_factory::new_lofi_sprite(0, 8),
             timer: PomoTimer::default(),
-            current_frequency: Freq::None,
-            pomo_finished_sound: &sounds::POMO_FINISHED,
-            break_finished_sound: &sounds::BREAK_FINISHED,
-            pomo_finished_index: None,
-            break_finished_index: None,
+            pomo_finished_track: AudioPlayer::new(
+                AudioId::PomodoroFinished,
+                RepeatMode::Off,
+                AutoPlayMode::Off,
+            ),
+            break_finished_track: AudioPlayer::new(
+                AudioId::BreakFinished,
+                RepeatMode::Off,
+                AutoPlayMode::Off,
+            ),
             frame_count: 0,
         }
     }
@@ -55,17 +59,20 @@ pub enum PomoMenuFrame {
 
 impl PomoScene<'_> {
     pub fn start_pomo_sound(&mut self) {
-        self.pomo_finished_index = Some(0);
+        self.pomo_finished_track.play()
+        // self.pomo_finished_index = Some(0);
     }
     pub fn start_break_sound(&mut self) {
-        self.break_finished_index = Some(0);
+        self.break_finished_track.play()
+        // self.break_finished_index = Some(0);
     }
     pub fn is_playing_alert(&self) -> bool {
-        match (self.break_finished_index, self.pomo_finished_index) {
-            (Some(_), _) => true,
-            (_, Some(_)) => true,
-            _ => false,
-        }
+        self.pomo_finished_track.is_playing() || self.break_finished_track.is_playing()
+        // match (self.break_finished_index, self.pomo_finished_index) {
+        //     (Some(_), _) => true,
+        //     (_, Some(_)) => true,
+        //     _ => false,
+        // }
     }
 }
 
@@ -119,45 +126,53 @@ impl SceneBehavior for PomoScene<'_> {
 
     fn sound(&mut self) {
         let hardware = crate::globals::get_hardware();
-
-        match (
-            &mut self.break_finished_index,
-            &mut self.pomo_finished_index,
-        ) {
-            (None, None) => {
-                hardware.end_tone();
-            }
-            (Some(_), Some(_)) => {
-                self.pomo_finished_index = None;
-                self.break_finished_index = None;
-                hardware.end_tone();
-                hardware.stop_vibrating();
-            }
-            (Some(index), None) => {
-                hardware.start_vibrating();
-                if self.current_frequency != self.break_finished_sound[*index] {
-                    hardware.start_tone(&self.break_finished_sound[*index]);
-                }
-                *index += 1;
-                if *index >= self.break_finished_sound.len() {
-                    self.break_finished_index = None;
-                    hardware.stop_vibrating();
-                    hardware.end_tone();
-                }
-            }
-            (None, Some(index)) => {
-                hardware.start_vibrating();
-                if self.current_frequency != self.pomo_finished_sound[*index] {
-                    hardware.start_tone(&self.pomo_finished_sound[*index]);
-                }
-                *index += 1;
-                if *index >= self.pomo_finished_sound.len() {
-                    self.pomo_finished_index = None;
-                    hardware.stop_vibrating();
-                    hardware.end_tone();
-                }
-            }
+        self.pomo_finished_track.tick();
+        self.break_finished_track.tick();
+        if self.is_playing_alert() {
+            hardware.start_vibrating();
+        } else {
+            hardware.stop_vibrating();
         }
+        // let hardware = crate::globals::get_hardware();
+
+        // match (
+        //     &mut self.break_finished_index,
+        //     &mut self.pomo_finished_index,
+        // ) {
+        //     (None, None) => {
+        //         hardware.end_tone();
+        //     }
+        //     (Some(_), Some(_)) => {
+        //         self.pomo_finished_index = None;
+        //         self.break_finished_index = None;
+        //         hardware.end_tone();
+        //         hardware.stop_vibrating();
+        //     }
+        //     (Some(index), None) => {
+        //         hardware.start_vibrating();
+        //         if self.current_frequency != self.break_finished_sound[*index] {
+        //             hardware.start_tone(&self.break_finished_sound[*index]);
+        //         }
+        //         *index += 1;
+        //         if *index >= self.break_finished_sound.len() {
+        //             self.break_finished_index = None;
+        //             hardware.stop_vibrating();
+        //             hardware.end_tone();
+        //         }
+        //     }
+        //     (None, Some(index)) => {
+        //         hardware.start_vibrating();
+        //         if self.current_frequency != self.pomo_finished_sound[*index] {
+        //             hardware.start_tone(&self.pomo_finished_sound[*index]);
+        //         }
+        //         *index += 1;
+        //         if *index >= self.pomo_finished_sound.len() {
+        //             self.pomo_finished_index = None;
+        //             hardware.stop_vibrating();
+        //             hardware.end_tone();
+        //         }
+        //     }
+        // }
     }
 
     fn draw(&mut self) {
