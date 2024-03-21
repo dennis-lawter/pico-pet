@@ -11,4 +11,7 @@ impl RealTime {
     pub fn dec_to_bcd(n: u8) -> u8 {
         (n / 10) * 16 + (n % 10)
     }
+    pub fn new(hr: u8, min: u8, sec: u8) -> Self {
+        Self { sec, min, hr }
+    }
 }

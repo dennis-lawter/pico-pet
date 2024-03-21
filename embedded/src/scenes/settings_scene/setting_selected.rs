@@ -8,6 +8,7 @@ pub enum SettingSelected {
     ShortRest,
     LongRest,
     PomoCycle,
+    FeedingDeadline,
     Reset,
     None = 255,
 }

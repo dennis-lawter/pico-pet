@@ -8,7 +8,6 @@ Done items should be removed from the list.
   - Vibe setting
   - 24 hr clock setting
   - Store the `MainScene::menu_item_selected` as a static/global for reloading the scene
-  - Feeding deadline setting (u8 hr u8 min)
 - Idle Scene
   - Entered from the main scene
   - Setting to control time before idle
@@ -37,7 +36,7 @@ Done items should be removed from the list.
       - Pet's health is adjusted
       - Tomatoes fed removed, remaining juiced
 - Pet maintenance
-  - Introduce check, runs at midnight
+  - Introduce check, runs at feeding deadline
     - Must have save data for last time a day was written to NVM
     - Don't read often, maybe only on 1hz clock
     - Performed outside of scene maintenance

@@ -1,4 +1,5 @@
 pub mod brightness_setting_component;
+pub mod feeding_deadline_setting_component;
 pub mod long_rest_setting_component;
 pub mod pomo_cycle_setting_component;
 pub mod pomo_time_setting_component;
@@ -6,10 +7,9 @@ pub mod reset_setting_component;
 pub mod short_rest_setting_component;
 pub mod time_setting_component;
 pub mod volume_setting_component;
-use crate::hardware::input::KeyNames;
-use crate::setting_value::Setting;
 
 pub use self::brightness_setting_component::BrightnessSettingComponent;
+pub use self::feeding_deadline_setting_component::FeedingDeadlineSettingComponent;
 pub use self::long_rest_setting_component::LongRestSettingComponent;
 pub use self::pomo_cycle_setting_component::PomoCycleSettingComponent;
 pub use self::pomo_time_setting_component::PomoTimeSettingComponent;
@@ -17,6 +17,9 @@ pub use self::reset_setting_component::ResetSettingComponent;
 pub use self::short_rest_setting_component::ShortRestSettingComponent;
 pub use self::time_setting_component::TimeSettingComponent;
 pub use self::volume_setting_component::VolumeSettingComponent;
+
+use crate::hardware::input::KeyNames;
+use crate::setting_value::Setting;
 
 pub enum SettingComponent {
     Brightness(BrightnessSettingComponent),
@@ -26,6 +29,7 @@ pub enum SettingComponent {
     ShortRest(ShortRestSettingComponent),
     LongRest(LongRestSettingComponent),
     PomoCycle(PomoCycleSettingComponent),
+    FeedingDeadline(FeedingDeadlineSettingComponent),
     Reset(ResetSettingComponent),
 }
 impl SettingComponent {
@@ -38,6 +42,7 @@ impl SettingComponent {
             SettingComponent::ShortRest(component) => component.draw(y_offset, selected),
             SettingComponent::LongRest(component) => component.draw(y_offset, selected),
             SettingComponent::PomoCycle(component) => component.draw(y_offset, selected),
+            SettingComponent::FeedingDeadline(component) => component.draw(y_offset, selected),
             SettingComponent::Reset(component) => component.draw(y_offset, selected),
         }
     }
@@ -51,6 +56,7 @@ impl SettingComponent {
             SettingComponent::ShortRest(component) => component.tick(),
             SettingComponent::LongRest(component) => component.tick(),
             SettingComponent::PomoCycle(component) => component.tick(),
+            SettingComponent::FeedingDeadline(component) => component.tick(),
             SettingComponent::Reset(component) => component.tick(),
         }
     }
@@ -64,6 +70,7 @@ impl SettingComponent {
             SettingComponent::ShortRest(component) => component.input(),
             SettingComponent::LongRest(component) => component.input(),
             SettingComponent::PomoCycle(component) => component.input(),
+            SettingComponent::FeedingDeadline(component) => component.input(),
             SettingComponent::Reset(component) => component.input(),
         }
     }
@@ -77,6 +84,7 @@ impl SettingComponent {
             SettingComponent::ShortRest(component) => component.is_deselected(),
             SettingComponent::LongRest(component) => component.is_deselected(),
             SettingComponent::PomoCycle(component) => component.is_deselected(),
+            SettingComponent::FeedingDeadline(component) => component.is_deselected(),
             SettingComponent::Reset(component) => component.is_deselected(),
         }
     }
@@ -90,6 +98,7 @@ impl SettingComponent {
             SettingComponent::ShortRest(component) => component.reset(),
             SettingComponent::LongRest(component) => component.reset(),
             SettingComponent::PomoCycle(component) => component.reset(),
+            SettingComponent::FeedingDeadline(component) => component.reset(),
             SettingComponent::Reset(component) => component.reset(),
         }
     }

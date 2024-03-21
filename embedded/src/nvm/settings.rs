@@ -7,6 +7,8 @@ const DEFAULT_POMO_TIME: u8 = 25;
 const DEFAULT_SHORT_REST_TIME: u8 = 5;
 const DEFAULT_LONG_REST_TIME: u8 = 15;
 const DEFAULT_POMO_CYCLE: u8 = 4;
+const DEFAULT_PET_FEEDING_DEADLINE_HOUR: u8 = 22;
+const DEFAULT_PET_FEEDING_DEADLINE_MINUTE: u8 = 0;
 
 pub struct NvmSettings {
     pub system_data: [u8; 8],
@@ -30,8 +32,8 @@ impl Default for NvmSettings {
                 DEFAULT_SHORT_REST_TIME,
                 DEFAULT_LONG_REST_TIME,
                 DEFAULT_POMO_CYCLE,
-                NVM_BLANK,
-                NVM_BLANK,
+                DEFAULT_PET_FEEDING_DEADLINE_HOUR,
+                DEFAULT_PET_FEEDING_DEADLINE_MINUTE,
                 NVM_BLANK,
                 NVM_BLANK,
             ],
@@ -67,6 +69,8 @@ impl NvmSettings {
         unsafe { &mut crate::globals::SHORT_REST_TIME_SETTING }.value = self.pomo_data[1];
         unsafe { &mut crate::globals::LONG_REST_TIME_SETTING }.value = self.pomo_data[2];
         unsafe { &mut crate::globals::POMO_CYCLE_SETTING }.value = self.pomo_data[3];
+        unsafe { &mut crate::globals::FEEDING_DEADLINE_HOUR_SETTING }.value = self.pomo_data[4];
+        unsafe { &mut crate::globals::FEEDING_DEADLINE_MINUTE_SETTING }.value = self.pomo_data[5];
     }
 
     pub fn update_from_globals(&mut self) {
@@ -77,5 +81,7 @@ impl NvmSettings {
         self.pomo_data[1] = unsafe { &mut crate::globals::SHORT_REST_TIME_SETTING }.value;
         self.pomo_data[2] = unsafe { &mut crate::globals::LONG_REST_TIME_SETTING }.value;
         self.pomo_data[3] = unsafe { &mut crate::globals::POMO_CYCLE_SETTING }.value;
+        self.pomo_data[4] = unsafe { &mut crate::globals::FEEDING_DEADLINE_HOUR_SETTING }.value;
+        self.pomo_data[5] = unsafe { &mut crate::globals::FEEDING_DEADLINE_MINUTE_SETTING }.value;
     }
 }

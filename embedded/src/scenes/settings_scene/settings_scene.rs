@@ -30,26 +30,6 @@ pub struct SettingsScene {
 }
 impl Default for SettingsScene {
     fn default() -> Self {
-        let setting_components = [
-            SettingComponent::Brightness(
-                super::setting_components::BrightnessSettingComponent::default(),
-            ),
-            SettingComponent::Volume(super::setting_components::VolumeSettingComponent::default()),
-            SettingComponent::Time(super::setting_components::TimeSettingComponent::default()),
-            SettingComponent::PomoTime(
-                super::setting_components::PomoTimeSettingComponent::default(),
-            ),
-            SettingComponent::ShortRest(
-                super::setting_components::ShortRestSettingComponent::default(),
-            ),
-            SettingComponent::LongRest(
-                super::setting_components::LongRestSettingComponent::default(),
-            ),
-            SettingComponent::PomoCycle(
-                super::setting_components::PomoCycleSettingComponent::default(),
-            ),
-            SettingComponent::Reset(super::setting_components::ResetSettingComponent::default()),
-        ];
         Self {
             frame_count: 0,
             next_scene: None,
@@ -57,11 +37,33 @@ impl Default for SettingsScene {
             setting_selected: SettingSelected::None,
             setting_highlighted: SettingSelected::None,
             input_enabled: false,
-            setting_components,
+            setting_components: generate_setting_components(),
 
             scroll_offset: 0,
         }
     }
+}
+
+fn generate_setting_components() -> [SettingComponent; SettingSelected::MAX_VALUE as usize + 1] {
+    [
+        SettingComponent::Brightness(
+            super::setting_components::BrightnessSettingComponent::default(),
+        ),
+        SettingComponent::Volume(super::setting_components::VolumeSettingComponent::default()),
+        SettingComponent::Time(super::setting_components::TimeSettingComponent::default()),
+        SettingComponent::PomoTime(super::setting_components::PomoTimeSettingComponent::default()),
+        SettingComponent::ShortRest(
+            super::setting_components::ShortRestSettingComponent::default(),
+        ),
+        SettingComponent::LongRest(super::setting_components::LongRestSettingComponent::default()),
+        SettingComponent::PomoCycle(
+            super::setting_components::PomoCycleSettingComponent::default(),
+        ),
+        SettingComponent::FeedingDeadline(
+            super::setting_components::FeedingDeadlineSettingComponent::default(),
+        ),
+        SettingComponent::Reset(super::setting_components::ResetSettingComponent::default()),
+    ]
 }
 
 impl SceneBehavior for SettingsScene {

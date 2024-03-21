@@ -40,6 +40,16 @@ pub static mut VIBE_SETTING: Setting = Setting {
     min_value: 0,
     max_value: 1,
 };
+pub static mut FEEDING_DEADLINE_HOUR_SETTING: Setting = Setting {
+    value: 0,
+    min_value: 0,
+    max_value: 23,
+};
+pub static mut FEEDING_DEADLINE_MINUTE_SETTING: Setting = Setting {
+    value: 0,
+    min_value: 0,
+    max_value: 59,
+};
 
 pub static mut HARDWARE: Option<HardwareComponents> = None;
 pub fn init_hardware() {
