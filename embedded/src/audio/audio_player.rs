@@ -48,23 +48,28 @@ impl AudioPlayer {
         }
     }
 
-    #[allow(dead_code)]
     pub fn play(&mut self) {
         self.tracker = Some(0);
     }
 
-    #[allow(dead_code)]
     pub fn stop(&mut self) {
         self.tracker = None;
     }
 
-    #[allow(dead_code)]
     pub fn is_playing(&self) -> bool {
         self.tracker.is_some()
     }
 
     pub fn tick(&mut self) {
         if let Some(tracker) = self.tracker {
+            if tracker >= self.audio_track.source.len() {
+                if self.repeat {
+                    self.tracker = Some(0);
+                } else {
+                    self.tracker = None;
+                    return;
+                }
+            }
             let note = Freq::from_byte(
                 self.audio_track.source[tracker / self.audio_track.playback_rate as usize],
             );

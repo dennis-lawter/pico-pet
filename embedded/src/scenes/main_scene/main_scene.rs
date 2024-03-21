@@ -5,7 +5,6 @@ use crate::audio::audio_player::RepeatMode;
 use crate::display::sprite::Sprite;
 use crate::display::sprite_factory;
 use crate::display::sprite_factory::MENU_DIMENSIONS;
-use crate::hardware::audio::AudioFrequency;
 use crate::hardware::hardware::LCD_HEIGHT;
 use crate::hardware::input::KeyNames;
 use crate::scenes::SceneBehavior;
@@ -19,8 +18,8 @@ pub struct MainScene<'a> {
     frame_count: u32,
     next_scene: Option<SceneType>,
     menu_item_selected: MenuSelection,
-    menu_select_tone_timer: u8,
     ferris_cry: AudioPlayer,
+    button_beep: AudioPlayer,
 }
 impl Default for MainScene<'static> {
     fn default() -> Self {
@@ -37,8 +36,8 @@ impl Default for MainScene<'static> {
             frame_count: 0,
             next_scene: None,
             menu_item_selected: MenuSelection::Pomo,
-            menu_select_tone_timer: 0,
             ferris_cry: AudioPlayer::new(AudioId::FerrisCry, RepeatMode::Off, AutoPlayMode::Off),
+            button_beep: AudioPlayer::new(AudioId::ButtonBeep, RepeatMode::Off, AutoPlayMode::Off),
         }
     }
 }
@@ -54,14 +53,10 @@ impl SceneBehavior for MainScene<'static> {
 
     fn sound(&mut self) {
         self.ferris_cry.tick();
-        let hardware = crate::globals::get_hardware();
-        if self.menu_select_tone_timer > 0 {
-            self.menu_select_tone_timer -= 1;
-            hardware.start_tone(&AudioFrequency::Ds6);
-        } else {
-            if self.frame_count % 40 == 20 {
-                self.ferris_cry.play();
-            }
+        self.button_beep.tick();
+
+        if self.frame_count % 40 == 20 {
+            self.ferris_cry.play();
         }
     }
 
@@ -93,11 +88,11 @@ impl SceneBehavior for MainScene<'static> {
 
         if input.get_state(&KeyNames::Left).just_pressed {
             self.menu_item_selected = self.menu_item_selected.prev();
-            self.menu_select_tone_timer = 3;
+            self.button_beep.play();
         }
         if input.get_state(&KeyNames::Right).just_pressed {
             self.menu_item_selected = self.menu_item_selected.next();
-            self.menu_select_tone_timer = 3;
+            self.button_beep.play();
         }
 
         if input.get_state(&KeyNames::Confirm).just_released {

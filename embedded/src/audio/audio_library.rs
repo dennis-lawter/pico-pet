@@ -6,6 +6,7 @@ pub enum AudioId {
     FerrisCry,
     PomodoroFinished,
     BreakFinished,
+    ButtonBeep,
 }
 impl AudioId {
     pub fn get_track(&self) -> AudioTrack {
@@ -21,6 +22,9 @@ impl AudioId {
             }
             AudioId::BreakFinished => {
                 audio_track::AudioTrack::new(include_bytes!("../../sound_raw/break_finish.beat"))
+            }
+            AudioId::ButtonBeep => {
+                audio_track::AudioTrack::new(include_bytes!("../../sound_raw/button_beep.beat"))
             }
         }
     }

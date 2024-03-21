@@ -3,6 +3,35 @@ use std::collections::HashMap;
 use lazy_static::lazy_static;
 
 lazy_static! {
+    pub static ref TRANSLATION_LAYER: HashMap<&'static str, &'static str> = {
+        let mut m = HashMap::new();
+        m.insert("C#", "Cs");
+        m.insert("Db", "Cs");
+        m.insert("D#", "Ds");
+        m.insert("Eb", "Ds");
+        m.insert("F#", "Fs");
+        m.insert("Gb", "Fs");
+        m.insert("G#", "Gs");
+        m.insert("Ab", "Gs");
+        m.insert("A#", "As");
+        m.insert("Bb", "As");
+        m
+    };
+}
+
+pub fn translate(name: &str) -> String {
+    if name.len() <= 2 {
+        return name.to_string();
+    }
+    let (first_two_chars, remainder) = name.split_at(2);
+    let translated_name = TRANSLATION_LAYER.get(first_two_chars).copied();
+    match translated_name {
+        Some(translated_name) => translated_name.to_string() + remainder,
+        None => name.to_string(),
+    }
+}
+
+lazy_static! {
     pub static ref FREQ_TABLE: HashMap<&'static str, u8> = {
         let mut m = HashMap::new();
         m.insert("C4", 0x77);
@@ -48,5 +77,6 @@ lazy_static! {
 }
 
 pub fn get_freq(name: &str) -> Option<u8> {
-    FREQ_TABLE.get(name).copied()
+    let name = translate(name);
+    FREQ_TABLE.get(name.as_str()).copied()
 }

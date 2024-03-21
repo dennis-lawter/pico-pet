@@ -33,31 +33,28 @@ impl Track {
         writer.flush().expect("Could not write to file");
     }
     pub fn load_text(&mut self, text: &str) {
-        let lines: Vec<&str> = text.lines().collect();
-        assert!(lines.len() >= 5, "Not enough lines");
-        assert_eq!(lines[0], "PEAT 1", "Invalid header: PEAT version");
-        assert!(lines[1].starts_with("NPMD "), "Invalid header: NPMD value");
-        assert_eq!(
-            lines[2], "",
-            "Invalid header, expected empty line on line 3"
-        );
-        assert_eq!(
-            lines[4], "",
-            "Invalid header, expected empty line on line 5"
+        let (header, notes_string) = text
+            .split_once("\n\n")
+            .expect("Invalid track, no header divider");
+        let header_lines: Vec<&str> = header.lines().collect();
+        assert!(header_lines.len() == 3, "Not enough lines");
+        assert_eq!(header_lines[0], "PEAT 1", "Invalid header: PEAT version");
+        assert!(
+            header_lines[1].starts_with("NPMD "),
+            "Invalid header: NPMD value"
         );
 
-        self.notes.clear();
-
-        self.speed_divisor = lines[1]
+        self.speed_divisor = header_lines[1]
             .strip_prefix("NPMD ")
             .expect("Invalid header")
             .parse::<u8>()
             .expect("Invalid speed divisor");
 
         let mut previous_frequency: Option<u8> = None;
-        for line in lines.iter().skip(5) {
-            let line = *line;
-            let freq = match line {
+
+        let notes: Vec<_> = notes_string.split_whitespace().collect();
+        for note in notes {
+            let freq = match note {
                 "." => match previous_frequency {
                     Some(freq) => freq,
                     None => panic!("Sustain without prior note"),
