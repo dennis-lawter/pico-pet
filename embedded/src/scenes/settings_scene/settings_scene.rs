@@ -1,5 +1,7 @@
 use crate::audio::audio_library::AudioId;
 use crate::audio::audio_player::AudioPlayer;
+use crate::audio::audio_player::AutoPlayMode;
+use crate::audio::audio_player::RepeatMode;
 use crate::color::Rgb332;
 use crate::display::text_writer::FontStyle;
 use crate::display::text_writer::{self};
@@ -51,7 +53,7 @@ impl Default for SettingsScene {
         Self {
             frame_count: 0,
             next_scene: None,
-            song: AudioPlayer::new(AudioId::BallGame, true, true),
+            song: AudioPlayer::new(AudioId::BallGame, RepeatMode::On, AutoPlayMode::On),
             setting_selected: SettingSelected::None,
             setting_highlighted: SettingSelected::None,
             input_enabled: false,

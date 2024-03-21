@@ -3,6 +3,32 @@ use crate::hardware::audio::AudioFrequency as Freq;
 use super::audio_library::AudioId;
 use super::audio_track::AudioTrack;
 
+pub enum RepeatMode {
+    Off,
+    On,
+}
+impl Into<bool> for RepeatMode {
+    fn into(self) -> bool {
+        match self {
+            RepeatMode::Off => false,
+            RepeatMode::On => true,
+        }
+    }
+}
+
+pub enum AutoPlayMode {
+    Off,
+    On,
+}
+impl Into<bool> for AutoPlayMode {
+    fn into(self) -> bool {
+        match self {
+            AutoPlayMode::Off => false,
+            AutoPlayMode::On => true,
+        }
+    }
+}
+
 pub struct AudioPlayer {
     repeat: bool,
     tracker: Option<usize>,
@@ -10,10 +36,13 @@ pub struct AudioPlayer {
     audio_track: AudioTrack,
 }
 impl AudioPlayer {
-    pub fn new(audio_id: AudioId, repeat: bool, autoplay: bool) -> Self {
+    pub fn new(audio_id: AudioId, repeat: RepeatMode, autoplay: AutoPlayMode) -> Self {
         Self {
-            repeat,
-            tracker: if autoplay { Some(0) } else { None },
+            repeat : repeat.into(),
+            tracker: match autoplay {
+                AutoPlayMode::On => Some(0),
+                AutoPlayMode::Off => None,
+            },
             current_freq: Freq::None,
             audio_track: audio_id.get_track(),
         }

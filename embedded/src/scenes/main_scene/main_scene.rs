@@ -1,3 +1,7 @@
+use crate::audio::audio_library::AudioId;
+use crate::audio::audio_player::AudioPlayer;
+use crate::audio::audio_player::AutoPlayMode;
+use crate::audio::audio_player::RepeatMode;
 use crate::display::sprite::Sprite;
 use crate::display::sprite_factory;
 use crate::display::sprite_factory::MENU_DIMENSIONS;
@@ -16,6 +20,27 @@ pub struct MainScene<'a> {
     next_scene: Option<SceneType>,
     menu_item_selected: MenuSelection,
     menu_select_tone_timer: u8,
+    ferris_cry: AudioPlayer,
+}
+impl Default for MainScene<'static> {
+    fn default() -> Self {
+        let ferris = sprite_factory::new_ferris_sprite(
+            (128 - sprite_factory::FERRIS_DIMENSIONS.w as i32) / 2,
+            128 - 64,
+        );
+
+        let menu_sprite = sprite_factory::new_menu_sprite(0, 0);
+
+        Self {
+            ferris,
+            menu_sprite,
+            frame_count: 0,
+            next_scene: None,
+            menu_item_selected: MenuSelection::Pomo,
+            menu_select_tone_timer: 0,
+            ferris_cry: AudioPlayer::new(AudioId::FerrisCry, RepeatMode::Off, AutoPlayMode::Off),
+        }
+    }
 }
 impl SceneBehavior for MainScene<'static> {
     fn tick(&mut self) {
@@ -28,27 +53,19 @@ impl SceneBehavior for MainScene<'static> {
     }
 
     fn sound(&mut self) {
+        self.ferris_cry.tick();
         let hardware = crate::globals::get_hardware();
         if self.menu_select_tone_timer > 0 {
             self.menu_select_tone_timer -= 1;
             hardware.start_tone(&AudioFrequency::Ds6);
         } else {
-            if (self.frame_count / 20) % 2 == 1 {
-                if self.frame_count % 4 == 0 {
-                    hardware.start_tone(&AudioFrequency::C4);
-                } else if self.frame_count % 4 == 2 {
-                    hardware.start_tone(&AudioFrequency::A4);
-                } else {
-                    hardware.start_tone(&AudioFrequency::None);
-                }
-            } else {
-                hardware.end_tone();
+            if self.frame_count % 40 == 20 {
+                self.ferris_cry.play();
             }
         }
     }
 
     fn draw(&mut self) {
-        // render::flood(Rgb332::from_u8(0b000_000_01));
         self.ferris.draw(((self.frame_count / 20) % 2) as usize);
 
         let sel_item = self.menu_item_selected as usize;
@@ -102,26 +119,6 @@ impl MainScene<'static> {
             MenuSelection::Cosmetic => self.next_scene = Some(SceneType::Cosmetics),
             MenuSelection::Settings => self.next_scene = Some(SceneType::Settings),
             MenuSelection::None => {}
-        }
-    }
-}
-
-impl Default for MainScene<'static> {
-    fn default() -> Self {
-        let ferris = sprite_factory::new_ferris_sprite(
-            (128 - sprite_factory::FERRIS_DIMENSIONS.w as i32) / 2,
-            128 - 64,
-        );
-
-        let menu_sprite = sprite_factory::new_menu_sprite(0, 0);
-
-        Self {
-            ferris,
-            menu_sprite,
-            frame_count: 0,
-            next_scene: None,
-            menu_item_selected: MenuSelection::Pomo,
-            menu_select_tone_timer: 0,
         }
     }
 }
