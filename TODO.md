@@ -9,9 +9,6 @@ Done items should be removed from the list.
   - 24 hr clock setting
   - Store the `MainScene::menu_item_selected` as a static/global for reloading the scene
   - Feeding deadline setting (u8 hr u8 min)
-- Sound System
-  - Update all current audio players to the new system
-  - Possibly create a sound editor as a rust helper...
 - Idle Scene
   - Entered from the main scene
   - Setting to control time before idle
