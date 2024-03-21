@@ -38,7 +38,7 @@ pub fn new_ferris_sprite(x: i32, y: i32) -> Sprite<'static> {
         y,
         FERRIS_DIMENSIONS.w,
         FERRIS_DIMENSIONS.h,
-        include_bytes!("../../sprite_raw/ferris.data"),
+        include_bytes!("../../sprite_raw/ferris.png.data"),
     )
 }
 
@@ -48,7 +48,7 @@ pub fn new_menu_sprite(x: i32, y: i32) -> Sprite<'static> {
         y,
         MENU_DIMENSIONS.w,
         MENU_DIMENSIONS.h,
-        include_bytes!("../../sprite_raw/menu.data"),
+        include_bytes!("../../sprite_raw/menu.png.data"),
     )
 }
 
@@ -58,7 +58,7 @@ pub fn new_pomo_menu_sprite(x: i32, y: i32) -> Sprite<'static> {
         y,
         POMO_MENU_DIMENSIONS.w,
         POMO_MENU_DIMENSIONS.h,
-        include_bytes!("../../sprite_raw/pomo_menu.data"),
+        include_bytes!("../../sprite_raw/pomo_menu.png.data"),
     )
 }
 
@@ -68,7 +68,7 @@ pub fn new_inventory_sprite(x: i32, y: i32) -> Sprite<'static> {
         y,
         INVENTORY_DIMENSIONS.w,
         INVENTORY_DIMENSIONS.h,
-        include_bytes!("../../sprite_raw/inventory.data"),
+        include_bytes!("../../sprite_raw/inventory.png.data"),
     )
 }
 
@@ -78,6 +78,6 @@ pub fn new_lofi_sprite(x: i32, y: i32) -> Sprite<'static> {
         y,
         LOFI_DIMENSIONS.w,
         LOFI_DIMENSIONS.h,
-        include_bytes!("../../sprite_raw/lofi.data"),
+        include_bytes!("../../sprite_raw/lofi.png.data"),
     )
 }
