@@ -41,6 +41,10 @@ impl SceneManager<'static> {
         let curr_scene = self.get_scene();
         match curr_scene.next_scene().clone() {
             Some(next_scene) => {
+                {
+                    let hardware = crate::globals::get_hardware();
+                    hardware.start_tone(&crate::hardware::audio::AudioFrequency::None);
+                }
                 self.active_scene = next_scene.clone();
                 self.game_play_scene = None;
                 self.pomo_scene = None;
