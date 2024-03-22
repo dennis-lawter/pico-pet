@@ -1,11 +1,13 @@
 pub mod header;
 pub mod inventory;
 pub mod page_canon;
+mod pet;
 pub mod settings;
 
 pub use self::header::NvmHeader;
 use self::inventory::NvmInventory;
 use self::page_canon::PageCanon;
+pub use self::pet::NvmPet;
 pub use self::settings::NvmSettings;
 
 pub const NVM_BLANK: u8 = 0xff;
@@ -14,6 +16,7 @@ pub struct Nvm {
     pub parity: NvmHeader,
     pub settings: NvmSettings,
     pub inventory: NvmInventory,
+    pub pet: NvmPet,
 }
 impl Default for Nvm {
     fn default() -> Self {
@@ -21,6 +24,7 @@ impl Default for Nvm {
             parity: NvmHeader::default(),
             settings: NvmSettings::default(),
             inventory: NvmInventory::default(),
+            pet: NvmPet::default(),
         }
     }
 }
@@ -32,6 +36,7 @@ impl Nvm {
                     parity,
                     settings: NvmSettings::load(),
                     inventory: NvmInventory::load(),
+                    pet: NvmPet::load(),
                 };
 
                 new_nvm.settings.apply_to_globals();
@@ -54,6 +59,7 @@ impl Nvm {
         self.parity.write();
         self.settings.write();
         self.inventory.write();
+        self.pet.write();
     }
 
     pub fn erase_all_then_reboot(&mut self) {

@@ -69,15 +69,17 @@ Pages are addressed from hexidecimal 0x000 to 0x1ff.
 
 
 |  | **Inventory** |
-| --- | --- |
-| 0 | Tomatoes |
-| 1 | Raspberries |
-| 2 | Lower byte of juice value |
-| 3 | Higher byte of juice value |
-| 4 |  |
-| 5 |  |
-| 6 |  |
-| 7 |  |
+| --- | --- | min | max |
+| 0 | Tomatoes | 0 | 99 |
+| 1 | Raspberries | 0 | 9 |
+| 2 | Lower byte of juice value |  |  |
+| 3 | Higher byte of juice value |  |  |
+| 4 |  |  |  |
+| 5 |  |  |  |
+| 6 |  |  |  |
+| 7 |  |  |  |
+
+Max juice is 9999ml as a u16
 
 |  | **Pet Page 1** |
 | --- | --- |
@@ -90,7 +92,6 @@ Pages are addressed from hexidecimal 0x000 to 0x1ff.
 | 6 |  |
 | 7 |  |
 
-Max HP = Daily Hunger + 4
 |  | **Pet Page 2** |
 | --- | --- |
 | 0 | Current HP |
@@ -98,9 +99,15 @@ Max HP = Daily Hunger + 4
 | 2 | Daily Hunger |
 | 3 | Last Fed Day |
 | 4 | Last Fed Month |
-| 5 |  |
+| 5 | Last Fed Year |
 | 6 |  |
 | 7 |  |
+
+Max HP = Daily Hunger + 4
+
+Last Fed Year is probably excessive,
+but it'd be a weird bug if someone started the pet up after exactly 1 year,
+and their pet showed no signs of missed days of hunger...
 
 ## Pin Out
 

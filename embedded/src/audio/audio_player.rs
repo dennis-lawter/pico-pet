@@ -52,6 +52,8 @@ impl AudioPlayer {
         self.tracker = Some(0);
     }
 
+    // TODO (Release): remove if unused
+    #[allow(dead_code)]
     pub fn stop(&mut self) {
         self.tracker = None;
     }

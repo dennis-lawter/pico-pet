@@ -13,14 +13,14 @@ impl Default for NvmInventory {
     fn default() -> Self {
         Self {
             data: [
-                DEFAULT_TOMATOES,    //
-                DEFAULT_RASPBERRIES, //
-                DEFAULT_JUICE_LOWER, //
-                DEFAULT_JUICE_UPPER, //
-                NVM_BLANK,           //
-                NVM_BLANK,           //
-                NVM_BLANK,           //
-                NVM_BLANK,           //
+                DEFAULT_TOMATOES,
+                DEFAULT_RASPBERRIES,
+                DEFAULT_JUICE_LOWER,
+                DEFAULT_JUICE_UPPER,
+                NVM_BLANK,
+                NVM_BLANK,
+                NVM_BLANK,
+                NVM_BLANK,
             ],
         }
     }
@@ -35,8 +35,6 @@ impl NvmInventory {
 
     pub fn write(&mut self) {
         let hardware = crate::globals::get_hardware();
-
-        // self.update_from_globals();
 
         hardware.write_nvm_page(PageCanon::Inventory1.into(), &self.data);
     }
@@ -54,12 +52,6 @@ impl NvmInventory {
         self.data[2] = (juice >> 8) as u8;
         self.data[3] = juice as u8;
     }
-    // pub fn set_tomatoes(&mut self, tomatoes: u8) {
-    //     self.data[0] = tomatoes;
-    // }
-    // pub fn set_raspberries(&mut self, raspberries: u8) {
-    //     self.data[1] = raspberries;
-    // }
 
     pub fn inc_tomatoes(&mut self) {
         self.data[0] += 1;

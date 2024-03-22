@@ -7,8 +7,8 @@ pub enum PageCanon {
 
     Inventory1 = 0x003,
 
-    _Pet = 0x004,
-    _Pet2 = 0x005,
+    Pet1 = 0x004,
+    Pet2 = 0x005,
 
     PagesInUse,
 }
