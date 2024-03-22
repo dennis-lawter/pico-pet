@@ -68,8 +68,8 @@ Pages are addressed from hexidecimal 0x000 to 0x1ff.
 | 7 |  |  |  |
 
 
-|  | **Inventory** |
-| --- | --- | min | max |
+|  | **Inventory** | min | max |
+| --- | --- | --- | --- |
 | 0 | Tomatoes | 0 | 99 |
 | 1 | Raspberries | 0 | 9 |
 | 2 | Lower byte of juice value |  |  |
