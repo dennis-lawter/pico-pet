@@ -4,10 +4,16 @@ This list is not final. It will grow and evolve.
 
 Done items should be removed from the list.
 
+- Bugs
+  - 00:30 displays as "00:30PM"; test and verify every hour.
+  - Don't allow player to gain tomatoes, raspberries, or juice when at max.
 - Misc
   - Vibe setting
   - 24 hr clock setting
+  - Date setting
   - Store the `MainScene::menu_item_selected` as a static/global for reloading the scene
+  - Handle AM/PM hour and AM/PM text from RTC struct.
+  - Handle AM/PM displays better (settings menu)
 - Idle Scene
   - Entered from the main scene
   - Setting to control time before idle
@@ -50,14 +56,13 @@ Just ideas, not committed to them
 - Start
   - Pet starts the game with 5 HP.
   - Pet starts the game with 5 Max HP.
-  - Pet starts the game with the "time to feed" timer at 30h.
   - Pet starts the game with a renewing hunger of 1.
 - Feeding
   - Entering the feeding scene, player can commit to feeding.
   - All tomatoes up to the hunger are consumed.
   - If hunger remains, pet consumes 6 juice per tomato of hunger missing.
   - Every leftover tomato becomes 5 juice.
-  - A timestamp is saved signaling the next feeding time for 30 hours from now.
+  - Feeding must be done by the configured "eating deadline"; and a date is saved from teh last feeding.
   - Failing to eat enough causes the pet to lose 1 HP per tomato of hunger remaining.
   - Eating enough tomatoes with no juice consumed regains 1 HP.
 - Pet leveling

@@ -28,7 +28,7 @@ impl Default for NvmInventory {
 impl NvmInventory {
     pub fn load() -> Self {
         let hardware = crate::globals::get_hardware();
-        let data = hardware.get_nvm_page(PageCanon::Inventory.into());
+        let data = hardware.get_nvm_page(PageCanon::Inventory1.into());
 
         Self { data }
     }
@@ -38,7 +38,7 @@ impl NvmInventory {
 
         // self.update_from_globals();
 
-        hardware.write_nvm_page(PageCanon::Inventory.into(), &self.data);
+        hardware.write_nvm_page(PageCanon::Inventory1.into(), &self.data);
     }
 
     pub fn get_tomatoes(&self) -> u8 {

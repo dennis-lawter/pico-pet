@@ -43,9 +43,9 @@ impl Default for NvmSettings {
 impl NvmSettings {
     pub fn load() -> Self {
         let hardware = crate::globals::get_hardware();
-        let system_data = hardware.get_nvm_page(PageCanon::Settings as u16);
+        let system_data = hardware.get_nvm_page(PageCanon::Settings1 as u16);
 
-        let pomo_data = hardware.get_nvm_page(PageCanon::Settings as u16 + 1);
+        let pomo_data = hardware.get_nvm_page(PageCanon::Settings2 as u16);
         Self {
             system_data,
             pomo_data,
@@ -57,8 +57,8 @@ impl NvmSettings {
 
         self.update_from_globals();
 
-        hardware.write_nvm_page(PageCanon::Settings as u16, &self.system_data);
-        hardware.write_nvm_page(PageCanon::Settings as u16 + 1, &self.pomo_data);
+        hardware.write_nvm_page(PageCanon::Settings1 as u16, &self.system_data);
+        hardware.write_nvm_page(PageCanon::Settings2 as u16, &self.pomo_data);
     }
 
     pub fn apply_to_globals(&self) {

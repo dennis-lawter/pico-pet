@@ -31,6 +31,7 @@ Pages are addressed from hexidecimal 0x000 to 0x1ff.
 | 000 | 000 | Header |
 | 001 | 002 | Settings |
 | 003 | 003 | Inventory |
+| 004 | 005 | Pet |
 
 *note: If the NVM becomes corrupted, try changing the const `NVM_SENTINEL` to force a header guard check failure. This will factory reset the device, and all data will be lost.*
 |  | **Header** |
@@ -74,6 +75,29 @@ Pages are addressed from hexidecimal 0x000 to 0x1ff.
 | 2 | Lower byte of juice value |
 | 3 | Higher byte of juice value |
 | 4 |  |
+| 5 |  |
+| 6 |  |
+| 7 |  |
+
+|  | **Pet Page 1** |
+| --- | --- |
+| 0 | Birth Day |
+| 1 | Birth Month |
+| 2 | Birth Year |
+| 3 |  |
+| 4 |  |
+| 5 |  |
+| 6 |  |
+| 7 |  |
+
+Max HP = Daily Hunger + 4
+|  | **Pet Page 2** |
+| --- | --- |
+| 0 | Current HP |
+| 1 | Sickness |
+| 2 | Daily Hunger |
+| 3 | Last Fed Day |
+| 4 | Last Fed Month |
 | 5 |  |
 | 6 |  |
 | 7 |  |

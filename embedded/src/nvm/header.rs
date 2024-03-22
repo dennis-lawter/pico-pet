@@ -25,7 +25,7 @@ impl Default for NvmHeader {
 impl NvmHeader {
     pub fn try_load() -> Option<Self> {
         let hardware = crate::globals::get_hardware();
-        let data = hardware.get_nvm_page(PageCanon::Header.into());
+        let data = hardware.get_nvm_page(PageCanon::Header1.into());
         if data[0] == NVM_SENTINEL {
             Some(Self { data })
         } else {
@@ -35,6 +35,6 @@ impl NvmHeader {
 
     pub fn write(&self) {
         let hardware = crate::globals::get_hardware();
-        hardware.write_nvm_page(PageCanon::Header.into(), &self.data);
+        hardware.write_nvm_page(PageCanon::Header1.into(), &self.data);
     }
 }

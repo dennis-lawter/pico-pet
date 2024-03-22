@@ -1,7 +1,14 @@
+#[repr(u16)]
 pub enum PageCanon {
-    Header = 0x000,
-    Settings = 0x001,
-    Inventory = 0x003,
+    Header1 = 0x000,
+
+    Settings1 = 0x001,
+    Settings2 = 0x002,
+
+    Inventory1 = 0x003,
+
+    _Pet = 0x004,
+    _Pet2 = 0x005,
 
     PagesInUse,
 }
