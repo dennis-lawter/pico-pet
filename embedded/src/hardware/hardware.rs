@@ -115,9 +115,6 @@ impl HardwareComponents {
             // Configure LCD PWM slice
             let pwm6 = &mut pwm_slices.pwm6;
             pwm6.set_ph_correct();
-            // these numbers are around 55hz, aka the note A1
-            // pwm6.set_div_int(255);
-            // pwm6.set_top(4456);
             pwm6.set_top(65535);
             pwm6.set_div_int(1);
             pwm6.set_div_frac(0);
@@ -200,15 +197,11 @@ impl HardwareComponents {
 
             let sda_pin = pins.gpio0.into_mode::<hal::gpio::FunctionI2C>();
             let scl_pin = pins.gpio1.into_mode::<hal::gpio::FunctionI2C>();
-            // let not_an_scl_pin = pins.gpio20.into_function::<hal::gpio::FunctionI2C>();
 
-            // Create the I²C drive, using the two pre-configured pins. This will fail
-            // at compile time if the pins are in the wrong mode, or if this I²C
-            // peripheral isn't available on these pins!
             let i2c_bus: I2CBus = hal::I2C::i2c0(
                 pac.I2C0,
                 sda_pin,
-                scl_pin, // Try `not_an_scl_pin` here
+                scl_pin,
                 400.kHz(),
                 &mut pac.RESETS,
                 &clocks.system_clock,
