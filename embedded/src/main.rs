@@ -1,6 +1,7 @@
 #![no_std]
 #![no_main]
 #![feature(iter_advance_by)]
+#![deny(warnings)]
 
 extern crate cortex_m;
 extern crate cortex_m_rt;
@@ -18,6 +19,7 @@ mod audio;
 mod color;
 mod cores;
 mod display;
+mod display_helper;
 mod exit;
 mod globals;
 mod hardware;
