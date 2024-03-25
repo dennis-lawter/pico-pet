@@ -5,15 +5,13 @@ This list is not final. It will grow and evolve.
 Done items should be removed from the list.
 
 - Bugs
-  - 00:30 displays as "00:30PM"; test and verify every hour.
   - Don't allow player to gain tomatoes, raspberries, or juice when at max.
 - Misc
   - Vibe setting
   - 24 hr clock setting
   - Date setting
   - Store the `MainScene::menu_item_selected` as a static/global for reloading the scene
-  - Handle AM/PM hour and AM/PM text from RTC struct.
-  - Handle AM/PM displays better (settings menu)
+  - Handle AM/PM time adjustment in settings scene
 - Idle Scene
   - Entered from the main scene
   - Setting to control time before idle
