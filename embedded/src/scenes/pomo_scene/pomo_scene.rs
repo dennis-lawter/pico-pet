@@ -26,6 +26,8 @@ pub struct PomoScene<'a> {
     timer: PomoTimer,
     pomo_finished_track: AudioPlayer,
     break_finished_track: AudioPlayer,
+    countdown_321_track: AudioPlayer,
+    countdown_go_track: AudioPlayer,
     frame_count: usize,
 }
 impl Default for PomoScene<'static> {
@@ -42,6 +44,16 @@ impl Default for PomoScene<'static> {
             ),
             break_finished_track: AudioPlayer::new(
                 AudioId::BreakFinished,
+                RepeatMode::Off,
+                AutoPlayMode::Off,
+            ),
+            countdown_321_track: AudioPlayer::new(
+                AudioId::Countdown321,
+                RepeatMode::Off,
+                AutoPlayMode::Off,
+            ),
+            countdown_go_track: AudioPlayer::new(
+                AudioId::CountdownGo,
                 RepeatMode::Off,
                 AutoPlayMode::Off,
             ),
@@ -92,7 +104,8 @@ impl SceneBehavior for PomoScene<'_> {
         }
         let input = crate::globals::get_input();
         if input.get_state(&KeyNames::Clock).just_pressed {
-            self.timer.timer_interrupt();
+            self.timer
+                .timer_interrupt(&mut self.countdown_321_track, &mut self.countdown_go_track);
         }
         match self.timer.pop_event() {
             TimerEvent::Paused => {}
@@ -121,6 +134,8 @@ impl SceneBehavior for PomoScene<'_> {
         let hardware = crate::globals::get_hardware();
         self.pomo_finished_track.tick();
         self.break_finished_track.tick();
+        self.countdown_321_track.tick();
+        self.countdown_go_track.tick();
         if self.is_playing_alert() {
             hardware.start_vibrating();
         } else {

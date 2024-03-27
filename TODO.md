@@ -10,6 +10,7 @@ Done items should be removed from the list.
   - Vibe setting
   - 24 hr clock setting
   - Date setting
+  - Idle setting
   - Store the `MainScene::menu_item_selected` as a static/global for reloading the scene
   - Handle AM/PM time adjustment in settings scene
 - Idle Scene

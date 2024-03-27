@@ -3,9 +3,14 @@ use super::audio_track::{self};
 
 pub enum AudioId {
     BallGame,
+
     FerrisCry,
+
     PomodoroFinished,
     BreakFinished,
+    Countdown321,
+    CountdownGo,
+
     ButtonBeep,
 }
 impl AudioId {
@@ -17,12 +22,20 @@ impl AudioId {
             AudioId::FerrisCry => {
                 audio_track::AudioTrack::new(include_bytes!("../../sound_raw/ferris_cry.beat"))
             }
+
             AudioId::PomodoroFinished => {
                 audio_track::AudioTrack::new(include_bytes!("../../sound_raw/pomodoro_finish.beat"))
             }
             AudioId::BreakFinished => {
                 audio_track::AudioTrack::new(include_bytes!("../../sound_raw/break_finish.beat"))
             }
+            AudioId::Countdown321 => {
+                audio_track::AudioTrack::new(include_bytes!("../../sound_raw/countdown_321.beat"))
+            }
+            AudioId::CountdownGo => {
+                audio_track::AudioTrack::new(include_bytes!("../../sound_raw/countdown_go.beat"))
+            }
+
             AudioId::ButtonBeep => {
                 audio_track::AudioTrack::new(include_bytes!("../../sound_raw/button_beep.beat"))
             }

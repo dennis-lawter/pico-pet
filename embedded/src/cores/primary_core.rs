@@ -14,6 +14,9 @@ use crate::scenes::SceneType;
 
 use super::scene_manager::SceneManager;
 
+const APPROX_FRAMES_PER_SECOND: usize = 21;
+const SECONDS_UNTIL_IDLE: usize = 60 * APPROX_FRAMES_PER_SECOND;
+
 pub fn primary_main_loop() -> ! {
     let mut scene_manager = SceneManager::default();
     scene_manager.game_play_scene = Some(MainScene::default());
@@ -25,7 +28,16 @@ pub fn primary_main_loop() -> ! {
     // Black fails to initialize the display
     render::flood(Rgb332::DARKEST_BLUE);
     swap();
+
     loop {
+        // Disable the timer during the pomo scene
+        match scene_manager.active_scene {
+            SceneType::Pomo => {
+                idle_frame_counter = 0;
+            }
+            _ => {}
+        }
+
         let input = crate::globals::get_input();
         let hardware = crate::globals::get_hardware();
 
@@ -33,7 +45,7 @@ pub fn primary_main_loop() -> ! {
             || hardware.key1_pressed()
             || hardware.key2_pressed()
             || hardware.key3_pressed();
-        if idle_frame_counter >= 60 {
+        if idle_frame_counter >= SECONDS_UNTIL_IDLE {
             input.force_reset();
             if any_key_pressed {
                 // next frame will return from idle state

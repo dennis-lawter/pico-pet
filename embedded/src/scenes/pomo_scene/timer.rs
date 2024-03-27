@@ -1,5 +1,6 @@
 use fixedstr::str_format;
 
+use crate::audio::audio_player::AudioPlayer;
 use crate::color::Rgb332;
 
 use super::pomo_scene::PomoMenuFrame;
@@ -27,7 +28,7 @@ pub enum TimerEvent {
     None,
 }
 
-const PRE_TIMER_WAIT: u16 = 3;
+const PRE_TIMER_WAIT: u16 = 5;
 
 pub struct PomoTimer {
     pub phase: PomoPhase,
@@ -186,11 +187,21 @@ impl PomoTimer {
         }
     }
 
-    pub fn timer_interrupt(&mut self) {
+    pub fn timer_interrupt(
+        &mut self,
+        countdown_321_track: &mut AudioPlayer,
+        countdown_go_track: &mut AudioPlayer,
+    ) {
         match self.timer_status {
             TimerStatus::Stopped | TimerStatus::Paused => {}
             TimerStatus::Running => {
-                if self.pre_timer > 0 {
+                if self.pre_timer > 2 {
+                    self.pre_timer -= 1;
+                    countdown_321_track.play();
+                } else if self.pre_timer == 2 {
+                    self.pre_timer -= 1;
+                    countdown_go_track.play();
+                } else if self.pre_timer == 1 {
                     self.pre_timer -= 1;
                 } else if self.timer > 0 {
                     self.decrement_timer();
@@ -252,12 +263,16 @@ impl PomoTimer {
         }
     }
 
-    pub(crate) fn get_timer_text_and_color(&self) -> (fixedstr::str16, Rgb332) {
+    pub fn get_timer_text_and_color(&self) -> (fixedstr::str16, Rgb332) {
         let mut color = Rgb332::BLUE;
         let text = match self.timer_status {
             TimerStatus::Running => {
-                if self.pre_timer > 0 {
-                    str_format!(fixedstr::str16, "{}...", self.pre_timer)
+                if self.pre_timer == PRE_TIMER_WAIT {
+                    fixedstr::str16::from("") // Synchronizing with 1hz clock
+                } else if self.pre_timer > 1 {
+                    str_format!(fixedstr::str16, "{}...", self.pre_timer - 1)
+                } else if self.pre_timer == 1 {
+                    fixedstr::str16::from("GO!!")
                 } else {
                     str_format!(
                         fixedstr::str16,
@@ -290,74 +305,4 @@ impl PomoTimer {
             PomoPhase::LongBreak => TimerEvent::LongBreakFinished,
         }
     }
-
-    /*
-    match self.timer.timer_status {
-                TimerStatus::Running => {
-                    match self.timer.phase {
-                        PomoPhase::Pomodoro => text_writer::bottom_dialog_box(&str_format!(
-                            fixedstr::str24,
-                            "Pomodoro #{}",
-                            self.cycles_elapsed + 1
-                        )),
-                        PomoPhase::ShortBreak => text_writer::bottom_dialog_box(&str_format!(
-                            fixedstr::str24,
-                            "Short Break #{}",
-                            self.cycles_elapsed + 1
-                        )),
-                        PomoPhase::LongBreak => text_writer::bottom_dialog_box("Long Break"),
-                    }
-                    if self.pre_timer > 0 {
-                        text_writer::bottom_big_dialog_box(&str_format!(
-                            fixedstr::str16,
-                            "{}...",
-                            self.pre_timer
-                        ))
-                    } else if self.timer > 0 {
-                        let time_left = self.timer;
-                        text_writer::bottom_big_dialog_box(&str_format!(
-                            fixedstr::str16,
-                            "{:02}:{:02}",
-                            time_left / 60,
-                            time_left % 60,
-                        ));
-                    } else {
-                        text_writer::bottom_big_dialog_box("FINISHED");
-                    }
-                    frame = 1;
-                }
-                TimerStatus::Paused => {
-                    text_writer::bottom_dialog_box("...Paused...");
-                    frame = 0
-                }
-                TimerStatus::Stopped => {
-                    if self.phase_complete {
-                        match self.phase {
-                            PomoPhase::Pomodoro => text_writer::bottom_dialog_box("Ready for a break?"),
-                            PomoPhase::ShortBreak => {
-                                text_writer::bottom_dialog_box("Let's get back to work!")
-                            }
-                            PomoPhase::LongBreak => {
-                                text_writer::bottom_dialog_box("Refreshing! Again?")
-                            }
-                        }
-                    } else {
-                        match self.phase {
-                            PomoPhase::Pomodoro => {
-                                if self.cycles_elapsed == 0 {
-                                    text_writer::bottom_dialog_box("Let's get to work!")
-                                } else {
-                                    text_writer::bottom_dialog_box("Let's get back to work!")
-                                }
-                            }
-                            PomoPhase::ShortBreak | PomoPhase::LongBreak => {
-                                text_writer::bottom_dialog_box("Ready for a break?")
-                            }
-                        }
-                    }
-
-                    0
-                }
-            };
-         */
 }
