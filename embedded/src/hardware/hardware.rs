@@ -35,6 +35,12 @@ use super::rtc::RealTime;
 pub const LCD_WIDTH: usize = 128;
 pub const LCD_HEIGHT: usize = 128;
 
+pub const BRIGHTNESS_LUT: [u16; 16] = [
+    306, 438, 626, 895, 1281, 1831, 2619, 3746, 5357, 7660, 10955, 15667, 22406, 32043, 45825,
+    65535,
+];
+pub const VOLUME_LUT: [u16; 6] = [0, 32768 / 256, 32768 / 128, 32768 / 64, 32768 / 32, 32768];
+
 type DisplaySdi = hal::Spi<hal::spi::Enabled, pac::SPI1, 8>;
 type DisplayDc = hal::gpio::Pin<hal::gpio::bank0::Gpio8, hal::gpio::Output<hal::gpio::PushPull>>;
 type DisplayRst = hal::gpio::Pin<hal::gpio::bank0::Gpio12, hal::gpio::Output<hal::gpio::PushPull>>;
@@ -254,18 +260,15 @@ impl HardwareComponents {
         self.second_clock.is_low().unwrap()
     }
 
-    const BRIGHTNESS_LUT: [u16; 16] = [
-        306, 438, 626, 895, 1281, 1831, 2619, 3746, 5357, 7660, 10955, 15667, 22406, 32043, 45825,
-        65535,
-    ];
-
-    pub fn set_backlight(&mut self) {
+    pub fn set_backlight_from_lut(&mut self) {
         let brightness = unsafe { &globals::BRIGHTNESS_SETTING };
-        let effective_brightness = Self::BRIGHTNESS_LUT[brightness.get_value() as usize];
-        unsafe { (*self.backlight_channel_ptr).set_duty(effective_brightness) }
+        let effective_brightness = BRIGHTNESS_LUT[brightness.get_value() as usize];
+        self.set_backlight_raw(effective_brightness);
     }
 
-    const VOLUME_LUT: [u16; 6] = [0, 32768 / 256, 32768 / 128, 32768 / 64, 32768 / 32, 32768];
+    pub fn set_backlight_raw(&mut self, brightness_value: u16) {
+        unsafe { (*self.backlight_channel_ptr).set_duty(brightness_value) }
+    }
 
     pub fn start_tone(&mut self, tone: &AudioFrequency) {
         let volume = unsafe { &globals::VOLUME_SETTING };
@@ -278,7 +281,7 @@ impl HardwareComponents {
         let effective_volume = if tone == &AudioFrequency::None {
             0
         } else {
-            Self::VOLUME_LUT[volume.get_value() as usize]
+            VOLUME_LUT[volume.get_value() as usize]
         };
         unsafe {
             (*self.buzzer_pwm_slice_ptr).set_top(tone_settings.0);

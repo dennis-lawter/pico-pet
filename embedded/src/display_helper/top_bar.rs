@@ -36,11 +36,10 @@ fn draw_top_bar_alert() {
 fn draw_top_bar_clock() {
     let hardware = crate::globals::get_hardware();
     let time = hardware.get_time();
-    let hr = time.get_meridian_hour();
-    let meridian = time.get_meridian().to_cap_str2();
-    let time_str = str_format!(fixedstr::str8, "{:>2}:{:02}{}", hr, time.min, meridian);
+    let time_str = time.hh_mm_str();
     let x = LCD_WIDTH as i32 - FontStyle::Small.get_glyph_dimensions().0 as i32 * (5 + 2);
-    text_writer::draw_text(x, 0, FontStyle::Small, Rgb332::WHITE, time_str.as_str());
+
+    text_writer::draw_text(x, 0, FontStyle::Small, Rgb332::WHITE, &time_str);
 }
 
 fn draw_top_bar_inventory(offset: i32) {

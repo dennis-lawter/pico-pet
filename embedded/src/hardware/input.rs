@@ -62,6 +62,13 @@ impl InputHandler {
         }
     }
 
+    pub fn force_reset(&mut self) {
+        for i in 0..self.keys.len() {
+            self.keys[i].update(false);
+            self.keys[i].update(false);
+        }
+    }
+
     pub fn get_state(&self, name: &KeyNames) -> &KeyState {
         &self.keys[name.clone() as usize]
     }

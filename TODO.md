@@ -13,10 +13,7 @@ Done items should be removed from the list.
   - Store the `MainScene::menu_item_selected` as a static/global for reloading the scene
   - Handle AM/PM time adjustment in settings scene
 - Idle Scene
-  - Entered from the main scene
-  - Setting to control time before idle
-  - Attempt to insert a deep sleep cycle for 5 seconds if possible
-  - Displays time, with backlight fully off
+  - Bugs and improvements listed in comments
 - Intro Scene
   - Only loaded if NVM is not initialized properly and must be reset
   - Remove the current code which checks for invalid NVM then autowrites default

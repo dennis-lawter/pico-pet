@@ -1,12 +1,14 @@
+use fixedstr::str_format;
+
 pub enum Meridian {
     Am,
     Pm,
 }
 impl Meridian {
-    pub fn to_cap_str2(&self) -> fixedstr::str4 {
+    pub fn to_cap_str2(&self) -> &str {
         match self {
-            Self::Am => fixedstr::str4::from("AM"),
-            Self::Pm => fixedstr::str4::from("PM"),
+            Self::Am => "AM",
+            Self::Pm => "PM",
         }
     }
 }
@@ -42,5 +44,11 @@ impl RealTime {
         } else {
             Meridian::Pm
         }
+    }
+    pub fn hh_mm_str(&self) -> fixedstr::str8 {
+        let hr = self.get_meridian_hour();
+        let meridian = self.get_meridian();
+        let meridian_str = meridian.to_cap_str2();
+        str_format!(fixedstr::str8, "{:>2}:{:02}{}", hr, self.min, meridian_str)
     }
 }
