@@ -25,6 +25,13 @@ Done items should be removed from the list.
     - Possibly describe how they each work (why must we have a clock?)
   - Finalize by saving to NVM and pet greeting scene
   - Remove the current code which checks for invalid NVM then autowrites
+- Stats Scene
+  - Displays information about the pet:
+    - Birthday
+    - Age
+    - Current and max HP
+    - Current daily hunger
+    - Illness if applicable
 - Eating Scene
   - Opening the scene after eating today says the pet cannot eat again.
   - Upon opening the eating scene present pet's hunger
