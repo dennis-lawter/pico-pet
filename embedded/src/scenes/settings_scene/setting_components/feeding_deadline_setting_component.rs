@@ -3,25 +3,34 @@ use fixedstr::str_format;
 use crate::color::Rgb332;
 use crate::display::text_writer;
 use crate::display::text_writer::FontStyle;
-use crate::globals;
 use crate::hardware::hardware::LCD_WIDTH;
 use crate::hardware::input::KeyNames;
-use crate::hardware::rtc::RealTime;
+use crate::nvm::settings::SettingType;
+use crate::setting_value::Setting;
 
 use super::SettingComponentTrait;
 
 pub struct FeedingDeadlineSettingComponent {
-    pub time: RealTime,
+    pub initial_hr_setting: u8,
+    pub hr_setting: Setting,
+    pub initial_min_setting: u8,
+    pub min_setting: Setting,
     pub new_time_selection: u8,
     pub will_be_deselected: bool,
 }
 
 impl Default for FeedingDeadlineSettingComponent {
     fn default() -> Self {
-        let hr = unsafe { &globals::FEEDING_DEADLINE_HOUR_SETTING }.get_value();
-        let min = unsafe { &globals::FEEDING_DEADLINE_MINUTE_SETTING }.get_value();
+        let nvm = crate::globals::get_nvm();
+        let hr_setting = nvm.settings.get_setting(SettingType::FeedingDeadlineHour);
+        let initial_hr_setting = hr_setting.get_value();
+        let min_setting = nvm.settings.get_setting(SettingType::FeedingDeadlineMinute);
+        let initial_min_setting = min_setting.get_value();
         Self {
-            time: RealTime::new(hr, min, 0),
+            initial_hr_setting,
+            hr_setting,
+            initial_min_setting,
+            min_setting,
             new_time_selection: 0,
             will_be_deselected: false,
         }
@@ -43,8 +52,8 @@ impl SettingComponentTrait for FeedingDeadlineSettingComponent {
                     let time_str = str_format!(
                         fixedstr::str16,
                         "  :{:02}",
-                        // self.time.hr,
-                        self.time.min,
+                        // self.hr_setting.get_value(),
+                        self.min_setting.get_value(),
                     );
                     text_writer::draw_text_centered(
                         LCD_WIDTH as i32 / 2,
@@ -56,8 +65,8 @@ impl SettingComponentTrait for FeedingDeadlineSettingComponent {
                     let active_time_str = str_format!(
                         fixedstr::str16,
                         "{:02}   ",
-                        self.time.hr,
-                        // self.time.min,
+                        self.hr_setting.get_value(),
+                        // self.min_setting.get_value(),
                     );
                     text_writer::draw_text_centered(
                         LCD_WIDTH as i32 / 2,
@@ -71,8 +80,8 @@ impl SettingComponentTrait for FeedingDeadlineSettingComponent {
                     let time_str = str_format!(
                         fixedstr::str16,
                         "{:02}:  ",
-                        self.time.hr,
-                        // self.time.min,
+                        self.hr_setting.get_value(),
+                        // self.min_setting.get_value(),
                     );
                     text_writer::draw_text_centered(
                         LCD_WIDTH as i32 / 2,
@@ -84,8 +93,8 @@ impl SettingComponentTrait for FeedingDeadlineSettingComponent {
                     let active_time_str = str_format!(
                         fixedstr::str16,
                         "   {:02}",
-                        // self.time.hr,
-                        self.time.min,
+                        // self.hr_setting.get_value(),
+                        self.min_setting.get_value(),
                     );
                     text_writer::draw_text_centered(
                         LCD_WIDTH as i32 / 2,
@@ -98,8 +107,12 @@ impl SettingComponentTrait for FeedingDeadlineSettingComponent {
                 _ => {}
             }
         } else {
-            let time_str =
-                str_format!(fixedstr::str16, "{:02}:{:02}", self.time.hr, self.time.min,);
+            let time_str = str_format!(
+                fixedstr::str16,
+                "{:02}:{:02}",
+                self.hr_setting.get_value(),
+                self.min_setting.get_value(),
+            );
             text_writer::draw_text_centered(
                 LCD_WIDTH as i32 / 2,
                 y_offset + 8,
@@ -124,36 +137,20 @@ impl SettingComponentTrait for FeedingDeadlineSettingComponent {
         } else if input.get_state(&KeyNames::Left).just_pressed {
             match self.new_time_selection {
                 0 => {
-                    if self.time.hr == 00 {
-                        self.time.hr = 23;
-                    } else {
-                        self.time.hr -= 1;
-                    }
+                    self.hr_setting.dec();
                 }
                 1 => {
-                    if self.time.min == 00 {
-                        self.time.min = 59;
-                    } else {
-                        self.time.min -= 1;
-                    }
+                    self.min_setting.dec();
                 }
                 _ => {}
             }
         } else if input.get_state(&KeyNames::Right).just_pressed {
             match self.new_time_selection {
                 0 => {
-                    if self.time.hr == 23 {
-                        self.time.hr = 0;
-                    } else {
-                        self.time.hr += 1;
-                    }
+                    self.hr_setting.inc();
                 }
                 1 => {
-                    if self.time.min == 59 {
-                        self.time.min = 0;
-                    } else {
-                        self.time.min += 1;
-                    }
+                    self.min_setting.inc();
                 }
                 _ => {}
             }
@@ -163,11 +160,15 @@ impl SettingComponentTrait for FeedingDeadlineSettingComponent {
                 self.will_be_deselected = true;
                 self.new_time_selection = 0;
 
-                let setting_hr = unsafe { &mut globals::FEEDING_DEADLINE_HOUR_SETTING };
-                let setting_min = unsafe { &mut globals::FEEDING_DEADLINE_MINUTE_SETTING };
-
-                setting_hr.set_value(self.time.hr).unwrap();
-                setting_min.set_value(self.time.min).unwrap();
+                let nvm = crate::globals::get_nvm();
+                nvm.settings.set_value(
+                    SettingType::FeedingDeadlineHour,
+                    self.hr_setting.get_value(),
+                );
+                nvm.settings.set_value(
+                    SettingType::FeedingDeadlineMinute,
+                    self.min_setting.get_value(),
+                );
             }
         }
     }
@@ -176,12 +177,7 @@ impl SettingComponentTrait for FeedingDeadlineSettingComponent {
         self.will_be_deselected
     }
 
-    fn reset(&mut self) {
-        let setting_hr = unsafe { &mut globals::FEEDING_DEADLINE_HOUR_SETTING }.get_value();
-        let setting_min = unsafe { &mut globals::FEEDING_DEADLINE_MINUTE_SETTING }.get_value();
-        self.will_be_deselected = false;
-        self.time.hr = setting_hr;
-        self.time.min = setting_min;
-        self.new_time_selection = 0;
+    fn reset_internal_state(&mut self) {
+        *self = Self::default();
     }
 }

@@ -62,7 +62,6 @@ impl SettingComponentTrait for ResetSettingComponent {
                 self.frames_reset_button_held += 1;
             } else {
                 nvm.erase_all_then_reboot();
-                nvm.settings.apply_to_globals();
 
                 self.frames_reset_button_held = 0;
                 self.will_be_deselected = true;
@@ -76,7 +75,7 @@ impl SettingComponentTrait for ResetSettingComponent {
         self.will_be_deselected
     }
 
-    fn reset(&mut self) {
+    fn reset_internal_state(&mut self) {
         self.will_be_deselected = false;
         self.frames_reset_button_held = 0;
     }

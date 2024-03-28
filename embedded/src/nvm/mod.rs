@@ -39,16 +39,12 @@ impl Nvm {
                     pet: NvmPet::load(),
                 };
 
-                new_nvm.settings.apply_to_globals();
-
                 new_nvm
             }
             None => {
                 let mut new_nvm = Self::default();
 
                 new_nvm.write_all();
-
-                new_nvm.settings.apply_to_globals();
 
                 new_nvm
             }

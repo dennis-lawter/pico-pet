@@ -8,8 +8,8 @@ run: build
     echo "Raspberry Pi Pico mounted."
 	cargo run --bin pico-pet --release
 sprites:
-	rgba8888-to-rgb332 -m 0b111_000_11 -i sprite_png/ -o sprite_raw/
+	rgba8888-to-rgb332 -m 0b111_000_11 -i assets/sprite_png/ -o assets/sprite_raw/
 fonts:
-	rgba8888-to-rgb332 --monochrome -i font_png/ -o font_raw/
+	rgba8888-to-rgb332 --monochrome -i assets/font_png/ -o assets/font_raw/
 tracks:
-	peat_track_compiler -i sound_peat/ -o sound_raw/
+	peat_track_compiler -i assets/sound_peat/ -o assets/sound_raw/

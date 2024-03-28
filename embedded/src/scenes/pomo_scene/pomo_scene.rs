@@ -10,6 +10,7 @@ use crate::display::text_writer::FontStyle;
 use crate::hardware::hardware::LCD_HEIGHT;
 use crate::hardware::hardware::LCD_WIDTH;
 use crate::hardware::input::KeyNames;
+use crate::nvm::settings::SettingType;
 use crate::scenes::SceneBehavior;
 use crate::scenes::SceneType;
 
@@ -112,7 +113,10 @@ impl SceneBehavior for PomoScene<'_> {
             TimerEvent::PomoFinished => {
                 self.start_pomo_sound();
                 let nvm = crate::globals::get_nvm();
-                let cycles = unsafe { &crate::globals::POMO_CYCLE_SETTING }.get_value();
+                let cycles = nvm
+                    .settings
+                    .get_setting(SettingType::PomodoroCycles)
+                    .get_value();
                 let inventory = &mut nvm.inventory;
                 inventory.inc_tomatoes();
                 if self.timer.cycles_elapsed + 1 == cycles {

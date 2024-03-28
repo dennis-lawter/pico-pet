@@ -27,7 +27,7 @@ use waveshare_rp2040_lcd_0_96::XOSC_CRYSTAL_FREQ;
 use st7735_lcd::Orientation;
 use st7735_lcd::ST7735;
 
-use crate::globals;
+use crate::nvm::settings::SettingType;
 
 use super::audio::AudioFrequency;
 use super::rtc::RealTime;
@@ -261,7 +261,8 @@ impl HardwareComponents {
     }
 
     pub fn set_backlight_from_lut(&mut self) {
-        let brightness = unsafe { &globals::BRIGHTNESS_SETTING };
+        let nvm = crate::globals::get_nvm();
+        let brightness = nvm.settings.get_setting(SettingType::Brightness);
         let effective_brightness = BRIGHTNESS_LUT[brightness.get_value() as usize];
         self.set_backlight_raw(effective_brightness);
     }
@@ -271,7 +272,8 @@ impl HardwareComponents {
     }
 
     pub fn start_tone(&mut self, tone: &AudioFrequency) {
-        let volume = unsafe { &globals::VOLUME_SETTING };
+        let nvm = crate::globals::get_nvm();
+        let volume = nvm.settings.get_setting(SettingType::Volume);
         let tone = if volume.get_value() == 0 {
             &AudioFrequency::None
         } else {
@@ -296,7 +298,8 @@ impl HardwareComponents {
     }
 
     pub fn start_vibrating(&mut self) {
-        let enabled = unsafe { &globals::VIBE_SETTING };
+        let nvm = crate::globals::get_nvm();
+        let enabled = nvm.settings.get_setting(SettingType::Vibration);
         if enabled.get_value() == 1 {
             self.vibe.set_high().unwrap()
         } else {

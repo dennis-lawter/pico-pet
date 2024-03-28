@@ -91,15 +91,15 @@ impl SettingComponent {
 
     pub fn reset(&mut self) {
         match self {
-            SettingComponent::Brightness(component) => component.reset(),
-            SettingComponent::Volume(component) => component.reset(),
-            SettingComponent::Time(component) => component.reset(),
-            SettingComponent::PomoTime(component) => component.reset(),
-            SettingComponent::ShortRest(component) => component.reset(),
-            SettingComponent::LongRest(component) => component.reset(),
-            SettingComponent::PomoCycle(component) => component.reset(),
-            SettingComponent::FeedingDeadline(component) => component.reset(),
-            SettingComponent::Reset(component) => component.reset(),
+            SettingComponent::Brightness(component) => component.reset_internal_state(),
+            SettingComponent::Volume(component) => component.reset_internal_state(),
+            SettingComponent::Time(component) => component.reset_internal_state(),
+            SettingComponent::PomoTime(component) => component.reset_internal_state(),
+            SettingComponent::ShortRest(component) => component.reset_internal_state(),
+            SettingComponent::LongRest(component) => component.reset_internal_state(),
+            SettingComponent::PomoCycle(component) => component.reset_internal_state(),
+            SettingComponent::FeedingDeadline(component) => component.reset_internal_state(),
+            SettingComponent::Reset(component) => component.reset_internal_state(),
         }
     }
 }
@@ -109,7 +109,7 @@ trait SettingComponentTrait {
     fn tick(&mut self);
     fn input(&mut self);
     fn is_deselected(&mut self) -> bool;
-    fn reset(&mut self);
+    fn reset_internal_state(&mut self);
 }
 
 fn adjust_setting(setting: &mut Setting) {

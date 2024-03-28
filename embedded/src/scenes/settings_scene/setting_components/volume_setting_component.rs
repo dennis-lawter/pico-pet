@@ -1,8 +1,9 @@
 use crate::color::Rgb332;
 use crate::display::text_writer;
 use crate::display::text_writer::FontStyle;
-use crate::globals;
 use crate::hardware::hardware::LCD_WIDTH;
+use crate::nvm::settings::SettingType;
+use crate::setting_value::Setting;
 
 use super::adjust_setting;
 use super::check_if_confirming;
@@ -10,15 +11,20 @@ use super::check_if_exiting;
 use super::SettingComponentTrait;
 
 pub struct VolumeSettingComponent {
-    will_be_deselected: bool,
-    pub initial_value: Option<u8>,
+    pub will_be_deselected: bool,
+    pub setting: Setting,
+    pub initial_value: u8,
 }
 
 impl Default for VolumeSettingComponent {
     fn default() -> Self {
+        let nvm = crate::globals::get_nvm();
+        let setting = nvm.settings.get_setting(SettingType::Volume);
+        let initial_value = setting.get_value();
         Self {
             will_be_deselected: false,
-            initial_value: None,
+            setting,
+            initial_value,
         }
     }
 }
@@ -37,26 +43,24 @@ impl SettingComponentTrait for VolumeSettingComponent {
             y_offset + 8,
             FontStyle::Icon,
             Rgb332::BLUE,
-            unsafe { &globals::VOLUME_SETTING }.generate_bar(selected),
+            self.setting.generate_bar(selected),
         );
     }
 
     fn tick(&mut self) {}
 
     fn input(&mut self) {
-        let setting = unsafe { &mut globals::VOLUME_SETTING };
-        if self.initial_value.is_none() {
-            self.initial_value = Some(setting.get_value());
-        }
-
+        let nvm = crate::globals::get_nvm();
         if check_if_confirming() {
             self.will_be_deselected = true;
-        }
-        if check_if_exiting() {
+        } else if check_if_exiting() {
+            nvm.settings
+                .set_value(SettingType::Volume, self.initial_value);
             self.will_be_deselected = true;
-            setting.set_value(self.initial_value.unwrap()).unwrap();
         } else {
-            adjust_setting(setting);
+            adjust_setting(&mut self.setting);
+            nvm.settings
+                .set_value(SettingType::Volume, self.setting.get_value());
         }
     }
 
@@ -64,8 +68,7 @@ impl SettingComponentTrait for VolumeSettingComponent {
         self.will_be_deselected
     }
 
-    fn reset(&mut self) {
-        self.will_be_deselected = false;
-        self.initial_value = None;
+    fn reset_internal_state(&mut self) {
+        *self = Self::default();
     }
 }

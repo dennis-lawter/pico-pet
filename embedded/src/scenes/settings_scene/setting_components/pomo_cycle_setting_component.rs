@@ -3,8 +3,9 @@ use fixedstr::str_format;
 use crate::color::Rgb332;
 use crate::display::text_writer;
 use crate::display::text_writer::FontStyle;
-use crate::globals;
 use crate::hardware::hardware::LCD_WIDTH;
+use crate::nvm::settings::SettingType;
+use crate::setting_value::Setting;
 
 use super::adjust_setting;
 use super::check_if_confirming;
@@ -12,15 +13,20 @@ use super::check_if_exiting;
 use super::SettingComponentTrait;
 
 pub struct PomoCycleSettingComponent {
-    will_be_deselected: bool,
-    pub initial_value: Option<u8>,
+    pub will_be_deselected: bool,
+    pub setting: Setting,
+    pub initial_value: u8,
 }
 
 impl Default for PomoCycleSettingComponent {
     fn default() -> Self {
+        let nvm = crate::globals::get_nvm();
+        let setting = nvm.settings.get_setting(SettingType::PomodoroCycles);
+        let initial_value = setting.get_value();
         Self {
             will_be_deselected: false,
-            initial_value: None,
+            setting,
+            initial_value,
         }
     }
 }
@@ -34,9 +40,8 @@ impl SettingComponentTrait for PomoCycleSettingComponent {
             Rgb332::BLACK,
             "POMODORO CYCLES",
         );
-        let pomo_time_setting = unsafe { &globals::POMO_CYCLE_SETTING }.get_value();
         if selected {
-            let time_str = str_format!(fixedstr::str12, "{}       ", pomo_time_setting,);
+            let time_str = str_format!(fixedstr::str12, "{}       ", self.setting.get_value(),);
             text_writer::draw_text_centered(
                 LCD_WIDTH as i32 / 2,
                 y_offset + 8 - 1,
@@ -45,7 +50,7 @@ impl SettingComponentTrait for PomoCycleSettingComponent {
                 time_str.as_str(),
             );
         } else {
-            let time_str = str_format!(fixedstr::str12, "{}       ", pomo_time_setting,);
+            let time_str = str_format!(fixedstr::str12, "{}       ", self.setting.get_value(),);
             text_writer::draw_text_centered(
                 LCD_WIDTH as i32 / 2,
                 y_offset + 8,
@@ -67,19 +72,17 @@ impl SettingComponentTrait for PomoCycleSettingComponent {
     fn tick(&mut self) {}
 
     fn input(&mut self) {
-        let setting = unsafe { &mut globals::POMO_CYCLE_SETTING };
-        if self.initial_value.is_none() {
-            self.initial_value = Some(setting.get_value());
-        }
-
+        let nvm = crate::globals::get_nvm();
         if check_if_confirming() {
             self.will_be_deselected = true;
-        }
-        if check_if_exiting() {
+        } else if check_if_exiting() {
+            nvm.settings
+                .set_value(SettingType::PomodoroCycles, self.initial_value);
             self.will_be_deselected = true;
-            setting.set_value(self.initial_value.unwrap()).unwrap();
         } else {
-            adjust_setting(setting);
+            adjust_setting(&mut self.setting);
+            nvm.settings
+                .set_value(SettingType::PomodoroCycles, self.setting.get_value());
         }
     }
 
@@ -87,8 +90,7 @@ impl SettingComponentTrait for PomoCycleSettingComponent {
         self.will_be_deselected
     }
 
-    fn reset(&mut self) {
-        self.will_be_deselected = false;
-        self.initial_value = None;
+    fn reset_internal_state(&mut self) {
+        *self = Self::default();
     }
 }

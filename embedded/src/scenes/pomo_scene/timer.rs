@@ -2,6 +2,7 @@ use fixedstr::str_format;
 
 use crate::audio::audio_player::AudioPlayer;
 use crate::color::Rgb332;
+use crate::nvm::settings::SettingType;
 
 use super::pomo_scene::PomoMenuFrame;
 
@@ -65,15 +66,32 @@ struct TimerValues {
 }
 impl TimerValues {
     fn new() -> Self {
+        let nvm = crate::globals::get_nvm();
+        let pomo_seconds = nvm
+            .settings
+            .get_setting(SettingType::PomodoroMinutes)
+            .get_value() as u16
+            * 60;
+        let short_break_seconds = nvm
+            .settings
+            .get_setting(SettingType::ShortRestMinutes)
+            .get_value() as u16
+            * 60;
+        let long_break_seconds = nvm
+            .settings
+            .get_setting(SettingType::LongRestMinutes)
+            .get_value() as u16
+            * 60;
+        let cycles = nvm
+            .settings
+            .get_setting(SettingType::PomodoroCycles)
+            .get_value();
+
         Self {
-            pomo_seconds: unsafe { &crate::globals::POMO_TIME_SETTING }.get_value() as u16 * 60,
-            short_break_seconds: unsafe { &crate::globals::SHORT_REST_TIME_SETTING }.get_value()
-                as u16
-                * 60,
-            long_break_seconds: unsafe { &crate::globals::LONG_REST_TIME_SETTING }.get_value()
-                as u16
-                * 60,
-            cycles: unsafe { &crate::globals::POMO_CYCLE_SETTING }.get_value(),
+            pomo_seconds,
+            short_break_seconds,
+            long_break_seconds,
+            cycles,
         }
     }
 }

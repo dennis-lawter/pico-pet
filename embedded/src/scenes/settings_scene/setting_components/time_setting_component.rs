@@ -243,7 +243,7 @@ impl SettingComponentTrait for TimeSettingComponent {
         self.will_be_deselected
     }
 
-    fn reset(&mut self) {
+    fn reset_internal_state(&mut self) {
         self.will_be_deselected = false;
         self.time = None;
         self.new_time = None;

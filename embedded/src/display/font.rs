@@ -134,35 +134,35 @@ impl FontFactory {
     pub fn new_small_font() -> Font<'static> {
         Font::new(
             FontSize::Size5x8,
-            include_bytes!("../../font_raw/font_5x8.data"),
+            include_bytes!("../../assets/font_raw/font_5x8.data"),
         )
     }
 
     pub fn new_small_icon_font() -> Font<'static> {
         Font::new(
             FontSize::Size5x8,
-            include_bytes!("../../font_raw/icon_font.data"),
+            include_bytes!("../../assets/font_raw/icon_font.data"),
         )
     }
 
     pub fn new_big_regular_font() -> Font<'static> {
         Font::new(
             FontSize::Size8x13,
-            include_bytes!("../../font_raw/font_8x13.data"),
+            include_bytes!("../../assets/font_raw/font_8x13.data"),
         )
     }
 
     pub fn new_big_bold_font() -> Font<'static> {
         Font::new(
             FontSize::Size8x13,
-            include_bytes!("../../font_raw/font_8x13_bold.data"),
+            include_bytes!("../../assets/font_raw/font_8x13_bold.data"),
         )
     }
 
     pub fn new_big_italic_font() -> Font<'static> {
         Font::new(
             FontSize::Size8x13,
-            include_bytes!("../../font_raw/font_8x13_italic.data"),
+            include_bytes!("../../assets/font_raw/font_8x13_italic.data"),
         )
     }
 }

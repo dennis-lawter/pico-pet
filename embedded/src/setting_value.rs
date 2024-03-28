@@ -18,13 +18,13 @@ impl Setting {
         self.value
     }
 
-    pub fn set_value(&mut self, value: u8) -> Result<(), ()> {
-        if value < self.min_value || value > self.max_value {
-            return Err(());
-        }
-        self.value = value;
-        Ok(())
-    }
+    // pub fn set_value(&mut self, value: u8) -> Result<(), ()> {
+    //     if value < self.min_value || value > self.max_value {
+    //         return Err(());
+    //     }
+    //     self.value = value;
+    //     Ok(())
+    // }
 
     pub fn inc(&mut self) {
         self.value = (self.value.saturating_add(1)).min(self.max_value);

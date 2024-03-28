@@ -115,7 +115,6 @@ impl SceneBehavior for SettingsScene {
                 if input.get_state(&KeyNames::Back).just_released {
                     self.next_scene = Some(SceneType::Main);
                     let nvm = crate::globals::get_nvm();
-                    nvm.settings.update_from_globals();
                     nvm.settings.write();
 
                     return;
