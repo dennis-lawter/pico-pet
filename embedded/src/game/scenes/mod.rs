@@ -3,6 +3,7 @@ pub mod main_scene;
 pub mod nyi_scene;
 pub mod pomo_scene;
 pub mod settings_scene;
+pub mod stat_scene;
 
 #[derive(Clone)]
 pub enum SceneType {

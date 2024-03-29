@@ -1,6 +1,5 @@
 #![no_std]
 #![no_main]
-#![feature(iter_advance_by)]
 
 extern crate cortex_m;
 extern crate cortex_m_rt;
@@ -16,15 +15,17 @@ extern crate waveshare_rp2040_lcd_0_96;
 
 mod game;
 
-use game::cores;
+use game::cores::run_primary_main_loop;
+use game::cores::spawn_secondary_core_worker;
 use game::globals::init_globals;
+
 use waveshare_rp2040_lcd_0_96::entry;
 
 #[entry]
 fn main() -> ! {
     init_globals();
 
-    cores::spawn_secondary_core_worker();
+    spawn_secondary_core_worker();
 
-    cores::run_primary_main_loop()
+    run_primary_main_loop()
 }

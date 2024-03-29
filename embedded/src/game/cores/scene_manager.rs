@@ -3,6 +3,7 @@ use crate::game::scenes::main_scene::MainScene;
 use crate::game::scenes::nyi_scene::NyiScene;
 use crate::game::scenes::pomo_scene::PomoScene;
 use crate::game::scenes::settings_scene::SettingsScene;
+use crate::game::scenes::stat_scene::stat_scene::StatScene;
 use crate::game::scenes::SceneBehavior;
 use crate::game::scenes::SceneType;
 
@@ -11,7 +12,7 @@ pub struct SceneManager<'a> {
     pub game_play_scene: Option<MainScene<'a>>,
     pub pomo_scene: Option<PomoScene<'a>>,
     pub eat_scene: Option<EatScene<'a>>,
-    pub stat_scene: Option<NyiScene>,
+    pub stat_scene: Option<StatScene>,
     pub cosmetic_scene: Option<NyiScene>,
     pub settings_scene: Option<SettingsScene>,
 
@@ -57,7 +58,7 @@ impl SceneManager<'static> {
                     SceneType::Main => self.game_play_scene = Some(MainScene::default()),
                     SceneType::Pomo => self.pomo_scene = Some(PomoScene::default()),
                     SceneType::Eat => self.eat_scene = Some(EatScene::default()),
-                    SceneType::Stat => self.stat_scene = Some(NyiScene::default()),
+                    SceneType::Stat => self.stat_scene = Some(StatScene::default()),
                     SceneType::Cosmetics => self.cosmetic_scene = Some(NyiScene::default()),
                     SceneType::Settings => self.settings_scene = Some(SettingsScene::default()),
                 }
