@@ -1,5 +1,3 @@
-mount:
-	udiskie -ant
 build: sprites fonts tracks
 	cargo build --bin pico-pet --release
 run: build
