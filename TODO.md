@@ -31,6 +31,7 @@ Done items should be removed from the list.
     - Age
     - Current and max HP
     - Current daily hunger
+    - Hours until next feeding deadline
     - Illness if applicable
 - Eating Scene
   - Opening the scene after eating today says the pet cannot eat again.

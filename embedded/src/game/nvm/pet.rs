@@ -61,4 +61,12 @@ impl NvmPet {
         hardware.write_nvm_page(PageCanon::Pet1 as u16, &self.pet_data);
         hardware.write_nvm_page(PageCanon::Pet2 as u16, &self.health_data);
     }
+
+    pub fn get_health(&self) -> u8 {
+        self.health_data[0]
+    }
+
+    pub fn get_max_health(&self) -> u8 {
+        self.health_data[2] + 4
+    }
 }
