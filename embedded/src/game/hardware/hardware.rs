@@ -176,7 +176,20 @@ impl HardwareComponents {
             let spi = spi.init(
                 &mut pac.RESETS,
                 clocks.peripheral_clock.freq(),
-                10.MHz(),
+                // 5_000.kHz(), // 14-15 FPS
+                // 7_500.kHz(), // 18-19 FPS
+                10_000.kHz(), // 22-23 FPS
+                // 15_000.kHz(), // 27-28 FPS
+                // 16_000.kHz(), // 31-32 FPS
+                // 20_000.kHz(), // 31-32 FPS
+                // 30_000.kHz(), // 34-35 FPS
+                // 40_000.kHz(), // 42-43 FPS
+                // 45_000.kHz(), // 42-43 FPS
+                // 50_000.kHz(), //42-43 FPS
+                // 55_000.kHz(), // 42-43 FPS
+                // 60_000.kHz(), // 42-43 FPS
+                // 65_000.kHz(), // 48-49 FPS
+                // 65_500.Hz(), // maximum frequency, 48-49 FPS
                 &embedded_hal::spi::MODE_0,
             );
 

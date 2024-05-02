@@ -1,3 +1,6 @@
 [submodule "helpers/rgba8888-to-rgb332"]
 	path = helpers/rgba8888-to-rgb332
 	url = https://github.com/dennis-lawter/rgba8888-to-rgb332.git
+[submodule "libs/st7735-lcd-rs"]
+	path = libs/st7735-lcd-rs
+	url = git@github.com:dennis-lawter/st7735-lcd-rs.git

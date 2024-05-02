@@ -10,8 +10,20 @@ use crate::game::hardware::hardware::LCD_WIDTH;
 static mut BUFFER: [u16; LCD_WIDTH * LCD_HEIGHT] = [0b00000_111111_00000; 128 * 128];
 
 pub fn draw(display: &mut Lcd) {
+    // unsafe {
+    //     use core::slice;
+
+    //     let len = BUFFER.len() * 2;
+
+    //     let ptr = BUFFER.as_ptr() as *const u8;
+
+    //     let cast_ptr = slice::from_raw_parts(ptr, len);
+
+    //     display.write_pixels_raw(cast_ptr).unwrap();
+    // }\
     unsafe {
         display.write_pixels_buffered(BUFFER).unwrap();
+        // display.write_pixels(BUFFER).unwrap();
     }
 }
 

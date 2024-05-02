@@ -8,6 +8,7 @@ cortex-m = "0.7.2"
 cortex-m-rt = "0.7.3"
 rp2040-boot2 = "0.2.1"
 st7735-lcd = "0.9.0"
+# st7735-lcd = { path = "../libs/st7735-lcd-rs" }
 embedded-time = "0.12.1"
 embedded-graphics = "0.8.1"
 fugit = "0.3.7"
