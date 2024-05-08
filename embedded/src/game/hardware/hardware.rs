@@ -30,6 +30,9 @@ use st7735_lcd::ST7735;
 use crate::game::nvm::settings::SettingType;
 
 use super::audio::AudioFrequency;
+use super::rtc;
+use super::rtc::RealDate;
+use super::rtc::RealDateTime;
 use super::rtc::RealTime;
 
 pub const LCD_WIDTH: usize = 128;
@@ -330,17 +333,46 @@ impl HardwareComponents {
         self.i2c_bus.write(0x68, &[0x00]).unwrap();
         self.i2c_bus.read(0x68, &mut buffer).unwrap();
 
-        let sec = RealTime::bcd_to_dec(buffer[0]);
-        let min = RealTime::bcd_to_dec(buffer[1]);
-        let hr = RealTime::bcd_to_dec(buffer[2]);
+        let sec = rtc::bcd_to_dec(buffer[0]);
+        let min = rtc::bcd_to_dec(buffer[1]);
+        let hr = rtc::bcd_to_dec(buffer[2]);
 
         RealTime { sec, min, hr }
     }
 
+    pub fn get_date(&mut self) -> RealDate {
+        let mut buffer = [0u8; 7];
+        self.i2c_bus.write(0x68, &[0x00]).unwrap();
+        self.i2c_bus.read(0x68, &mut buffer).unwrap();
+
+        let dow = buffer[3];
+        let dom = rtc::bcd_to_dec(buffer[4]);
+        let mon = rtc::bcd_to_dec(buffer[5] & 0b0001_1111);
+        let century = (buffer[5] & 0b1000_0000) >> 7;
+        let year = rtc::bcd_to_dec(buffer[6]) + (century * 100);
+
+        RealDate {
+            day_of_week: dow,
+            day_of_month: dom,
+            month: mon,
+            year_since_2k: year,
+        }
+    }
+
+    #[allow(dead_code)]
+    pub fn get_date_time(&mut self) -> RealDateTime {
+        let real_time = self.get_time();
+        let real_date = self.get_date();
+        RealDateTime {
+            real_time,
+            real_date,
+        }
+    }
+
     pub fn set_time(&mut self, new_time: &RealTime) {
-        let sec_bcd = RealTime::dec_to_bcd(new_time.sec);
-        let min_bcd = RealTime::dec_to_bcd(new_time.min);
-        let hr_bcd = RealTime::dec_to_bcd(new_time.hr);
+        let sec_bcd = rtc::dec_to_bcd(new_time.sec);
+        let min_bcd = rtc::dec_to_bcd(new_time.min);
+        let hr_bcd = rtc::dec_to_bcd(new_time.hr);
 
         let data = [0x00, sec_bcd, min_bcd, hr_bcd];
 

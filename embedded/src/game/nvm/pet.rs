@@ -65,8 +65,45 @@ impl NvmPet {
     pub fn get_health(&self) -> u8 {
         self.health_data[0]
     }
+    #[allow(dead_code)]
+    pub fn set_health(&mut self, health: u8) {
+        self.health_data[0] = health;
+    }
 
+    #[allow(dead_code)]
+    pub fn get_sickness(&self) -> u8 {
+        self.health_data[1]
+    }
+    #[allow(dead_code)]
+    pub fn set_sickness(&mut self, sickness: u8) {
+        self.health_data[1] = sickness;
+    }
+
+    #[allow(dead_code)]
     pub fn get_max_health(&self) -> u8 {
         self.health_data[2] + 4
+    }
+    #[allow(dead_code)]
+    pub fn get_daily_hunger(&self) -> u8 {
+        self.health_data[2]
+    }
+    #[allow(dead_code)]
+    pub fn set_daily_hunger(&mut self, hunger: u8) {
+        self.health_data[2] = hunger;
+    }
+
+    #[allow(dead_code)]
+    pub fn get_last_fed_time(&self) -> (u8, u8, u8) {
+        (
+            self.health_data[3],
+            self.health_data[4],
+            self.health_data[5],
+        )
+    }
+    #[allow(dead_code)]
+    pub fn set_last_fed_time(&mut self, time: (u8, u8, u8)) {
+        self.health_data[3] = time.0;
+        self.health_data[4] = time.1;
+        self.health_data[5] = time.2;
     }
 }

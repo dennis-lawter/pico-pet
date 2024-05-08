@@ -9,6 +9,7 @@ use crate::game::hardware::hardware::LCD_HEIGHT;
 use crate::game::hardware::input::KeyNames;
 use crate::game::scenes::SceneBehavior;
 use crate::game::scenes::SceneType;
+use crate::game::FRAME_RATE;
 
 use super::menu_selection::MenuSelection;
 
@@ -44,9 +45,13 @@ impl Default for MainScene<'static> {
 impl SceneBehavior for MainScene<'static> {
     fn tick(&mut self) {
         self.frame_count += 1;
-        if self.frame_count % 80 == 20 || self.frame_count % 80 == 0 {
+        if self.frame_count % (4 * FRAME_RATE) == (1 * FRAME_RATE)
+            || self.frame_count % (4 * FRAME_RATE) == 0
+        {
             self.ferris.x -= 8;
-        } else if self.frame_count % 80 == 40 || self.frame_count % 80 == 60 {
+        } else if self.frame_count % (4 * FRAME_RATE) == (2 * FRAME_RATE)
+            || self.frame_count % (4 * FRAME_RATE) == (3 * FRAME_RATE)
+        {
             self.ferris.x += 8;
         }
     }
@@ -55,13 +60,14 @@ impl SceneBehavior for MainScene<'static> {
         self.ferris_cry.tick();
         self.button_beep.tick();
 
-        if self.frame_count % 40 == 20 {
+        if self.frame_count % (2 * FRAME_RATE) == FRAME_RATE {
             self.ferris_cry.play();
         }
     }
 
     fn draw(&mut self) {
-        self.ferris.draw(((self.frame_count / 20) % 2) as usize);
+        self.ferris
+            .draw(((self.frame_count / FRAME_RATE) % 2) as usize);
 
         let sel_item = self.menu_item_selected as usize;
         let prev_item = self.menu_item_selected.prev() as usize;

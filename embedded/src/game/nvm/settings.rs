@@ -163,4 +163,8 @@ impl NvmSettings {
             SettingType::FeedingDeadlineMinute => self.pomo_data[5] = value,
         }
     }
+
+    pub fn get_feeding_deadline(&self) -> (u8, u8) {
+        (self.pomo_data[4], self.pomo_data[5])
+    }
 }

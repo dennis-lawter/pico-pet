@@ -65,6 +65,8 @@ pub fn primary_main_loop() -> ! {
             let y = LCD_HEIGHT as i32 / 2 - FontStyle::Big.get_glyph_dimensions().1 as i32 / 2;
             let time = hardware.get_time();
 
+            test_feeding_deadline(&time);
+
             // TODO: fix bug
             // I dont know why but I cant use any of the realtime helpers here...
             // Maybe they are not initialized yet?
@@ -117,6 +119,15 @@ pub fn primary_main_loop() -> ! {
 
         scene_manager.advance_scene();
     }
+}
+
+fn test_feeding_deadline(time: &crate::game::hardware::rtc::RealTime) -> () {
+    let time_hr = time.hr;
+    let time_min = time.min;
+    let nvm = crate::game::globals::get_nvm();
+    let (feeding_deadline_hr, feeding_deadline_min) = nvm.settings.get_feeding_deadline();
+    let (fed_day, fed_hr, fed_min) = nvm.pet.get_last_fed_time();
+    // if
 }
 
 fn swap() {
