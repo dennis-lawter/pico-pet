@@ -8,13 +8,16 @@ const DEFAULT_BIRTHYEAR: u8 = 0;
 const DEFAULT_CURRENT_HP: u8 = 5;
 const DEFAULT_SICKNESS: u8 = 0;
 const DEFAULT_DAILY_HUNGER: u8 = 1;
-const DEFAULT_LAST_FED_DAY: u8 = 0;
-const DEFAULT_LAST_FED_MONTH: u8 = 0;
+const DEFAULT_LAST_FED_DAY: u8 = 1;
+const DEFAULT_LAST_FED_MONTH: u8 = 1;
 const DEFAULT_LAST_FED_YEAR: u8 = 0;
 
 pub struct NvmPet {
     pub pet_data: [u8; 8],
     pub health_data: [u8; 8],
+
+    // temp values
+    pub is_hungry: bool,
 }
 impl Default for NvmPet {
     fn default() -> Self {
@@ -39,6 +42,7 @@ impl Default for NvmPet {
                 NVM_BLANK,
                 NVM_BLANK,
             ],
+            is_hungry: false,
         }
     }
 }
@@ -52,6 +56,8 @@ impl NvmPet {
         Self {
             pet_data,
             health_data,
+
+            is_hungry: false,
         }
     }
 
@@ -93,7 +99,7 @@ impl NvmPet {
     }
 
     #[allow(dead_code)]
-    pub fn get_last_fed_time(&self) -> (u8, u8, u8) {
+    pub fn get_last_fed_date(&self) -> (u8, u8, u8) {
         (
             self.health_data[3],
             self.health_data[4],

@@ -22,7 +22,8 @@ pub fn draw_top_bar() {
 
 fn alert_is_necessary() -> bool {
     // TODO: Add conditions (sick, hungry, etc...)
-    true
+    let pet = &crate::game::globals::get_nvm().pet;
+    pet.is_hungry
 }
 
 fn draw_top_bar_bg() {

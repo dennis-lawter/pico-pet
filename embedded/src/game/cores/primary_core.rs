@@ -8,6 +8,7 @@ use crate::game::display_helper::top_bar::draw_top_bar;
 use crate::game::hardware::hardware::BRIGHTNESS_LUT;
 use crate::game::hardware::hardware::LCD_HEIGHT;
 use crate::game::hardware::hardware::LCD_WIDTH;
+use crate::game::hardware::input::KeyNames;
 use crate::game::hardware::rtc::Meridian;
 use crate::game::scenes::main_scene::MainScene;
 use crate::game::scenes::SceneType;
@@ -30,6 +31,7 @@ pub fn primary_main_loop() -> ! {
     swap();
 
     loop {
+        test_feeding_deadline();
         // Disable the timer during the pomo scene
         match scene_manager.active_scene {
             SceneType::Pomo => {
@@ -64,8 +66,6 @@ pub fn primary_main_loop() -> ! {
             let x = LCD_WIDTH as i32 / 2;
             let y = LCD_HEIGHT as i32 / 2 - FontStyle::Big.get_glyph_dimensions().1 as i32 / 2;
             let time = hardware.get_time();
-
-            test_feeding_deadline(&time);
 
             // TODO: fix bug
             // I dont know why but I cant use any of the realtime helpers here...
@@ -121,13 +121,36 @@ pub fn primary_main_loop() -> ! {
     }
 }
 
-fn test_feeding_deadline(time: &crate::game::hardware::rtc::RealTime) -> () {
-    let time_hr = time.hr;
-    let time_min = time.min;
+fn test_feeding_deadline() -> () {
+    let input = crate::game::globals::get_input();
+    if !input.get_state(&KeyNames::Clock).just_released {
+        // limit checks to 1hz
+        return;
+    }
     let nvm = crate::game::globals::get_nvm();
+    // nvm.pet.is_hungry = true;
+    let now = crate::game::globals::get_hardware().get_date_time();
+    let time_hr = now.time.hr;
+    let time_min = now.time.min;
     let (feeding_deadline_hr, feeding_deadline_min) = nvm.settings.get_feeding_deadline();
-    let (fed_day, fed_hr, fed_min) = nvm.pet.get_last_fed_time();
-    // if
+    let (fed_day, fed_mon, fed_yr) = nvm.pet.get_last_fed_date();
+    let next_feed_day = fed_day + 1;
+    let next_feed_mon = fed_mon;
+    let next_feed_yr = fed_yr;
+
+    if now.date.year_since_2k >= next_feed_yr {
+        if now.date.month >= next_feed_mon {
+            if now.date.day_of_month >= next_feed_day {
+                if now.time.hr >= feeding_deadline_hr {
+                    if now.time.min >= feeding_deadline_min {
+                        // It's time to feed
+                        // TODO: this is a test to confirm the logic
+                        nvm.pet.is_hungry = true;
+                    }
+                }
+            }
+        }
+    }
 }
 
 fn swap() {

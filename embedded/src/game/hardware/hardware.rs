@@ -329,6 +329,16 @@ impl HardwareComponents {
     }
 
     pub fn get_time(&mut self) -> RealTime {
+        let date_time = self.get_date_time();
+        date_time.time
+    }
+
+    // pub fn get_date(&mut self) -> RealDate {
+    //     let date_time = self.get_date_time();
+    //     date_time.real_date
+    // }
+
+    pub fn get_date_time(&mut self) -> RealDateTime {
         let mut buffer = [0u8; 7];
         self.i2c_bus.write(0x68, &[0x00]).unwrap();
         self.i2c_bus.read(0x68, &mut buffer).unwrap();
@@ -337,13 +347,7 @@ impl HardwareComponents {
         let min = rtc::bcd_to_dec(buffer[1]);
         let hr = rtc::bcd_to_dec(buffer[2]);
 
-        RealTime { sec, min, hr }
-    }
-
-    pub fn get_date(&mut self) -> RealDate {
-        let mut buffer = [0u8; 7];
-        self.i2c_bus.write(0x68, &[0x00]).unwrap();
-        self.i2c_bus.read(0x68, &mut buffer).unwrap();
+        let real_time = RealTime { sec, min, hr };
 
         let dow = buffer[3];
         let dom = rtc::bcd_to_dec(buffer[4]);
@@ -351,21 +355,16 @@ impl HardwareComponents {
         let century = (buffer[5] & 0b1000_0000) >> 7;
         let year = rtc::bcd_to_dec(buffer[6]) + (century * 100);
 
-        RealDate {
+        let real_date = RealDate {
             day_of_week: dow,
             day_of_month: dom,
             month: mon,
             year_since_2k: year,
-        }
-    }
+        };
 
-    #[allow(dead_code)]
-    pub fn get_date_time(&mut self) -> RealDateTime {
-        let real_time = self.get_time();
-        let real_date = self.get_date();
         RealDateTime {
-            real_time,
-            real_date,
+            time: real_time,
+            date: real_date,
         }
     }
 
