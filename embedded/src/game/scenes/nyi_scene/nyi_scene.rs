@@ -41,8 +41,8 @@ impl SceneBehavior for NyiScene {
         let nvm = crate::game::globals::get_nvm();
         nvm.pet.is_hungry = false;
         let now = crate::game::globals::get_hardware().get_date_time();
-        let time_hr = now.time.hr;
-        let time_min = now.time.min;
+        // let time_hr = now.time.hr;
+        // let time_min = now.time.min;
         let (feeding_deadline_hr, feeding_deadline_min) = nvm.settings.get_feeding_deadline();
         let (fed_day, fed_mon, fed_yr) = nvm.pet.get_last_fed_date();
         let next_feed_day = fed_day + 1; // TODO: wrap around.....

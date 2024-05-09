@@ -1,3 +1,5 @@
+use core::ptr::addr_of;
+
 use crate::game::color::Rgb332;
 
 use super::font::Font;
@@ -64,13 +66,13 @@ pub fn draw_text_wrapped(x: i32, y: i32, style: FontStyle, color: Rgb332, text: 
 fn get_font(style: FontStyle) -> &'static Font<'static> {
     unsafe {
         let font_opt = match style {
-            FontStyle::Small => &SMALL_FONT,
-            FontStyle::Big => &BIG_REGULAR_FONT,
-            FontStyle::BigBold => &BIG_BOLD_FONT,
-            FontStyle::BigItalic => &BIG_ITALIC_FONT,
-            FontStyle::Icon => &ICON_FONT,
+            FontStyle::Small => addr_of!(SMALL_FONT),
+            FontStyle::Big => addr_of!(BIG_REGULAR_FONT),
+            FontStyle::BigBold => addr_of!(BIG_BOLD_FONT),
+            FontStyle::BigItalic => addr_of!(BIG_ITALIC_FONT),
+            FontStyle::Icon => addr_of!(ICON_FONT),
         };
-        &font_opt.as_ref().unwrap()
+        &font_opt.as_ref().unwrap().as_ref().unwrap()
     }
 }
 

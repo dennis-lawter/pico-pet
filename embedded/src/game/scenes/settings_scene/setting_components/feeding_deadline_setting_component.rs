@@ -10,6 +10,7 @@ use crate::game::setting_value::Setting;
 
 use super::SettingComponentTrait;
 
+#[allow(dead_code)]
 pub struct FeedingDeadlineSettingComponent {
     pub initial_hr_setting: u8,
     pub hr_setting: Setting,

@@ -75,7 +75,7 @@ impl Setting {
                 };
             }
 
-            core::str::from_utf8_unchecked(&BUFFER)
+            core::str::from_utf8_unchecked(core::ptr::addr_of!(BUFFER).as_ref().unwrap())
         }
     }
 }
