@@ -5,7 +5,6 @@ This list is not final. It will grow and evolve.
 Done items should be removed from the list.
 
 - Bugs
-  - Don't allow player to gain tomatoes, raspberries, or juice when at max.
 - Misc
   - Vibe setting
   - 24 hr clock setting
@@ -14,7 +13,7 @@ Done items should be removed from the list.
   - Store the `MainScene::menu_item_selected` as a static/global for reloading the scene
   - Handle AM/PM time adjustment in settings scene
 - Idle Scene
-  - Bugs and improvements listed in comments
+  - Bugs and improvements listed in code comments
 - Intro Scene
   - Only loaded if NVM is not initialized properly and must be reset
   - Remove the current code which checks for invalid NVM then autowrites default
@@ -52,7 +51,7 @@ Done items should be removed from the list.
     - Performed outside of scene maintenance
 - Pet rework
   - Switch from Ferris to a custom designed pet
-  - Switch from lofi girl to custom animations
+  - Switch from lofi girl to custom animation(s)
 
 
 ## General Ideas

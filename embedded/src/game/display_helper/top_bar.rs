@@ -7,6 +7,9 @@ use crate::game::display::render;
 use crate::game::display::text_writer;
 use crate::game::display::text_writer::FontStyle;
 use crate::game::hardware::hardware::LCD_WIDTH;
+use crate::game::nvm::inventory::MAX_JUICE;
+use crate::game::nvm::inventory::MAX_RASPBERRIES;
+use crate::game::nvm::inventory::MAX_TOMATOES;
 
 pub fn draw_top_bar() {
     draw_top_bar_bg();
@@ -47,14 +50,14 @@ fn draw_top_bar_inventory(offset: i32) {
     let nvm = crate::game::globals::get_nvm();
     let inventory = &nvm.inventory;
 
-    let tomatoes = min(99, inventory.get_tomatoes());
-    let raspberries = min(9, inventory.get_raspberries());
-    let juice = min(9999, inventory.get_juice());
+    let tomatoes = min(MAX_TOMATOES, inventory.get_tomatoes());
+    let raspberries = min(MAX_RASPBERRIES, inventory.get_raspberries());
+    let juice = min(MAX_JUICE, inventory.get_juice());
 
-    // max values for testing
-    // let tomatoes = 99;
-    // let raspberries = 9;
-    // let juice = 9999;
+    // DEBUG: max values for testing
+    // let tomatoes = MAX_TOMATOES;
+    // let raspberries = MAX_RASPBERRIES;
+    // let juice = MAX_JUICE;
 
     let tomato_offset = if tomatoes > 9 { 5 } else { 0 };
 
@@ -63,19 +66,34 @@ fn draw_top_bar_inventory(offset: i32) {
     text_writer::draw_text(x, 0, FontStyle::Icon, Rgb332::RED, tomato_icon);
     let display_tomatoes = str_format!(fixedstr::str4, "{}", tomatoes);
     let x = 12 + offset;
-    text_writer::draw_text(x, 0, FontStyle::Small, Rgb332::WHITE, &display_tomatoes);
+    let color = if tomatoes == MAX_TOMATOES {
+        Rgb332::RED
+    } else {
+        Rgb332::WHITE
+    };
+    text_writer::draw_text(x, 0, FontStyle::Small, color, &display_tomatoes);
 
     let rasp_icon = "rs";
     let x = 17 + offset + tomato_offset;
     text_writer::draw_text(x, 0, FontStyle::Icon, Rgb332::RED, rasp_icon);
     let display_raspberries = str_format!(fixedstr::str4, "{}", raspberries);
     let x = 28 + offset + tomato_offset;
-    text_writer::draw_text(x, 0, FontStyle::Small, Rgb332::WHITE, &display_raspberries);
+    let color = if raspberries == MAX_RASPBERRIES {
+        Rgb332::RED
+    } else {
+        Rgb332::WHITE
+    };
+    text_writer::draw_text(x, 0, FontStyle::Small, color, &display_raspberries);
 
     let juice_icon = "w";
     let x = 35 + offset + tomato_offset;
     text_writer::draw_text(x, 0, FontStyle::Icon, Rgb332::RED, juice_icon);
     let display_juice = str_format!(fixedstr::str8, "{}ml", juice);
     let x = 43 + offset + tomato_offset;
-    text_writer::draw_text(x, 0, FontStyle::Small, Rgb332::WHITE, &display_juice);
+    let color = if juice == MAX_JUICE {
+        Rgb332::RED
+    } else {
+        Rgb332::WHITE
+    };
+    text_writer::draw_text(x, 0, FontStyle::Small, color, &display_juice);
 }
