@@ -3,9 +3,8 @@ use crate::game::display::text_writer;
 use crate::game::display::text_writer::draw_text;
 use crate::game::display::text_writer::FontStyle;
 use crate::game::hardware::input::KeyNames;
-use crate::game::hardware::rtc::RealDate;
-use crate::game::hardware::rtc::RealDateTime;
-use crate::game::hardware::rtc::RealTime;
+use crate::game::hardware::rtc::real_date_time::RealDateTime;
+use crate::game::hardware::rtc::real_time::RealTime;
 use crate::game::scenes::SceneBehavior;
 use crate::game::scenes::SceneType;
 
@@ -44,26 +43,23 @@ impl SceneBehavior for NyiScene {
         // let time_hr = now.time.hr;
         // let time_min = now.time.min;
         let (feeding_deadline_hr, feeding_deadline_min) = nvm.settings.get_feeding_deadline();
-        let (fed_day, fed_mon, fed_yr) = nvm.pet.get_last_fed_date();
-        let next_feed_day = fed_day + 1; // TODO: wrap around.....
-        let next_feed_mon = fed_mon;
-        let next_feed_yr = fed_yr;
+        let mut last_fed = nvm.pet.get_last_fed_date();
+        last_fed.inc_by_1_day();
+        // let next_feed_day = fed_day + 1; // TODO: wrap around.....
+        // let next_feed_mon = fed_mon;
+        // let next_feed_yr = fed_yr;
 
         let last_fed = RealDateTime {
-            date: RealDate {
-                year_since_2k: fed_yr,
-                month: fed_mon,
-                day_of_month: fed_day,
-                day_of_week: 1, // doesn't matter
-            },
+            date: last_fed,
             time: RealTime {
+                // Pet feeding time is advanced to the deadline
                 hr: feeding_deadline_hr,
                 min: feeding_deadline_min,
                 sec: 0,
             },
         };
         let mut next_feed = last_fed.clone();
-        next_feed.date.add_day();
+        next_feed.date.inc_by_1_day();
 
         // if now.date.year_since_2k > next_feed_yr {
         //     nvm.pet.is_hungry = true;
@@ -158,9 +154,9 @@ impl SceneBehavior for NyiScene {
             &fixedstr::str_format!(
                 fixedstr::str32,
                 "{}-{:02}-{:02} {:02}:{:02}:{:02}",
-                next_feed_yr as u16 + 2000,
-                next_feed_mon,
-                next_feed_day,
+                next_feed.date.year_since_2k as u16 + 2000,
+                next_feed.date.month,
+                next_feed.date.day_of_month,
                 feeding_deadline_hr,
                 feeding_deadline_min,
                 0

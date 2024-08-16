@@ -9,7 +9,7 @@ use crate::game::hardware::hardware::BRIGHTNESS_LUT;
 use crate::game::hardware::hardware::LCD_HEIGHT;
 use crate::game::hardware::hardware::LCD_WIDTH;
 use crate::game::hardware::input::KeyNames;
-use crate::game::hardware::rtc::Meridian;
+use crate::game::hardware::rtc::meridian::Meridian;
 use crate::game::scenes::main_scene::MainScene;
 use crate::game::scenes::SceneType;
 
@@ -133,14 +133,13 @@ fn test_feeding_deadline() -> () {
     // let time_hr = now.time.hr;
     // let time_min = now.time.min;
     let (feeding_deadline_hr, feeding_deadline_min) = nvm.settings.get_feeding_deadline();
-    let (fed_day, fed_mon, fed_yr) = nvm.pet.get_last_fed_date();
-    let next_feed_day = fed_day + 1;
-    let next_feed_mon = fed_mon;
-    let next_feed_yr = fed_yr;
+    let last_fed = nvm.pet.get_last_fed_date();
+    let mut feed_deadline = last_fed;
+    feed_deadline.inc_by_1_day();
 
-    if now.date.year_since_2k >= next_feed_yr {
-        if now.date.month >= next_feed_mon {
-            if now.date.day_of_month >= next_feed_day {
+    if now.date.year_since_2k >= feed_deadline.year_since_2k {
+        if now.date.month >= feed_deadline.month {
+            if now.date.day_of_month >= feed_deadline.day_of_month {
                 if now.time.hr >= feeding_deadline_hr {
                     if now.time.min >= feeding_deadline_min {
                         // It's time to feed

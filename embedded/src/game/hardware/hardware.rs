@@ -31,9 +31,9 @@ use crate::game::nvm::settings::SettingType;
 
 use super::audio::AudioFrequency;
 use super::rtc;
-use super::rtc::RealDate;
-use super::rtc::RealDateTime;
-use super::rtc::RealTime;
+use game::hardware::rtc::real_date::RealDate;
+use game::hardware::rtc::real_date_time::RealDateTime;
+use game::hardware::rtc::real_time::RealTime;
 
 pub const LCD_WIDTH: usize = 128;
 pub const LCD_HEIGHT: usize = 128;

@@ -5,7 +5,7 @@ use crate::game::display::text_writer;
 use crate::game::display::text_writer::FontStyle;
 use crate::game::hardware::hardware::LCD_WIDTH;
 use crate::game::hardware::input::KeyNames;
-use crate::game::hardware::rtc::RealTime;
+use crate::game::hardware::rtc::real_time::RealTime;
 
 use super::SettingComponentTrait;
 

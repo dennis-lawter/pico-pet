@@ -1,3 +1,5 @@
+use crate::game::hardware::rtc::real_date::RealDate;
+
 use super::page_canon::PageCanon;
 use super::NVM_BLANK;
 
@@ -99,17 +101,17 @@ impl NvmPet {
     }
 
     #[allow(dead_code)]
-    pub fn get_last_fed_date(&self) -> (u8, u8, u8) {
-        (
+    pub fn get_last_fed_date(&self) -> RealDate {
+        RealDate::new(
             self.health_data[3],
             self.health_data[4],
             self.health_data[5],
         )
     }
     #[allow(dead_code)]
-    pub fn set_last_fed_time(&mut self, time: (u8, u8, u8)) {
-        self.health_data[3] = time.0;
-        self.health_data[4] = time.1;
-        self.health_data[5] = time.2;
+    pub fn set_last_fed_time(&mut self, time: RealDate) {
+        self.health_data[3] = time.day_of_month;
+        self.health_data[4] = time.month;
+        self.health_data[5] = time.year_since_2k;
     }
 }
