@@ -1,9 +1,4 @@
-// use super::interval_date::IntervalDate;
-// use super::interval_time::IntervalTime;
-
 pub struct IntervalDateTime {
-    // pub date: IntervalDate,
-    // pub time: IntervalTime,
     pub seconds: i32,
 }
 impl IntervalDateTime {

@@ -38,15 +38,15 @@ impl RealDate {
             }
         }
     }
-    pub fn yyyy_mm_dd_str(&self) -> fixedstr::str16 {
-        fixedstr::str_format!(
-            fixedstr::str16,
-            "{:04}-{:02}-{:02}",
-            self.year_since_2k as u16 + 2000,
-            self.month,
-            self.day_of_month
-        )
-    }
+    // pub fn yyyy_mm_dd_str(&self) -> fixedstr::str16 {
+    //     fixedstr::str_format!(
+    //         fixedstr::str16,
+    //         "{:04}-{:02}-{:02}",
+    //         self.year_since_2k as u16 + 2000,
+    //         self.month,
+    //         self.day_of_month
+    //     )
+    // }
 }
 impl PartialEq for RealDate {
     fn eq(&self, other: &Self) -> bool {

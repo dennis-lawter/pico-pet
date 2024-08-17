@@ -142,43 +142,9 @@ impl SceneBehavior for StatScene {
             let now = crate::game::globals::get_hardware().get_date_time();
             let feeding_deadline = nvm.pet.get_feeding_deadline();
             let diff = feeding_deadline - now;
-
-            // let data = fixedstr::str_format!(
-            //     fixedstr::str12,
-            //     "{}:{:02}:{:02}",
-            //     diff_secs / (60 * 60),
-            //     (diff_secs / 60) % 60,
-            //     diff_secs % 60
-            // );
             let data = diff.to_str();
             text_writer::draw_text(8, height_offset, FontStyle::Small, Rgb332::BLACK, &data);
         }
-
-        // height_offset += 8;
-
-        // {
-        //     let time = hardware.get_time();
-        //     let curr_hr = time.hr;
-        //     let curr_min = time.min;
-        //     let feeding_deadline_hr = nvm
-        //         .settings
-        //         .get_setting(SettingType::FeedingDeadlineHour)
-        //         .get_value();
-        //     let feeding_deadline_min = nvm
-        //         .settings
-        //         .get_setting(SettingType::FeedingDeadlineMinute)
-        //         .get_value();
-        //     let feeding_deadline_is_after_midnight = true; // TODO: testing
-
-        //     // create hours_to_feeding_deadline and minutes_to_feeding_deadline
-        //     if feeding_deadline_is_after_midnight {
-        //         let day_in_minutes = 24 * 60;
-        //         let minutes_from_midnight_to_feeding_deadline =
-        //             feeding_deadline_hr as i16 * 60 + feeding_deadline_min as i16;
-        //         let minutes_from_now_to_midnight =
-        //             day_in_minutes - (curr_hr as i16 * 60 + curr_min as i16);
-        //     }
-        // }
     }
 
     fn next_scene(&self) -> &Option<SceneType> {
