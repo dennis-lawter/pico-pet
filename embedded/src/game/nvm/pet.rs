@@ -22,6 +22,7 @@ pub struct NvmPet {
 
     // temp values
     pub is_hungry: bool,
+    pub is_starved: bool,
 }
 impl Default for NvmPet {
     fn default() -> Self {
@@ -47,6 +48,7 @@ impl Default for NvmPet {
                 NVM_BLANK,
             ],
             is_hungry: false,
+            is_starved: false,
         }
     }
 }
@@ -62,6 +64,7 @@ impl NvmPet {
             health_data,
 
             is_hungry: false,
+            is_starved: false,
         }
     }
 

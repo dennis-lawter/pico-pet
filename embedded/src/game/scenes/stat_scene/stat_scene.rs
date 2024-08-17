@@ -4,6 +4,8 @@ use crate::game::display::text_writer;
 use crate::game::display::text_writer::FontStyle;
 use crate::game::hardware::hardware::LCD_WIDTH;
 use crate::game::hardware::input::KeyNames;
+use crate::game::hardware::rtc::real_date_time::RealDateTime;
+use crate::game::hardware::rtc::real_time::RealTime;
 // use crate::game::nvm::settings::SettingType;
 use crate::game::scenes::SceneBehavior;
 use crate::game::scenes::SceneType;
@@ -66,18 +68,12 @@ impl SceneBehavior for StatScene {
         height_offset += 8;
 
         {
+            // TODO: move to a helper
             let last_fed = nvm.pet.get_last_fed_date();
-            let feed_deadline = nvm.settings.get_feeding_deadline();
-            let data = fixedstr::str_format!(
-                fixedstr::str24,
-                "{}-{}-{} {}:{:02}:{:02}",
-                last_fed.year_since_2k as u16 + 2000,
-                last_fed.month,
-                last_fed.day_of_month,
-                feed_deadline.0,
-                feed_deadline.1,
-                0
-            );
+            let feed_deadline_raw = nvm.settings.get_feeding_deadline();
+            let feed_deadline_time = RealTime::new(feed_deadline_raw.0, feed_deadline_raw.1, 0);
+            let feed_deadline_datetime = RealDateTime::new(feed_deadline_time, last_fed);
+            let data = feed_deadline_datetime.to_fixed_str();
             text_writer::draw_text(8, height_offset, FontStyle::Small, Rgb332::BLACK, &data);
         }
 
@@ -92,16 +88,23 @@ impl SceneBehavior for StatScene {
 
         {
             let last_fed = nvm.pet.get_feeding_deadline();
-            let data = fixedstr::str_format!(
-                fixedstr::str24,
-                "{}-{}-{} {}:{:02}:{:02}",
-                last_fed.date.year_since_2k as u16 + 2000,
-                last_fed.date.month,
-                last_fed.date.day_of_month,
-                last_fed.time.hr,
-                last_fed.time.min,
-                last_fed.time.sec,
-            );
+            let data = last_fed.to_fixed_str();
+            text_writer::draw_text(8, height_offset, FontStyle::Small, Rgb332::BLACK, &data);
+        }
+
+        height_offset += 8;
+
+        {
+            let header = "Next warning";
+            text_writer::draw_text(8, height_offset, FontStyle::Small, Rgb332::BLACK, header);
+        }
+
+        height_offset += 8;
+
+        {
+            let mut feed_warning = nvm.pet.get_feeding_deadline();
+            feed_warning.dec_by_1_hour();
+            let data = feed_warning.to_fixed_str();
             text_writer::draw_text(8, height_offset, FontStyle::Small, Rgb332::BLACK, &data);
         }
 
@@ -116,16 +119,7 @@ impl SceneBehavior for StatScene {
 
         {
             let now = crate::game::globals::get_hardware().get_date_time();
-            let data = fixedstr::str_format!(
-                fixedstr::str24,
-                "{}-{}-{} {}:{:02}:{:02}",
-                now.date.year_since_2k as u16 + 2000,
-                now.date.month,
-                now.date.day_of_month,
-                now.time.hr,
-                now.time.min,
-                now.time.sec,
-            );
+            let data = now.to_fixed_str();
             text_writer::draw_text(8, height_offset, FontStyle::Small, Rgb332::BLACK, &data);
         }
 

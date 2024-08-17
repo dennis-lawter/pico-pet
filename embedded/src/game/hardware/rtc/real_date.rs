@@ -1,7 +1,7 @@
 use core::cmp;
 // use core::ops::Sub;
 
-use super::dow::DayOfWeek;
+// use super::dow::DayOfWeek;
 use super::find_day_of_week;
 // use super::interval_date::IntervalDate;
 use super::month::Month;
@@ -24,9 +24,8 @@ impl RealDate {
     }
     pub fn inc_by_1_day(&mut self) {
         self.day_of_week += 1;
-        if self.day_of_week > DayOfWeek::Saturday as u8 {
-            self.day_of_week = DayOfWeek::Sunday as u8;
-        }
+        self.day_of_week %= 7;
+
         self.day_of_month += 1;
         let month_enum = Month::from(self.month);
         if self.day_of_month > month_enum.days_in_month(self.year_since_2k) {
@@ -38,15 +37,42 @@ impl RealDate {
             }
         }
     }
-    // pub fn yyyy_mm_dd_str(&self) -> fixedstr::str16 {
-    //     fixedstr::str_format!(
-    //         fixedstr::str16,
-    //         "{:04}-{:02}-{:02}",
-    //         self.year_since_2k as u16 + 2000,
-    //         self.month,
-    //         self.day_of_month
-    //     )
-    // }
+    pub fn dec_by_1_day(&mut self) {
+        self.day_of_week += 6;
+        self.day_of_week %= 7;
+
+        // No 0 days unless we're avoiding a y2k underflow
+        if self.day_of_month > 1 {
+            self.day_of_month -= 1;
+        } else {
+            let month_enum: Month;
+            if self.month > 0 {
+                self.month -= 1;
+                month_enum = Month::from(self.month);
+            } else {
+                month_enum = Month::December;
+
+                if self.year_since_2k > 0 {
+                    self.year_since_2k -= 1;
+                } else {
+                    // Underflow protection, reset to y2k day 0 (jan 0, 2000)
+                    self.year_since_2k = 0;
+                    self.month = Month::January as u8;
+                    self.day_of_month = 0;
+                }
+            }
+            self.day_of_month = month_enum.days_in_month(self.year_since_2k);
+        }
+    }
+    pub fn yyyy_mm_dd_str(&self) -> fixedstr::str16 {
+        fixedstr::str_format!(
+            fixedstr::str16,
+            "{:04}-{:02}-{:02}",
+            self.year_since_2k as u16 + 2000,
+            self.month,
+            self.day_of_month
+        )
+    }
 }
 impl PartialEq for RealDate {
     fn eq(&self, other: &Self) -> bool {

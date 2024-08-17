@@ -31,14 +31,23 @@ impl RealDateTime {
             + month_seconds
     }
 
-    // pub fn to_fixed_str(&self) -> fixedstr::str32 {
-    //     fixedstr::str_format!(
-    //         fixedstr::str32,
-    //         "{} {}",
-    //         self.date.yyyy_mm_dd_str(),
-    //         self.time.hh_mm_ss_str()
-    //     )
-    // }
+    pub fn dec_by_1_hour(&mut self) {
+        if self.time.hr > 0 {
+            self.time.hr -= 1;
+        } else {
+            self.time.hr = 23;
+            self.date.dec_by_1_day();
+        }
+    }
+
+    pub fn to_fixed_str(&self) -> fixedstr::str32 {
+        fixedstr::str_format!(
+            fixedstr::str32,
+            "{} {}",
+            self.date.yyyy_mm_dd_str(),
+            self.time.hh_mm_ss_str()
+        )
+    }
 }
 impl PartialEq for RealDateTime {
     fn eq(&self, other: &Self) -> bool {
