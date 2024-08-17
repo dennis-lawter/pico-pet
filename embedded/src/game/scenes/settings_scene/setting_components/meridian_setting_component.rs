@@ -30,9 +30,7 @@ impl Default for MeridianSettingComponent {
 }
 
 impl SettingComponentTrait for MeridianSettingComponent {
-    fn draw(&mut self, y_offset: i32, selected: bool) {
-        const BAR_FILLED: u8 = b'4';
-        const BAR_EMPTY: u8 = b'=';
+    fn draw(&mut self, y_offset: i32, _selected: bool) {
         text_writer::draw_text_centered(
             LCD_WIDTH as i32 / 2,
             y_offset,
@@ -40,7 +38,6 @@ impl SettingComponentTrait for MeridianSettingComponent {
             Rgb332::BLACK,
             "CLOCK SETTING",
         );
-        // TODO: toggle switch
         let value = self.setting.get_value();
         if value == 0 {
             text_writer::draw_text(
@@ -55,8 +52,6 @@ impl SettingComponentTrait for MeridianSettingComponent {
                 y_offset + 8,
                 FontStyle::Small,
                 Rgb332::WHITE,
-                /*
-                "44444444========", */
                 "  24hr          ",
             );
             text_writer::draw_text(
@@ -64,8 +59,6 @@ impl SettingComponentTrait for MeridianSettingComponent {
                 y_offset + 8,
                 FontStyle::Small,
                 Rgb332::LIGHT_GREY,
-                /*
-                "44444444========", */
                 "          12hr  ",
             );
         } else {
@@ -81,8 +74,6 @@ impl SettingComponentTrait for MeridianSettingComponent {
                 y_offset + 8,
                 FontStyle::Small,
                 Rgb332::LIGHT_GREY,
-                /*
-                "44444444========", */
                 "  24hr          ",
             );
             text_writer::draw_text(
@@ -90,8 +81,6 @@ impl SettingComponentTrait for MeridianSettingComponent {
                 y_offset + 8,
                 FontStyle::Small,
                 Rgb332::WHITE,
-                /*
-                "44444444========", */
                 "          12hr  ",
             );
         }

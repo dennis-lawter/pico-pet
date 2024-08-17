@@ -1,5 +1,3 @@
-use fixedstr::str_format;
-
 use crate::game::color::Rgb332;
 use crate::game::display::render;
 use crate::game::display::text_writer;
@@ -9,7 +7,6 @@ use crate::game::hardware::hardware::BRIGHTNESS_LUT;
 use crate::game::hardware::hardware::LCD_HEIGHT;
 use crate::game::hardware::hardware::LCD_WIDTH;
 use crate::game::hardware::input::KeyNames;
-use crate::game::hardware::rtc::meridian::Meridian;
 use crate::game::scenes::main_scene::MainScene;
 use crate::game::scenes::SceneType;
 
@@ -67,23 +64,7 @@ pub fn primary_main_loop() -> ! {
             let y = LCD_HEIGHT as i32 / 2 - FontStyle::Big.get_glyph_dimensions().1 as i32 / 2;
             let time = hardware.get_time();
 
-            // TODO: fix bug
-            // I dont know why but I cant use any of the realtime helpers here...
-            // Maybe they are not initialized yet?
-            // But it works in the top_bar...
-            // And it still works with the raw members...
-
-            // let mut time_str = time.hh_mm_str();
-
-            let time_str = {
-                let hr = time.get_meridian_hour();
-                let meridian = time.get_meridian();
-                let meridian_str = match meridian {
-                    Meridian::Am => "AM",
-                    Meridian::Pm => "PM",
-                };
-                str_format!(fixedstr::str8, "{}:{:02}{}", hr, time.min, meridian_str)
-            };
+            let time_str = time.hh_mm_str();
 
             text_writer::draw_text_centered(
                 x,

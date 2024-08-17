@@ -7,7 +7,6 @@ Done items should be removed from the list.
 - Bugs
 - Misc
   - Vibe setting
-  - 24 hr clock setting
   - Date setting
   - Idle setting
   - Store the `MainScene::menu_item_selected` as a static/global for reloading the scene
