@@ -28,9 +28,7 @@ Done items should be removed from the list.
   - Displays information about the pet:
     - Birthday
     - Age
-    - Current and max HP
     - Current daily hunger
-    - Hours until next feeding deadline
     - Illness if applicable
 - Eating Scene
   - Opening the scene after eating today says the pet cannot eat again.
@@ -47,8 +45,6 @@ Done items should be removed from the list.
 - Pet maintenance
   - Introduce check, runs at feeding deadline
     - Must have save data for last time a day was written to NVM
-    - Don't read often, maybe only on 1hz clock
-    - Performed outside of scene maintenance
 - Pet rework
   - Switch from Ferris to a custom designed pet
   - Switch from lofi girl to custom animation(s)
