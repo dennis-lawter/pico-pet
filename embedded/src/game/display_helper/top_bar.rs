@@ -10,6 +10,7 @@ use crate::game::hardware::hardware::LCD_WIDTH;
 use crate::game::nvm::inventory::MAX_JUICE;
 use crate::game::nvm::inventory::MAX_RASPBERRIES;
 use crate::game::nvm::inventory::MAX_TOMATOES;
+use crate::game::nvm::settings::SettingType;
 
 pub fn draw_top_bar() {
     draw_top_bar_bg();
@@ -39,9 +40,18 @@ fn draw_top_bar_alert() {
 
 fn draw_top_bar_clock() {
     let hardware = crate::game::globals::get_hardware();
+    let nvm = crate::game::globals::get_nvm();
     let time = hardware.get_time();
     let time_str = time.hh_mm_str();
-    let x = LCD_WIDTH as i32 - FontStyle::Small.get_glyph_dimensions().0 as i32 * (5 + 2);
+    let mut x = LCD_WIDTH as i32 - FontStyle::Small.get_glyph_dimensions().0 as i32 * (5 + 2);
+    if nvm
+        .settings
+        .get_setting(SettingType::UseMeridian)
+        .get_value()
+        == 0
+    {
+        x += 2 * FontStyle::Small.get_glyph_dimensions().0 as i32;
+    }
 
     text_writer::draw_text(x, 0, FontStyle::Small, Rgb332::WHITE, &time_str);
 }

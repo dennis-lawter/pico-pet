@@ -4,14 +4,11 @@ This list is not final. It will grow and evolve.
 
 Done items should be removed from the list.
 
-- Bugs
 - Misc
-  - Date setting
-  - Idle setting
+  - Date setting, date selector...
+  - Idle setting, how many minutes
   - Store the `MainScene::menu_item_selected` as a static/global for reloading the scene
   - Handle AM/PM time adjustment in settings scene
-- Idle Scene
-  - Bugs and improvements listed in code comments
 - Intro Scene
   - Only loaded if NVM is not initialized properly and must be reset
   - Remove the current code which checks for invalid NVM then autowrites default
