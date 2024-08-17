@@ -1,4 +1,5 @@
 pub mod eat_scene;
+pub mod intro_scene;
 pub mod main_scene;
 pub mod nyi_scene;
 pub mod pomo_scene;
@@ -7,6 +8,8 @@ pub mod stat_scene;
 
 #[derive(Clone)]
 pub enum SceneType {
+    Intro,
+
     Main,
 
     Pomo,
@@ -17,7 +20,7 @@ pub enum SceneType {
 }
 impl Default for SceneType {
     fn default() -> Self {
-        Self::Main
+        Self::Intro
     }
 }
 

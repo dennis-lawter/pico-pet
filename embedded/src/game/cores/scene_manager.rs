@@ -1,4 +1,5 @@
 use crate::game::scenes::eat_scene::EatScene;
+use crate::game::scenes::intro_scene::IntroScene;
 use crate::game::scenes::main_scene::MainScene;
 use crate::game::scenes::nyi_scene::NyiScene;
 use crate::game::scenes::pomo_scene::PomoScene;
@@ -7,9 +8,11 @@ use crate::game::scenes::stat_scene::stat_scene::StatScene;
 use crate::game::scenes::SceneBehavior;
 use crate::game::scenes::SceneType;
 
-#[derive(Default)]
 pub struct SceneManager<'a> {
+    pub intro_scene: Option<IntroScene>,
+
     pub game_play_scene: Option<MainScene<'a>>,
+
     pub pomo_scene: Option<PomoScene<'a>>,
     pub eat_scene: Option<EatScene<'a>>,
     pub stat_scene: Option<StatScene>,
@@ -18,9 +21,25 @@ pub struct SceneManager<'a> {
 
     pub active_scene: SceneType,
 }
+
+impl<'a> Default for SceneManager<'a> {
+    fn default() -> Self {
+        Self {
+            intro_scene: Some(IntroScene::default()),
+            game_play_scene: Default::default(),
+            pomo_scene: Default::default(),
+            eat_scene: Default::default(),
+            stat_scene: Default::default(),
+            cosmetic_scene: Default::default(),
+            settings_scene: Default::default(),
+            active_scene: SceneType::Intro,
+        }
+    }
+}
 impl SceneManager<'static> {
     fn get_scene(&mut self) -> &mut dyn SceneBehavior {
         match self.active_scene {
+            SceneType::Intro => self.intro_scene.as_mut().unwrap(),
             SceneType::Main => self.game_play_scene.as_mut().unwrap(),
             SceneType::Settings => self.settings_scene.as_mut().unwrap(),
             SceneType::Pomo => self.pomo_scene.as_mut().unwrap(),
@@ -55,6 +74,7 @@ impl SceneManager<'static> {
                 self.settings_scene = None;
 
                 match next_scene {
+                    SceneType::Intro => self.intro_scene = Some(IntroScene::default()),
                     SceneType::Main => self.game_play_scene = Some(MainScene::default()),
                     SceneType::Pomo => self.pomo_scene = Some(PomoScene::default()),
                     SceneType::Eat => self.eat_scene = Some(EatScene::default()),

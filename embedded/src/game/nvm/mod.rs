@@ -13,6 +13,7 @@ pub use self::settings::NvmSettings;
 pub const NVM_BLANK: u8 = 0xff;
 
 pub struct Nvm {
+    pub fresh: bool,
     pub parity: NvmHeader,
     pub settings: NvmSettings,
     pub inventory: NvmInventory,
@@ -21,6 +22,7 @@ pub struct Nvm {
 impl Default for Nvm {
     fn default() -> Self {
         Self {
+            fresh: true,
             parity: NvmHeader::default(),
             settings: NvmSettings::default(),
             inventory: NvmInventory::default(),
@@ -33,6 +35,7 @@ impl Nvm {
         match NvmHeader::try_load() {
             Some(parity) => {
                 let new_nvm = Self {
+                    fresh: false,
                     parity,
                     settings: NvmSettings::load(),
                     inventory: NvmInventory::load(),
@@ -42,9 +45,9 @@ impl Nvm {
                 new_nvm
             }
             None => {
-                let mut new_nvm = Self::default();
+                let new_nvm = Self::default();
 
-                new_nvm.write_all();
+                // new_nvm.write_all();
 
                 new_nvm
             }

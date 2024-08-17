@@ -18,7 +18,6 @@ const SECONDS_UNTIL_IDLE: usize = 60 * APPROX_FRAMES_PER_SECOND;
 pub fn primary_main_loop() -> ! {
     let mut scene_manager = SceneManager::default();
     scene_manager.game_play_scene = Some(MainScene::default());
-    scene_manager.active_scene = SceneType::Main;
 
     let mut idle_frame_counter: usize = 0;
 
