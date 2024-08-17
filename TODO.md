@@ -10,8 +10,6 @@ Done items should be removed from the list.
   - Store the `MainScene::menu_item_selected` as a static/global for reloading the scene
   - Handle AM/PM time adjustment in settings scene
 - Intro Scene
-  - Only loaded if NVM is not initialized properly and must be reset
-  - Remove the current code which checks for invalid NVM then autowrites default
   - Introduce pet
   - Explain the pomodoro method
   - Explain how feeding works
