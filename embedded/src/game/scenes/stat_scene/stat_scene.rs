@@ -141,15 +141,16 @@ impl SceneBehavior for StatScene {
         {
             let now = crate::game::globals::get_hardware().get_date_time();
             let feeding_deadline = nvm.pet.get_feeding_deadline();
-            let diff_secs = feeding_deadline - now;
+            let diff = feeding_deadline - now;
 
-            let data = fixedstr::str_format!(
-                fixedstr::str12,
-                "{}:{:02}:{:02}",
-                diff_secs / (60 * 60),
-                (diff_secs / 60) % 60,
-                diff_secs % 60
-            );
+            // let data = fixedstr::str_format!(
+            //     fixedstr::str12,
+            //     "{}:{:02}:{:02}",
+            //     diff_secs / (60 * 60),
+            //     (diff_secs / 60) % 60,
+            //     diff_secs % 60
+            // );
+            let data = diff.to_str();
             text_writer::draw_text(8, height_offset, FontStyle::Small, Rgb332::BLACK, &data);
         }
 

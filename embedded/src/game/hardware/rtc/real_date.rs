@@ -1,7 +1,9 @@
 use core::cmp;
+// use core::ops::Sub;
 
 use super::dow::DayOfWeek;
 use super::find_day_of_week;
+// use super::interval_date::IntervalDate;
 use super::month::Month;
 
 #[derive(Copy, Clone)]
@@ -36,6 +38,15 @@ impl RealDate {
             }
         }
     }
+    pub fn yyyy_mm_dd_str(&self) -> fixedstr::str16 {
+        fixedstr::str_format!(
+            fixedstr::str16,
+            "{:04}-{:02}-{:02}",
+            self.year_since_2k as u16 + 2000,
+            self.month,
+            self.day_of_month
+        )
+    }
 }
 impl PartialEq for RealDate {
     fn eq(&self, other: &Self) -> bool {
@@ -67,3 +78,9 @@ impl PartialOrd for RealDate {
         }
     }
 }
+// impl Sub for RealDate {
+//     type Output = IntervalDate;
+//     fn sub(self, other: Self) -> IntervalDate {
+//         // TODO
+//     }
+// }

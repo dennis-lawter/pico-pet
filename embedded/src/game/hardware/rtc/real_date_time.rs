@@ -1,6 +1,7 @@
 use core::cmp;
 use core::ops::Sub;
 
+use super::interval_date_time::IntervalDateTime;
 use super::month::Month;
 use super::real_date::RealDate;
 use super::real_time::RealTime;
@@ -29,6 +30,15 @@ impl RealDateTime {
             + self.date.day_of_month as u32 * (60 * 60 * 24)
             + month_seconds
     }
+
+    pub fn to_fixed_str(&self) -> fixedstr::str32 {
+        fixedstr::str_format!(
+            fixedstr::str32,
+            "{} {}",
+            self.date.yyyy_mm_dd_str(),
+            self.time.hh_mm_ss_str()
+        )
+    }
 }
 impl PartialEq for RealDateTime {
     fn eq(&self, other: &Self) -> bool {
@@ -55,11 +65,19 @@ impl PartialOrd for RealDateTime {
         // }
     }
 }
+// impl Sub for RealDateTime {
+//     type Output = i32;
+//     fn sub(self, other: Self) -> i32 {
+//         let my_epoch = self.to_y2k_epoch() as i32;
+//         let other_epoch = other.to_y2k_epoch() as i32;
+//         my_epoch - other_epoch
+//     }
+// }
 impl Sub for RealDateTime {
-    type Output = i32;
-    fn sub(self, other: Self) -> i32 {
+    type Output = IntervalDateTime;
+    fn sub(self, other: Self) -> IntervalDateTime {
         let my_epoch = self.to_y2k_epoch() as i32;
         let other_epoch = other.to_y2k_epoch() as i32;
-        my_epoch - other_epoch
+        IntervalDateTime::from_epoch(my_epoch - other_epoch)
     }
 }
