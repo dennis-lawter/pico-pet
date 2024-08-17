@@ -117,11 +117,26 @@ fn check_feeding_deadline_is_passed() -> () {
     feeding_warning.dec_by_1_hour();
 
     if now > feeding_deadline {
-        nvm.pet.is_hungry = true; // TODO: reconsider?
-        nvm.pet.is_starved = true;
+        perform_starve();
+        // nvm.pet.is_hungry = true; // TODO: reconsider?
+        // nvm.pet.is_starved = true;
         // } else if now > feeding_warning {
         //     nvm.pet.is_hungry = true;
     }
+}
+
+fn perform_starve() {
+    let nvm = crate::game::globals::get_nvm();
+    nvm.pet.is_hungry = false;
+    nvm.pet.is_starved = false;
+    let current_feeding_deadline = nvm.pet.get_feeding_deadline();
+    nvm.pet.set_last_fed_date(current_feeding_deadline.date);
+    let hp = nvm.pet.get_health();
+    if hp > 0 {
+        nvm.pet.set_health(hp - 1);
+    }
+    // current_feeding_deadline.inc_by_1_day();
+    // nvm.pet.set
 }
 
 fn swap() {

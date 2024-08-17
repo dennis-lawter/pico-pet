@@ -54,7 +54,7 @@ impl SceneBehavior for StatScene {
         {
             let full_hp_bar_width = LCD_WIDTH - 16;
             let hp_bar_width = curr_hp as usize * full_hp_bar_width / max_hp as usize;
-            render::solid_line_rect(8, height_offset, hp_bar_width, 8, Rgb332::BLACK);
+            render::solid_line_rect(8, height_offset, full_hp_bar_width, 8, Rgb332::BLACK);
             render::fill_rect(8, height_offset, hp_bar_width, 8, Rgb332::RED);
         }
 

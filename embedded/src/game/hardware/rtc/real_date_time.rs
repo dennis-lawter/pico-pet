@@ -40,6 +40,10 @@ impl RealDateTime {
         }
     }
 
+    // pub fn inc_by_1_day(&mut self) {
+    //     self.date.inc_by_1_day();
+    // }
+
     pub fn to_fixed_str(&self) -> fixedstr::str32 {
         fixedstr::str_format!(
             fixedstr::str32,

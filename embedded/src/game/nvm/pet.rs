@@ -127,9 +127,9 @@ impl NvmPet {
         )
     }
     #[allow(dead_code)]
-    pub fn set_last_fed_time(&mut self, time: RealDate) {
-        self.health_data[3] = time.day_of_month;
-        self.health_data[4] = time.month;
-        self.health_data[5] = time.year_since_2k;
+    pub fn set_last_fed_date(&mut self, date: RealDate) {
+        self.health_data[3] = date.day_of_month;
+        self.health_data[4] = date.month;
+        self.health_data[5] = date.year_since_2k;
     }
 }
