@@ -4,6 +4,7 @@ pub enum SettingSelected {
     Brightness = 0,
     Volume,
     Time,
+    Meridian,
     PomoTime,
     ShortRest,
     LongRest,

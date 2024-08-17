@@ -50,7 +50,7 @@ Pages are addressed from hexidecimal 0x000 to 0x1ff.
 | 0 | User brightness | 0 | 15 |
 | 1 | User volume | 0 | 4 |
 | 2 | *nyi* Vibration enabled | 0 | 1 |
-| 3 | *nyi* 24hr clock enabled | 0 | 1 |
+| 3 | *nyi* 12hr clock enabled | 0 | 1 |
 | 4 | *nyi* minutes before device sleeps | 1 | 90 |
 | 5 |  |  |  |
 | 6 |  |  |  |

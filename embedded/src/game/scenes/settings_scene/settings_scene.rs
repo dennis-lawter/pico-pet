@@ -51,6 +51,7 @@ fn generate_setting_components() -> [SettingComponent; SettingSelected::MAX_VALU
         ),
         SettingComponent::Volume(super::setting_components::VolumeSettingComponent::default()),
         SettingComponent::Time(super::setting_components::TimeSettingComponent::default()),
+        SettingComponent::Meridian(super::setting_components::MeridianSettingComponent::default()),
         SettingComponent::PomoTime(super::setting_components::PomoTimeSettingComponent::default()),
         SettingComponent::ShortRest(
             super::setting_components::ShortRestSettingComponent::default(),

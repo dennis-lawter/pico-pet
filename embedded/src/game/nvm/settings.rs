@@ -13,6 +13,7 @@ pub enum SettingType {
     Brightness,
     Volume,
     Vibration,
+    UseMeridian,
 
     PomodoroMinutes,
     ShortRestMinutes,
@@ -38,6 +39,11 @@ impl SettingType {
                 min: 0,
                 max: 1,
                 default: 1,
+            },
+            SettingType::UseMeridian => SettingValues {
+                min: 0,
+                max: 1,
+                default: 0,
             },
 
             SettingType::PomodoroMinutes => SettingValues {
@@ -85,7 +91,7 @@ impl Default for NvmSettings {
                 SettingType::Brightness.to_setting_value().default,
                 SettingType::Volume.to_setting_value().default,
                 SettingType::Vibration.to_setting_value().default,
-                NVM_BLANK,
+                SettingType::UseMeridian.to_setting_value().default,
                 NVM_BLANK,
                 NVM_BLANK,
                 NVM_BLANK,
@@ -133,6 +139,7 @@ impl NvmSettings {
             SettingType::Brightness => self.system_data[0],
             SettingType::Volume => self.system_data[1],
             SettingType::Vibration => self.system_data[2],
+            SettingType::UseMeridian => self.system_data[3],
 
             SettingType::PomodoroMinutes => self.pomo_data[0],
             SettingType::ShortRestMinutes => self.pomo_data[1],
@@ -154,6 +161,7 @@ impl NvmSettings {
             SettingType::Brightness => self.system_data[0] = value,
             SettingType::Volume => self.system_data[1] = value,
             SettingType::Vibration => self.system_data[2] = value,
+            SettingType::UseMeridian => self.system_data[3] = value,
 
             SettingType::PomodoroMinutes => self.pomo_data[0] = value,
             SettingType::ShortRestMinutes => self.pomo_data[1] = value,
