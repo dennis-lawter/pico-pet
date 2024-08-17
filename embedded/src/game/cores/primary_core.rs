@@ -31,7 +31,7 @@ pub fn primary_main_loop() -> ! {
     swap();
 
     loop {
-        test_feeding_deadline();
+        check_feeding_deadline_is_passed();
         // Disable the timer during the pomo scene
         match scene_manager.active_scene {
             SceneType::Pomo => {
@@ -121,34 +121,20 @@ pub fn primary_main_loop() -> ! {
     }
 }
 
-fn test_feeding_deadline() -> () {
+fn check_feeding_deadline_is_passed() -> () {
     let input = crate::game::globals::get_input();
     if !input.get_state(&KeyNames::Clock).just_released {
-        // limit checks to 1hz
+        // limit checks to 1hz to save CPU cycles
         return;
     }
     let nvm = crate::game::globals::get_nvm();
+    // DEBUG: force hungry
     // nvm.pet.is_hungry = true;
     let now = crate::game::globals::get_hardware().get_date_time();
-    // let time_hr = now.time.hr;
-    // let time_min = now.time.min;
-    let (feeding_deadline_hr, feeding_deadline_min) = nvm.settings.get_feeding_deadline();
-    let last_fed = nvm.pet.get_last_fed_date();
-    let mut feed_deadline = last_fed;
-    feed_deadline.inc_by_1_day();
+    let feeding_deadline = nvm.pet.get_feeding_deadline();
 
-    if now.date.year_since_2k >= feed_deadline.year_since_2k {
-        if now.date.month >= feed_deadline.month {
-            if now.date.day_of_month >= feed_deadline.day_of_month {
-                if now.time.hr >= feeding_deadline_hr {
-                    if now.time.min >= feeding_deadline_min {
-                        // It's time to feed
-                        // TODO: this is a test to confirm the logic
-                        nvm.pet.is_hungry = true;
-                    }
-                }
-            }
-        }
+    if now > feeding_deadline {
+        nvm.pet.is_hungry = true;
     }
 }
 

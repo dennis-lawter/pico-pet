@@ -11,9 +11,9 @@ pub struct RealTime {
     pub hr: u8,
 }
 impl RealTime {
-    // pub fn new(hr: u8, min: u8, sec: u8) -> Self {
-    //     Self { sec, min, hr }
-    // }
+    pub fn new(hr: u8, min: u8, sec: u8) -> Self {
+        Self { sec, min, hr }
+    }
     pub fn get_meridian_hour(&self) -> u8 {
         if self.hr == 00 {
             12

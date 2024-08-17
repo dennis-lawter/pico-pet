@@ -59,8 +59,98 @@ impl SceneBehavior for StatScene {
         height_offset += 8;
 
         {
+            let header = "Last fed";
+            text_writer::draw_text(8, height_offset, FontStyle::Small, Rgb332::BLACK, header);
+        }
+
+        height_offset += 8;
+
+        {
+            let last_fed = nvm.pet.get_last_fed_date();
+            let feed_deadline = nvm.settings.get_feeding_deadline();
+            let data = fixedstr::str_format!(
+                fixedstr::str24,
+                "{}-{}-{} {}:{:02}:{:02}",
+                last_fed.year_since_2k as u16 + 2000,
+                last_fed.month,
+                last_fed.day_of_month,
+                feed_deadline.0,
+                feed_deadline.1,
+                0
+            );
+            text_writer::draw_text(8, height_offset, FontStyle::Small, Rgb332::BLACK, &data);
+        }
+
+        height_offset += 8;
+
+        {
+            let header = "Next feeding";
+            text_writer::draw_text(8, height_offset, FontStyle::Small, Rgb332::BLACK, header);
+        }
+
+        height_offset += 8;
+
+        {
+            let last_fed = nvm.pet.get_feeding_deadline();
+            let data = fixedstr::str_format!(
+                fixedstr::str24,
+                "{}-{}-{} {}:{:02}:{:02}",
+                last_fed.date.year_since_2k as u16 + 2000,
+                last_fed.date.month,
+                last_fed.date.day_of_month,
+                last_fed.time.hr,
+                last_fed.time.min,
+                last_fed.time.sec,
+            );
+            text_writer::draw_text(8, height_offset, FontStyle::Small, Rgb332::BLACK, &data);
+        }
+
+        height_offset += 8;
+
+        {
+            let header = "Now";
+            text_writer::draw_text(8, height_offset, FontStyle::Small, Rgb332::BLACK, header);
+        }
+
+        height_offset += 8;
+
+        {
+            let now = crate::game::globals::get_hardware().get_date_time();
+            let data = fixedstr::str_format!(
+                fixedstr::str24,
+                "{}-{}-{} {}:{:02}:{:02}",
+                now.date.year_since_2k as u16 + 2000,
+                now.date.month,
+                now.date.day_of_month,
+                now.time.hr,
+                now.time.min,
+                now.time.sec,
+            );
+            text_writer::draw_text(8, height_offset, FontStyle::Small, Rgb332::BLACK, &data);
+        }
+
+        height_offset += 8;
+
+        {
             let header = "Time until next feeding";
             text_writer::draw_text(8, height_offset, FontStyle::Small, Rgb332::BLACK, header);
+        }
+
+        height_offset += 8;
+
+        {
+            let now = crate::game::globals::get_hardware().get_date_time();
+            let feeding_deadline = nvm.pet.get_feeding_deadline();
+            let diff_secs = feeding_deadline - now;
+
+            let data = fixedstr::str_format!(
+                fixedstr::str12,
+                "{}:{:02}:{:02}",
+                diff_secs / (60 * 60),
+                (diff_secs / 60) % 60,
+                diff_secs % 60
+            );
+            text_writer::draw_text(8, height_offset, FontStyle::Small, Rgb332::BLACK, &data);
         }
 
         // height_offset += 8;

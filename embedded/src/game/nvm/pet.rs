@@ -1,4 +1,6 @@
 use crate::game::hardware::rtc::real_date::RealDate;
+use crate::game::hardware::rtc::real_date_time::RealDateTime;
+use crate::game::hardware::rtc::real_time::RealTime;
 
 use super::page_canon::PageCanon;
 use super::NVM_BLANK;
@@ -100,6 +102,19 @@ impl NvmPet {
         self.health_data[2] = hunger;
     }
 
+    pub fn get_feeding_deadline(&self) -> RealDateTime {
+        let nvm = crate::game::globals::get_nvm();
+
+        let last_fed = self.get_last_fed_date();
+        let mut feed_deadline = last_fed.clone();
+        feed_deadline.inc_by_1_day();
+
+        let (feeding_deadline_hr, feeding_deadline_min) = nvm.settings.get_feeding_deadline();
+        RealDateTime::new(
+            RealTime::new(feeding_deadline_hr, feeding_deadline_min, 0),
+            feed_deadline,
+        )
+    }
     #[allow(dead_code)]
     pub fn get_last_fed_date(&self) -> RealDate {
         RealDate::new(

@@ -1,4 +1,5 @@
 use core::cmp;
+use core::ops::Sub;
 
 use super::month::Month;
 use super::real_date::RealDate;
@@ -52,5 +53,13 @@ impl PartialOrd for RealDateTime {
         // } else {
         //     Some(cmp::Ordering::Less)
         // }
+    }
+}
+impl Sub for RealDateTime {
+    type Output = i32;
+    fn sub(self, other: Self) -> i32 {
+        let my_epoch = self.to_y2k_epoch() as i32;
+        let other_epoch = other.to_y2k_epoch() as i32;
+        my_epoch - other_epoch
     }
 }
