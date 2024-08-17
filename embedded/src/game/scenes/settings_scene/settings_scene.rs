@@ -50,6 +50,9 @@ fn generate_setting_components() -> [SettingComponent; SettingSelected::MAX_VALU
             super::setting_components::BrightnessSettingComponent::default(),
         ),
         SettingComponent::Volume(super::setting_components::VolumeSettingComponent::default()),
+        SettingComponent::Vibration(
+            super::setting_components::VibrationSettingComponent::default(),
+        ),
         SettingComponent::Time(super::setting_components::TimeSettingComponent::default()),
         SettingComponent::Meridian(super::setting_components::MeridianSettingComponent::default()),
         SettingComponent::PomoTime(super::setting_components::PomoTimeSettingComponent::default()),

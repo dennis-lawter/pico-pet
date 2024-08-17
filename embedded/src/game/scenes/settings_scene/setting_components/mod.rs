@@ -7,6 +7,7 @@ pub mod pomo_time_setting_component;
 pub mod reset_setting_component;
 pub mod short_rest_setting_component;
 pub mod time_setting_component;
+pub mod vibration_setting_component;
 pub mod volume_setting_component;
 
 pub use self::brightness_setting_component::BrightnessSettingComponent;
@@ -18,6 +19,7 @@ pub use self::pomo_time_setting_component::PomoTimeSettingComponent;
 pub use self::reset_setting_component::ResetSettingComponent;
 pub use self::short_rest_setting_component::ShortRestSettingComponent;
 pub use self::time_setting_component::TimeSettingComponent;
+pub use self::vibration_setting_component::VibrationSettingComponent;
 pub use self::volume_setting_component::VolumeSettingComponent;
 
 use crate::game::hardware::input::KeyNames;
@@ -26,6 +28,7 @@ use crate::game::setting_value::Setting;
 pub enum SettingComponent {
     Brightness(BrightnessSettingComponent),
     Volume(VolumeSettingComponent),
+    Vibration(VibrationSettingComponent),
     Time(TimeSettingComponent),
     Meridian(MeridianSettingComponent),
     PomoTime(PomoTimeSettingComponent),
@@ -40,6 +43,7 @@ impl SettingComponent {
         match self {
             SettingComponent::Brightness(component) => component.draw(y_offset, selected),
             SettingComponent::Volume(component) => component.draw(y_offset, selected),
+            SettingComponent::Vibration(component) => component.draw(y_offset, selected),
             SettingComponent::Time(component) => component.draw(y_offset, selected),
             SettingComponent::Meridian(component) => component.draw(y_offset, selected),
             SettingComponent::PomoTime(component) => component.draw(y_offset, selected),
@@ -55,6 +59,7 @@ impl SettingComponent {
         match self {
             SettingComponent::Brightness(component) => component.tick(),
             SettingComponent::Volume(component) => component.tick(),
+            SettingComponent::Vibration(component) => component.tick(),
             SettingComponent::Time(component) => component.tick(),
             SettingComponent::Meridian(component) => component.tick(),
             SettingComponent::PomoTime(component) => component.tick(),
@@ -70,6 +75,7 @@ impl SettingComponent {
         match self {
             SettingComponent::Brightness(component) => component.input(),
             SettingComponent::Volume(component) => component.input(),
+            SettingComponent::Vibration(component) => component.input(),
             SettingComponent::Time(component) => component.input(),
             SettingComponent::Meridian(component) => component.input(),
             SettingComponent::PomoTime(component) => component.input(),
@@ -85,6 +91,7 @@ impl SettingComponent {
         match self {
             SettingComponent::Brightness(component) => component.is_deselected(),
             SettingComponent::Volume(component) => component.is_deselected(),
+            SettingComponent::Vibration(component) => component.is_deselected(),
             SettingComponent::Time(component) => component.is_deselected(),
             SettingComponent::Meridian(component) => component.is_deselected(),
             SettingComponent::PomoTime(component) => component.is_deselected(),
@@ -100,6 +107,7 @@ impl SettingComponent {
         match self {
             SettingComponent::Brightness(component) => component.reset_internal_state(),
             SettingComponent::Volume(component) => component.reset_internal_state(),
+            SettingComponent::Vibration(component) => component.reset_internal_state(),
             SettingComponent::Time(component) => component.reset_internal_state(),
             SettingComponent::Meridian(component) => component.reset_internal_state(),
             SettingComponent::PomoTime(component) => component.reset_internal_state(),

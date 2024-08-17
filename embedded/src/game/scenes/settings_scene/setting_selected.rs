@@ -3,6 +3,7 @@
 pub enum SettingSelected {
     Brightness = 0,
     Volume,
+    Vibration,
     Time,
     Meridian,
     PomoTime,
