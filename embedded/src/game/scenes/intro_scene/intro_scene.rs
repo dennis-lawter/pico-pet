@@ -1,4 +1,3 @@
-use core::u16;
 use core::usize;
 
 use crate::game::color::Rgb332;
@@ -54,11 +53,6 @@ impl SceneBehavior for IntroScene {
         if self.frame > anim_end {
             text_writer::full_dialog_box("Setup", "DEBUGGING\npress ok to skip");
         } else {
-            // intro fade to test
-            // let fade = Self::fade_function(anim_frame as u8);
-            // let (r, g, b) = fade.into_components();
-            // let text = fixedstr::str_format!(fixedstr::str32, "R{:03}, G{:03}, B{:02}", r, g, b);
-            // text_writer::full_dialog_box("TEST", &text);
             render::fill_rect(0, 0, 128, 128, Self::fade_function(anim_frame as u8))
         }
     }
@@ -110,18 +104,4 @@ impl IntroScene {
 
         Rgb332::from_components(r, g, b)
     }
-    // fn fade_function(f: u8) -> Rgb332 {
-    //     let r = Self::lerp(0, 0b111, f);
-    //     let g = Self::lerp(0, 0b111, f);
-    //     let b = Self::lerp(0, 0b11, f);
-    //     Rgb332::from_components(r, g, b)
-    // }
-    // fn lerp(a: u8, b: u8, t: u8) -> u8 {
-    //     let t = (t as u16) << 8;
-    //     let a = (a as u16) << 8;
-    //     let b = (b as u16) << 8;
-    //     let r = a * u16::MAX - t + b * t;
-
-    //     (r >> 8) as u8
-    // }
 }
