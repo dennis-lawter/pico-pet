@@ -39,4 +39,10 @@ impl Rgb332 {
     pub fn from_u8(value: u8) -> Self {
         Rgb332(value)
     }
+    pub fn from_components(r: u8, g: u8, b: u8) -> Self {
+        Rgb332((r << 5) | (g << 2) | b)
+    }
+    pub fn into_components(self) -> (u8, u8, u8) {
+        ((self.0 >> 5) & 0b111, (self.0 >> 2) & 0b111, self.0 & 0b11)
+    }
 }

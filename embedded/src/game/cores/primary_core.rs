@@ -30,7 +30,7 @@ pub fn primary_main_loop() -> ! {
         check_feeding_deadline_is_passed();
         // Disable the timer during the pomo scene
         match scene_manager.active_scene {
-            SceneType::Pomo => {
+            SceneType::Pomo | SceneType::Intro => {
                 idle_frame_counter = 0;
             }
             _ => {}
