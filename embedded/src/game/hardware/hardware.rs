@@ -31,9 +31,9 @@ use crate::game::nvm::settings::SettingType;
 
 use super::audio::AudioFrequency;
 use super::rtc;
-use game::hardware::rtc::real_date::RealDate;
-use game::hardware::rtc::real_date_time::RealDateTime;
-use game::hardware::rtc::real_time::RealTime;
+use game::hardware::rtc::RealDate;
+use game::hardware::rtc::RealDateTime;
+use game::hardware::rtc::RealTime;
 
 pub const LCD_WIDTH: usize = 128;
 pub const LCD_HEIGHT: usize = 128;
@@ -333,10 +333,10 @@ impl HardwareComponents {
         date_time.time
     }
 
-    // pub fn get_date(&mut self) -> RealDate {
-    //     let date_time = self.get_date_time();
-    //     date_time.real_date
-    // }
+    pub fn get_date(&mut self) -> RealDate {
+        let date_time = self.get_date_time();
+        date_time.date
+    }
 
     pub fn get_date_time(&mut self) -> RealDateTime {
         let mut buffer = [0u8; 7];
@@ -374,6 +374,25 @@ impl HardwareComponents {
         let hr_bcd = rtc::dec_to_bcd(new_time.hr);
 
         let data = [0x00, sec_bcd, min_bcd, hr_bcd];
+
+        self.i2c_bus.write(0x68, &data).unwrap();
+    }
+
+    pub fn set_date(&mut self, new_date: &RealDate) {
+        let dow = new_date.day_of_week;
+        let dom_bcd = rtc::dec_to_bcd(new_date.day_of_month);
+        let mon_bcd = rtc::dec_to_bcd(new_date.month);
+        let century = (new_date.year_since_2k / 100) as u8;
+        let year = new_date.year_since_2k % 100;
+        let year_bcd = rtc::dec_to_bcd(year);
+        let data = [
+            0x03,
+            dow,
+            dom_bcd,
+            mon_bcd,
+            year_bcd,
+            (century << 7) | year_bcd,
+        ];
 
         self.i2c_bus.write(0x68, &data).unwrap();
     }

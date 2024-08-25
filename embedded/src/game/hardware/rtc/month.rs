@@ -36,6 +36,23 @@ impl Month {
             Self::April | Self::June | Self::September | Self::November => 30,
         }
     }
+
+    pub fn to_abbrev(&self) -> &str {
+        match self {
+            Month::January => "Jan",
+            Month::February => "Feb",
+            Month::March => "Mar",
+            Month::April => "Apr",
+            Month::May => "May",
+            Month::June => "Jun",
+            Month::July => "Jul",
+            Month::August => "Aug",
+            Month::September => "Sep",
+            Month::October => "Oct",
+            Month::November => "Nov",
+            Month::December => "Dec",
+        }
+    }
 }
 impl From<u8> for Month {
     fn from(value: u8) -> Self {

@@ -5,6 +5,7 @@ use crate::game::display::text_writer::FontStyle;
 use crate::game::hardware::input::KeyNames;
 use crate::game::hardware::rtc::real_date_time::RealDateTime;
 use crate::game::hardware::rtc::real_time::RealTime;
+use crate::game::hardware::rtc::RealDate;
 use crate::game::scenes::SceneBehavior;
 use crate::game::scenes::SceneType;
 
@@ -98,12 +99,12 @@ impl SceneBehavior for NyiScene {
             &fixedstr::str_format!(
                 fixedstr::str32,
                 "{}-{:02}-{:02} {:02}:{:02}:{:02}",
-                now.date.year_since_2k as u16 + 2000,
+                now.date.year_since_2k as u16 + RealDate::ZERO_YEAR,
                 now.date.month,
                 now.date.day_of_month,
                 now.time.hr,
                 now.time.min,
-                now.time.sec
+                now.time.sec,
             ),
         );
         y += 8;
@@ -126,7 +127,7 @@ impl SceneBehavior for NyiScene {
         //     &fixedstr::str_format!(
         //         fixedstr::str32,
         //         "{}-{:02}-{:02} {:02}:{:02}:{:02}",
-        //         fed_yr as u16 + 2000,
+        //         fed_yr as u16 + RealDate::ZERO_YEAR,
         //         fed_mon,
         //         fed_day,
         //         feeding_deadline_hr,
@@ -154,7 +155,7 @@ impl SceneBehavior for NyiScene {
             &fixedstr::str_format!(
                 fixedstr::str32,
                 "{}-{:02}-{:02} {:02}:{:02}:{:02}",
-                next_feed.date.year_since_2k as u16 + 2000,
+                next_feed.date.year_since_2k as u16 + RealDate::ZERO_YEAR,
                 next_feed.date.month,
                 next_feed.date.day_of_month,
                 feeding_deadline_hr,

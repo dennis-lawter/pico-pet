@@ -1,9 +1,6 @@
 use core::cmp;
-// use core::ops::Sub;
 
-// use super::dow::DayOfWeek;
 use super::find_day_of_week;
-// use super::interval_date::IntervalDate;
 use super::month::Month;
 
 #[derive(Copy, Clone)]
@@ -14,6 +11,8 @@ pub struct RealDate {
     pub year_since_2k: u8,
 }
 impl RealDate {
+    pub const ZERO_YEAR: u16 = 2024;
+
     pub fn new(day_of_month: u8, month: u8, year_since_2k: u8) -> Self {
         Self {
             day_of_week: find_day_of_week(day_of_month, Month::from(month), year_since_2k) as u8,
@@ -30,47 +29,78 @@ impl RealDate {
         let month_enum = Month::from(self.month);
         if self.day_of_month > month_enum.days_in_month(self.year_since_2k) {
             self.day_of_month = 1;
-            self.month += 1;
-            if self.month > 12 {
-                self.month = 1;
-                self.year_since_2k += 1;
-            }
+            self.inc_by_1_month();
         }
+    }
+    pub fn inc_by_1_month(&mut self) {
+        self.month += 1;
+        if self.month > 12 {
+            self.month = 1;
+            self.inc_by_1_year();
+        }
+        let month_enum = Month::from(self.month);
+        let max_days_in_month = month_enum.days_in_month(self.year_since_2k);
+        if self.day_of_month > max_days_in_month {
+            self.day_of_month = max_days_in_month;
+        }
+    }
+    pub fn inc_by_1_year(&mut self) {
+        self.year_since_2k += 1;
     }
     pub fn dec_by_1_day(&mut self) {
         self.day_of_week += 6;
         self.day_of_week %= 7;
 
-        // No 0 days unless we're avoiding a y2k underflow
         if self.day_of_month > 1 {
             self.day_of_month -= 1;
         } else {
-            let month_enum: Month;
-            if self.month > 0 {
-                self.month -= 1;
-                month_enum = Month::from(self.month);
-            } else {
-                month_enum = Month::December;
-
-                if self.year_since_2k > 0 {
-                    self.year_since_2k -= 1;
-                } else {
-                    // Underflow protection, reset to y2k day 0 (jan 0, 2000)
-                    self.year_since_2k = 0;
-                    self.month = Month::January as u8;
-                    self.day_of_month = 0;
-                }
-            }
-            self.day_of_month = month_enum.days_in_month(self.year_since_2k);
+            self.dec_by_1_month();
+            self.day_of_month = Month::from(self.month).days_in_month(self.year_since_2k);
         }
     }
-    pub fn yyyy_mm_dd_str(&self) -> fixedstr::str16 {
+    pub fn dec_by_1_month(&mut self) {
+        let month_enum: Month;
+        if self.month > 1 {
+            self.month -= 1;
+            month_enum = Month::from(self.month);
+        } else {
+            month_enum = Month::December;
+
+            self.dec_by_1_year();
+        }
+        let max_days_in_month = month_enum.days_in_month(self.year_since_2k);
+        self.month = month_enum as u8;
+        if self.day_of_month > max_days_in_month {
+            self.day_of_month = max_days_in_month;
+        }
+    }
+    pub fn dec_by_1_year(&mut self) {
+        if self.year_since_2k > 0 {
+            self.year_since_2k -= 1;
+        } else {
+            // Underflow protection, reset to y2k day 0 (jan 0, 2024)
+            self.year_since_2k = 0;
+            self.month = Month::January as u8;
+            self.day_of_month = 0;
+        }
+    }
+    pub fn yyyy_mm_dd_str(&self) -> fixedstr::str12 {
         fixedstr::str_format!(
-            fixedstr::str16,
+            fixedstr::str12,
             "{:04}-{:02}-{:02}",
-            self.year_since_2k as u16 + 2000,
+            self.year_since_2k as u16 + Self::ZERO_YEAR,
             self.month,
-            self.day_of_month
+            self.day_of_month,
+        )
+    }
+    pub fn yyyy_mmm_dd_str(&self) -> fixedstr::str12 {
+        let month = Month::from(self.month);
+        fixedstr::str_format!(
+            fixedstr::str12,
+            "{:04} {} {:02}",
+            self.year_since_2k as u16 + Self::ZERO_YEAR,
+            month.to_abbrev(),
+            self.day_of_month,
         )
     }
 }
@@ -104,9 +134,3 @@ impl PartialOrd for RealDate {
         }
     }
 }
-// impl Sub for RealDate {
-//     type Output = IntervalDate;
-//     fn sub(self, other: Self) -> IntervalDate {
-//         // TODO
-//     }
-// }

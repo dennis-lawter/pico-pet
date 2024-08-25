@@ -5,7 +5,8 @@ This list is not final. It will grow and evolve.
 Done items should be removed from the list.
 
 - Misc
-  - Date setting, date selector...
+  - When adjusting date/time, there needs to be adjustments made to the feeding schedule
+  - Warn users when adjusting date/time that feeding schedule may be affected (maybe unnecessary?)
   - Idle setting, how many minutes
   - Store the `MainScene::menu_item_selected` as a static/global for reloading the scene
   - Handle AM/PM time adjustment in settings scene

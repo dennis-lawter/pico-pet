@@ -1,4 +1,5 @@
 pub mod brightness_setting_component;
+pub mod date_setting_component;
 pub mod feeding_deadline_setting_component;
 pub mod long_rest_setting_component;
 pub mod meridian_setting_component;
@@ -11,6 +12,7 @@ pub mod vibration_setting_component;
 pub mod volume_setting_component;
 
 pub use self::brightness_setting_component::BrightnessSettingComponent;
+pub use self::date_setting_component::DateSettingComponent;
 pub use self::feeding_deadline_setting_component::FeedingDeadlineSettingComponent;
 pub use self::long_rest_setting_component::LongRestSettingComponent;
 pub use self::meridian_setting_component::MeridianSettingComponent;
@@ -30,6 +32,7 @@ pub enum SettingComponent {
     Volume(VolumeSettingComponent),
     Vibration(VibrationSettingComponent),
     Time(TimeSettingComponent),
+    Date(DateSettingComponent),
     Meridian(MeridianSettingComponent),
     PomoTime(PomoTimeSettingComponent),
     ShortRest(ShortRestSettingComponent),
@@ -45,6 +48,7 @@ impl SettingComponent {
             SettingComponent::Volume(component) => component.draw(y_offset, selected),
             SettingComponent::Vibration(component) => component.draw(y_offset, selected),
             SettingComponent::Time(component) => component.draw(y_offset, selected),
+            SettingComponent::Date(component) => component.draw(y_offset, selected),
             SettingComponent::Meridian(component) => component.draw(y_offset, selected),
             SettingComponent::PomoTime(component) => component.draw(y_offset, selected),
             SettingComponent::ShortRest(component) => component.draw(y_offset, selected),
@@ -61,6 +65,7 @@ impl SettingComponent {
             SettingComponent::Volume(component) => component.tick(),
             SettingComponent::Vibration(component) => component.tick(),
             SettingComponent::Time(component) => component.tick(),
+            SettingComponent::Date(component) => component.tick(),
             SettingComponent::Meridian(component) => component.tick(),
             SettingComponent::PomoTime(component) => component.tick(),
             SettingComponent::ShortRest(component) => component.tick(),
@@ -77,6 +82,7 @@ impl SettingComponent {
             SettingComponent::Volume(component) => component.input(),
             SettingComponent::Vibration(component) => component.input(),
             SettingComponent::Time(component) => component.input(),
+            SettingComponent::Date(component) => component.input(),
             SettingComponent::Meridian(component) => component.input(),
             SettingComponent::PomoTime(component) => component.input(),
             SettingComponent::ShortRest(component) => component.input(),
@@ -93,6 +99,7 @@ impl SettingComponent {
             SettingComponent::Volume(component) => component.is_deselected(),
             SettingComponent::Vibration(component) => component.is_deselected(),
             SettingComponent::Time(component) => component.is_deselected(),
+            SettingComponent::Date(component) => component.is_deselected(),
             SettingComponent::Meridian(component) => component.is_deselected(),
             SettingComponent::PomoTime(component) => component.is_deselected(),
             SettingComponent::ShortRest(component) => component.is_deselected(),
@@ -109,6 +116,7 @@ impl SettingComponent {
             SettingComponent::Volume(component) => component.reset_internal_state(),
             SettingComponent::Vibration(component) => component.reset_internal_state(),
             SettingComponent::Time(component) => component.reset_internal_state(),
+            SettingComponent::Date(component) => component.reset_internal_state(),
             SettingComponent::Meridian(component) => component.reset_internal_state(),
             SettingComponent::PomoTime(component) => component.reset_internal_state(),
             SettingComponent::ShortRest(component) => component.reset_internal_state(),

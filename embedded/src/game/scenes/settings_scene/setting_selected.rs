@@ -5,6 +5,7 @@ pub enum SettingSelected {
     Volume,
     Vibration,
     Time,
+    Date,
     Meridian,
     PomoTime,
     ShortRest,

@@ -54,6 +54,7 @@ fn generate_setting_components() -> [SettingComponent; SettingSelected::MAX_VALU
             super::setting_components::VibrationSettingComponent::default(),
         ),
         SettingComponent::Time(super::setting_components::TimeSettingComponent::default()),
+        SettingComponent::Date(super::setting_components::DateSettingComponent::default()),
         SettingComponent::Meridian(super::setting_components::MeridianSettingComponent::default()),
         SettingComponent::PomoTime(super::setting_components::PomoTimeSettingComponent::default()),
         SettingComponent::ShortRest(
