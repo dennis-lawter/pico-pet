@@ -1,25 +1,29 @@
 {
-  description = "Flake for building the pico-pet";
-
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    rust-overlay.url = "github:oxalica/rust-overlay";  # Use rust overlay for more control over Rust versions
+  description = "Build environment for pico-pet";
+  inputs =
+  {
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
   };
-
-  outputs = { self, nixpkgs, rust-overlay }: {
-    devShells.default = nixpkgs.mkShell {
-      buildInputs = [
-        nixpkgs.alsaLib
-        nixpkgs.pkg-config
-        nixpkgs.udev
-        (rust-overlay.packages.nightly."2024-01-01".rust  # Replace with actual date for Rust 1.77 nightly
-        .override { extensions = [ "rust-src" "rustfmt" "clippy" ]; })
-        nixpkgs.rustPlatform.rustPackages.flip-link
+  
+  outputs = { self, nixpkgs, ... }@inputs:
+  let
+    system = "x86_64-linux";
+    pkgs = nixpkgs.legacyPackages.${system};
+  in
+  {
+    devShells.${system}.default = pkgs.mkShell
+    {
+      packages = with pkgs; [
+        # rustc
+        # cargo
+        alsaLib
+        pkg-config
+        udev
       ];
-
-      # Optional: Set RUSTUP_TOOLCHAIN to ensure it always uses the specified toolchain
       shellHook = ''
-        export RUSTUP_TOOLCHAIN=nightly-2024-01-01  # Rust 1.77 nightly
+        rustup toolchain install nightly-2023-11-16
+        rustup default nightly-2023-11-16
+        rustup target add thumbv6m-none-eabi
       '';
     };
   };
