@@ -14,8 +14,8 @@
     devShells.${system}.default = pkgs.mkShell
     {
       packages = with pkgs; [
-        # rustc
-        # cargo
+        rustc
+        cargo
         alsaLib
         pkg-config
         udev
@@ -24,6 +24,7 @@
         rustup toolchain install nightly-2023-11-16
         rustup default nightly-2023-11-16
         rustup target add thumbv6m-none-eabi
+        export RUSTC=$(rustup which rustc)
       '';
     };
   };
