@@ -20,8 +20,8 @@ Done items should be removed from the list.
   - Remove the current code which checks for invalid NVM then autowrites
 - Stats Scene
   - Displays information about the pet:
-    - Birthday
-    - Age
+    - Birthday (requires intro scene)
+    - Age (should this go up if date changes?)
     - Current daily hunger
     - Illness if applicable
 - Eating Scene
@@ -36,6 +36,9 @@ Done items should be removed from the list.
       - Pet's hunger is adjusted
       - Pet's health is adjusted
       - Tomatoes fed removed, remaining juiced
+- Shop Scene
+  - Spend raspberries for cosmetics
+  - Cosmetics are locked behind "level" (HP)
 - Pet maintenance
   - Introduce check, runs at feeding deadline
     - Must have save data for last time a day was written to NVM
