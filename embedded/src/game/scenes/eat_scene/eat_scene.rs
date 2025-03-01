@@ -1,10 +1,22 @@
 use crate::game::color::Rgb332;
-use crate::game::display::render;
+// use crate::game::display::render;
 use crate::game::display::sprite::Sprite;
 use crate::game::display::sprite_factory;
+use crate::game::display::text_writer;
 use crate::game::hardware::input::KeyNames;
 use crate::game::scenes::SceneBehavior;
 use crate::game::scenes::SceneType;
+
+/*
+
+Thoughts:
+Probably need subscenes...
+1. You have already fed the pet and it cannot be fed again today.
+2. You have insufficient tomatoes+juice, go do more pomodoros.
+3. You have no tomatoes, would you like to use your reserved juice?
+4. You have enough tomatoes, proceed?
+
+*/
 
 pub struct EatScene<'a> {
     next_scene: Option<SceneType>,
@@ -37,7 +49,9 @@ impl SceneBehavior for EatScene<'_> {
     }
 
     fn draw(&mut self) {
-        render::flood(Rgb332::WHITE);
+        // render::flood(Rgb332::WHITE);
+
+        text_writer::draw_text(0, 64, text_writer::FontStyle::Small, Rgb332::WHITE, "Feed?");
 
         self.inv_sprite.x = 0;
         self.inv_sprite.y = 0;
