@@ -16,9 +16,11 @@
       packages = with pkgs; [
         rustc
         cargo
-        alsaLib
+        alsa-lib
         pkg-config
         udev
+        freecad
+        kicad
       ];
       shellHook = ''
         rustup toolchain install nightly-2023-11-16
