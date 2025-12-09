@@ -7,6 +7,6 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "4.5.3", features = ["derive"] }
-cursive = { version = "0.20.0", default-features = false, features = ["toml", "crossterm-backend", "term_size"] }
+cursive = { version = "0.21.1", default-features = false, features = ["toml"] }
 lazy_static = "1.4.0"
 rodio = { version = "0.17.3", default-features = false }
