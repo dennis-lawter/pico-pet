@@ -137,11 +137,13 @@ impl HardwareComponents {
             let backlight_channel_ptr = &mut pwm6.channel_b as *mut LcdBlPinChannel;
             // disable backlight ASAP to hide boot artifacts
             (*backlight_channel_ptr).output_to(pins.gpio13);
+            (*backlight_channel_ptr).enable();
             (*backlight_channel_ptr).set_duty(0);
 
             let buzzer_channel_ptr =
                 &mut (*buzzer_pwm_slice_ptr).channel_a as *mut BuzzerPinChannel;
             (*buzzer_channel_ptr).output_to(pins.gpio4);
+            (*buzzer_channel_ptr).enable();
             (*buzzer_channel_ptr).set_duty(0);
 
             (*buzzer_pwm_slice_ptr).set_ph_correct();
@@ -271,7 +273,10 @@ impl HardwareComponents {
     }
 
     pub fn set_backlight_raw(&mut self, brightness_value: u16) {
-        unsafe { (*self.backlight_channel_ptr).set_duty(brightness_value) }
+        unsafe {
+            (*self.backlight_channel_ptr).set_duty(brightness_value);
+            (*self.backlight_channel_ptr).enable();
+        }
     }
 
     pub fn start_tone(&mut self, tone: &AudioFrequency) {
@@ -293,6 +298,7 @@ impl HardwareComponents {
             (*self.buzzer_pwm_slice_ptr).set_div_int(tone_settings.1);
             (*self.buzzer_pwm_slice_ptr).set_div_frac(tone_settings.2);
             (*self.buzzer_channel_ptr).set_duty(effective_volume);
+            (*self.buzzer_channel_ptr).enable();
         }
     }
 
