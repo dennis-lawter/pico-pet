@@ -28,6 +28,7 @@
   {
     devShells.${system}.default = pkgs.mkShell {
       packages = with pkgs; [
+        vscodium
         rust
         alsa-lib
         pkg-config
@@ -35,6 +36,8 @@
         freecad
         kicad
         elf2uf2-rs
+        libresprite
+        openscad
       ];
 
       shellHook = ''

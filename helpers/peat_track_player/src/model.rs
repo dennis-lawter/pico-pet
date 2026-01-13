@@ -10,7 +10,7 @@ pub struct Track {
     pub title: String,
     pub samples: Vec<f32>,
     pub playing: bool,
-    pub samples_played: usize,
+    // pub samples_played: usize,
 }
 impl Track {
     fn new() -> Self {
@@ -19,7 +19,7 @@ impl Track {
             title: "".to_string(),
             samples: vec![],
             playing: false,
-            samples_played: 0,
+            // samples_played: 0,
         }
     }
     pub fn load_text(&mut self, text: &str) {
