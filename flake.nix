@@ -28,12 +28,14 @@
   {
     devShells.${system}.default = pkgs.mkShell {
       packages = with pkgs; [
+        vscodium
         rust
         alsa-lib
         pkg-config
         udev
         freecad
         kicad
+        libresprite
         elf2uf2-rs
       ];
 

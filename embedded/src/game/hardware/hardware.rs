@@ -59,15 +59,15 @@ type Key1Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio17, hal::gpio::Input<hal::gp
 type Key1AltPin = hal::gpio::Pin<hal::gpio::bank0::Gpio29, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key2Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio2, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key3Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio3, hal::gpio::Input<hal::gpio::PullUp>>;
-type Key5Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio5, hal::gpio::Input<hal::gpio::PullUp>>;
+type Key5Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio22, hal::gpio::Input<hal::gpio::PullUp>>;
 
-type VibePin = hal::gpio::Pin<hal::gpio::bank0::Gpio6, hal::gpio::Output<hal::gpio::PushPull>>;
+type VibePin = hal::gpio::Pin<hal::gpio::bank0::Gpio21, hal::gpio::Output<hal::gpio::PushPull>>;
 
 type I2CBus = hal::I2C<
-    pac::I2C0,
+    pac::I2C1,
     (
-        hal::gpio::Pin<hal::gpio::bank0::Gpio0, hal::gpio::Function<hal::gpio::I2C>>,
-        hal::gpio::Pin<hal::gpio::bank0::Gpio1, hal::gpio::Function<hal::gpio::I2C>>,
+        hal::gpio::Pin<hal::gpio::bank0::Gpio26, hal::gpio::Function<hal::gpio::I2C>>,
+        hal::gpio::Pin<hal::gpio::bank0::Gpio27, hal::gpio::Function<hal::gpio::I2C>>,
     ),
 >;
 
@@ -142,7 +142,7 @@ impl HardwareComponents {
 
             let buzzer_channel_ptr =
                 &mut (*buzzer_pwm_slice_ptr).channel_a as *mut BuzzerPinChannel;
-            (*buzzer_channel_ptr).output_to(pins.gpio4);
+            (*buzzer_channel_ptr).output_to(pins.gpio20);
             (*buzzer_channel_ptr).enable();
             (*buzzer_channel_ptr).set_duty(0);
 
@@ -158,9 +158,9 @@ impl HardwareComponents {
             let key2 = pins.gpio2.into_pull_up_input();
             let key3 = pins.gpio3.into_pull_up_input();
 
-            let second_clock = pins.gpio5.into_pull_up_input();
+            let second_clock = pins.gpio22.into_pull_up_input();
 
-            let mut vibe = pins.gpio6.into_push_pull_output();
+            let mut vibe = pins.gpio21.into_push_pull_output();
             vibe.set_low().unwrap();
 
             let sys_freq = clocks.system_clock.freq().to_Hz();
@@ -206,11 +206,11 @@ impl HardwareComponents {
 
             display.clear(Rgb565::BLACK).debugless_unwrap();
 
-            let sda_pin = pins.gpio0.into_mode::<hal::gpio::FunctionI2C>();
-            let scl_pin = pins.gpio1.into_mode::<hal::gpio::FunctionI2C>();
+            let sda_pin = pins.gpio26.into_mode::<hal::gpio::FunctionI2C>();
+            let scl_pin = pins.gpio27.into_mode::<hal::gpio::FunctionI2C>();
 
-            let i2c_bus: I2CBus = hal::I2C::i2c0(
-                pac.I2C0,
+            let i2c_bus: I2CBus = hal::I2C::i2c1(
+                pac.I2C1,
                 sda_pin,
                 scl_pin,
                 400.kHz(),
