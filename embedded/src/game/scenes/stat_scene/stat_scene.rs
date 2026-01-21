@@ -1,3 +1,5 @@
+use core::ops::Sub;
+
 use crate::game::color::Rgb332;
 use crate::game::display::render;
 use crate::game::display::text_writer;
@@ -135,7 +137,7 @@ impl SceneBehavior for StatScene {
         {
             let now = crate::game::globals::get_hardware().get_date_time();
             let feeding_deadline = nvm.pet.get_feeding_deadline();
-            let diff = feeding_deadline - now;
+            let diff = feeding_deadline.sub(now);
             let data = diff.to_str();
             text_writer::draw_text(8, height_offset, FontStyle::Small, Rgb332::BLACK, &data);
         }

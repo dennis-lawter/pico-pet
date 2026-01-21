@@ -27,13 +27,13 @@ use waveshare_rp2040_lcd_0_96::XOSC_CRYSTAL_FREQ;
 use st7735_lcd::Orientation;
 use st7735_lcd::ST7735;
 
+use crate::game::hardware::rtc::real_time::RealTime;
 use crate::game::nvm::settings::SettingType;
 
 use super::audio::AudioFrequency;
 use super::rtc;
-use game::hardware::rtc::RealDate;
-use game::hardware::rtc::RealDateTime;
-use game::hardware::rtc::RealTime;
+use crate::game::hardware::rtc::RealDate;
+use crate::game::hardware::rtc::RealDateTime;
 
 pub const LCD_WIDTH: usize = 128;
 pub const LCD_HEIGHT: usize = 128;
