@@ -5,6 +5,7 @@ use crate::game::display::render;
 use crate::game::display::text_writer;
 
 #[panic_handler]
+#[allow(static_mut_refs)]
 fn panic(info: &core::panic::PanicInfo) -> ! {
     if unsafe { crate::game::globals::HARDWARE.is_none() } {
         loop {
@@ -59,6 +60,7 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
     cortex_m::peripheral::SCB::sys_reset()
 }
 
+#[allow(static_mut_refs)]
 pub fn reboot() -> ! {
     if unsafe { crate::game::globals::HARDWARE.is_none() } {
         loop {

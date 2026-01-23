@@ -18,6 +18,7 @@ pub fn spawn_secondary_core_worker() {
         let cores = &mut mc.cores();
         let core1 = &mut cores[1];
         let sys_freq = hardware.sys_freq;
+        #[allow(static_mut_refs)]
         let stack_ref = &mut secondary_core::CORE1_STACK.mem;
         let _test = core1.spawn(stack_ref, move || secondary_main_loop(sys_freq));
     }
