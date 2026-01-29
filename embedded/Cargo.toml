@@ -6,7 +6,7 @@ version = "0.1.0"
 [dependencies]
 embedded-hal = { version = "0.2.5", features = ["unproven"] }
 cortex-m = "0.7.2"
-cortex-m-rt = "0.7.3"
+cortex-m-rt = { version = "0.7.3", features = ["device"] }
 rp2040-boot2 = "0.2.1"
 st7735-lcd = "0.9.0"
 embedded-time = "0.12.1"
@@ -26,5 +26,5 @@ path = "src/main.rs"
 # opt-level = 's'
 opt-level = 3
 lto = true
-overflow-checks = false 
+overflow-checks = false
 debug = false

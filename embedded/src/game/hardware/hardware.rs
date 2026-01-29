@@ -1,5 +1,6 @@
 use cortex_m::delay::Delay;
 
+use cortex_m::asm::wfi;
 use debugless_unwrap::DebuglessUnwrap;
 use embedded_graphics::pixelcolor::Rgb565;
 use embedded_graphics::prelude::DrawTarget;
@@ -20,6 +21,8 @@ use waveshare_rp2040_lcd_0_96::hal::sio::SioFifo;
 use waveshare_rp2040_lcd_0_96::hal::watchdog::Watchdog;
 use waveshare_rp2040_lcd_0_96::hal::Sio;
 use waveshare_rp2040_lcd_0_96::hal::{self};
+use waveshare_rp2040_lcd_0_96::pac::Interrupt;
+use waveshare_rp2040_lcd_0_96::pac::NVIC;
 use waveshare_rp2040_lcd_0_96::pac::PPB;
 use waveshare_rp2040_lcd_0_96::pac::PSM;
 use waveshare_rp2040_lcd_0_96::XOSC_CRYSTAL_FREQ;
@@ -238,6 +241,8 @@ impl HardwareComponents {
                 i2c_bus,
             };
 
+            s.init_wfi();
+
             // enable 1hz clock
             s.write_sqw_pin_mode(0x00);
 
@@ -435,5 +440,20 @@ impl HardwareComponents {
 
         // wait for the EEPROM to complete its write
         self.delay.delay_ms(5);
+    }
+
+    pub fn init_wfi(&mut self) {
+        self.key3
+            .set_interrupt_enabled(hal::gpio::Interrupt::EdgeLow, true);
+        self.second_clock
+            .set_interrupt_enabled(hal::gpio::Interrupt::EdgeHigh, true);
+
+        unsafe {
+            NVIC::unmask(Interrupt::IO_IRQ_BANK0);
+        }
+    }
+
+    pub fn wfi(&self) {
+        wfi();
     }
 }
