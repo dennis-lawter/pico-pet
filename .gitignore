@@ -1,2 +1,9 @@
-*.FCBak
+# built files
 target/
+
+# kicad
+_autosave*
+\#auto_saved*
+
+# freecad
+*.FCBak
