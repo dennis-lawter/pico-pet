@@ -4,6 +4,8 @@ target/
 # kicad
 _autosave*
 \#auto_saved*
+~*kicad_*.lck
+*.bak
 
 # freecad
 *.FCBak
