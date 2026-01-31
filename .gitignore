@@ -6,6 +6,7 @@ _autosave*
 \#auto_saved*
 ~*kicad_*.lck
 *.bak
+picopet-*.zip
 
 # freecad
 *.FCBak
