@@ -4766,7 +4766,7 @@
 		(uuid "14c54a90-f396-4285-9855-f4e97967ee9b")
 	)
 	(junction
-		(at 116.84 26.67)
+		(at 120.65 26.67)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "16a217f9-e496-439d-b04e-aa90f9e990d0")
@@ -5138,6 +5138,12 @@
 		(uuid "f5d368a7-36e2-4354-81b5-8aeb39defd82")
 	)
 	(junction
+		(at 217.17 171.45)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "f9cfe4e6-4073-49d3-a8ba-f3dc42bd8c04")
+	)
+	(junction
 		(at 154.94 24.13)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -5450,6 +5456,16 @@
 			(type default)
 		)
 		(uuid "1cc9eb7c-0eb5-4919-83e6-c938f924db3e")
+	)
+	(wire
+		(pts
+			(xy 102.87 184.15) (xy 102.87 185.42)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1e0fe9f3-2349-4d2c-935d-9c7d6c6c588a")
 	)
 	(wire
 		(pts
@@ -6113,16 +6129,6 @@
 	)
 	(wire
 		(pts
-			(xy 93.98 26.67) (xy 116.84 26.67)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "55842557-df7c-4897-914a-24476a23bcc6")
-	)
-	(wire
-		(pts
 			(xy 271.78 115.57) (xy 287.02 115.57)
 		)
 		(stroke
@@ -6233,7 +6239,7 @@
 	)
 	(wire
 		(pts
-			(xy 116.84 25.4) (xy 116.84 26.67)
+			(xy 120.65 25.4) (xy 120.65 26.67)
 		)
 		(stroke
 			(width 0)
@@ -6473,7 +6479,7 @@
 	)
 	(wire
 		(pts
-			(xy 116.84 27.94) (xy 116.84 26.67)
+			(xy 120.65 27.94) (xy 120.65 26.67)
 		)
 		(stroke
 			(width 0)
@@ -6640,6 +6646,16 @@
 			(type default)
 		)
 		(uuid "83863f56-8031-4416-a1cb-bf8acab0721a")
+	)
+	(wire
+		(pts
+			(xy 226.06 179.07) (xy 226.06 180.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8437ed9d-58a6-45d8-90d0-382d94638dd3")
 	)
 	(wire
 		(pts
@@ -7073,7 +7089,7 @@
 	)
 	(wire
 		(pts
-			(xy 116.84 35.56) (xy 116.84 36.83)
+			(xy 120.65 35.56) (xy 120.65 36.83)
 		)
 		(stroke
 			(width 0)
@@ -7350,6 +7366,16 @@
 			(type default)
 		)
 		(uuid "c353f67f-e0a1-428e-bb91-8694e0557885")
+	)
+	(wire
+		(pts
+			(xy 102.87 176.53) (xy 118.11 176.53)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c3ca8d1a-d88e-4839-8905-45b82bcd110f")
 	)
 	(wire
 		(pts
@@ -7883,6 +7909,16 @@
 	)
 	(wire
 		(pts
+			(xy 217.17 171.45) (xy 226.06 171.45)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f0cb91fe-7db2-4624-a96e-c595ca41d0d3")
+	)
+	(wire
+		(pts
 			(xy 180.34 184.15) (xy 187.96 184.15)
 		)
 		(stroke
@@ -8080,6 +8116,16 @@
 			(type default)
 		)
 		(uuid "ff8fd021-f622-42b8-86bf-2a7c9ef39e0c")
+	)
+	(wire
+		(pts
+			(xy 93.98 26.67) (xy 120.65 26.67)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ffce8b01-4cd3-43b1-bcda-0fc1b616bdfb")
 	)
 	(label "GPIO23"
 		(at 287.02 130.81 180)
@@ -8591,7 +8637,7 @@
 		)
 		(uuid "ff8f81ab-b3ab-4c8b-a3d8-5dbc412c493c")
 	)
-	(global_label "GPIO_11"
+	(global_label "GPIO11"
 		(shape input)
 		(at 88.9 153.67 0)
 		(fields_autoplaced yes)
@@ -8603,7 +8649,7 @@
 		)
 		(uuid "0bec5693-1f6c-4166-bc88-51c38dae0f6c")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 99.7471 153.67 0)
+			(at 98.7795 153.67 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8613,7 +8659,7 @@
 			)
 		)
 	)
-	(global_label "GPIO_15"
+	(global_label "GPIO15"
 		(shape input)
 		(at 144.78 111.76 180)
 		(fields_autoplaced yes)
@@ -8625,7 +8671,7 @@
 		)
 		(uuid "0fe0febc-a528-4f75-bca2-8896acd1799e")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 133.9329 111.76 0)
+			(at 134.9005 111.76 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8635,7 +8681,7 @@
 			)
 		)
 	)
-	(global_label "GPIO_2"
+	(global_label "GPIO2"
 		(shape input)
 		(at 144.78 132.08 180)
 		(fields_autoplaced yes)
@@ -8647,7 +8693,7 @@
 		)
 		(uuid "1cc22a4a-4362-4c86-8075-9e666f025ba7")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 135.1424 132.08 0)
+			(at 136.11 132.08 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8657,7 +8703,7 @@
 			)
 		)
 	)
-	(global_label "GPIO_8"
+	(global_label "GPIO8"
 		(shape input)
 		(at 88.9 156.21 0)
 		(fields_autoplaced yes)
@@ -8669,7 +8715,7 @@
 		)
 		(uuid "26b8a19f-78ae-4d67-8b25-92c3c98cbb63")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 98.5376 156.21 0)
+			(at 97.57 156.21 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8679,7 +8725,7 @@
 			)
 		)
 	)
-	(global_label "GPIO_3"
+	(global_label "GPIO3"
 		(shape input)
 		(at 144.78 142.24 180)
 		(fields_autoplaced yes)
@@ -8691,7 +8737,7 @@
 		)
 		(uuid "307a9e5a-7e8d-4849-af33-39fd5dae4dca")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 135.1424 142.24 0)
+			(at 136.11 142.24 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8701,7 +8747,7 @@
 			)
 		)
 	)
-	(global_label "GPIO_5"
+	(global_label "GPIO5"
 		(shape input)
 		(at 223.52 189.23 0)
 		(fields_autoplaced yes)
@@ -8713,7 +8759,7 @@
 		)
 		(uuid "3dba0433-d27d-4986-ba54-ab4df5a980a1")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 233.1576 189.23 0)
+			(at 232.19 189.23 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8723,7 +8769,7 @@
 			)
 		)
 	)
-	(global_label "GPIO_0"
+	(global_label "GPIO0"
 		(shape input)
 		(at 148.59 186.69 0)
 		(fields_autoplaced yes)
@@ -8735,7 +8781,7 @@
 		)
 		(uuid "481fa3fe-5ac6-4309-8768-48d6252d3dd0")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 158.2276 186.69 0)
+			(at 157.26 186.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8745,7 +8791,7 @@
 			)
 		)
 	)
-	(global_label "GPIO_9"
+	(global_label "GPIO9"
 		(shape input)
 		(at 88.9 148.59 0)
 		(fields_autoplaced yes)
@@ -8757,7 +8803,7 @@
 		)
 		(uuid "55f18536-a604-46ab-830c-aeee70204730")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 98.5376 148.59 0)
+			(at 97.57 148.59 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8767,7 +8813,7 @@
 			)
 		)
 	)
-	(global_label "GPIO_UNDECIDED"
+	(global_label "GPIO_UNDECIDE_A"
 		(shape input)
 		(at 95.25 31.75 0)
 		(fields_autoplaced yes)
@@ -8779,7 +8825,7 @@
 		)
 		(uuid "580ac9f0-5623-4b69-8d5c-6d2fe4dc2717")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 114.3219 31.75 0)
+			(at 115.1081 31.75 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8789,7 +8835,7 @@
 			)
 		)
 	)
-	(global_label "GPIO_1"
+	(global_label "GPIO1"
 		(shape input)
 		(at 139.7 189.23 0)
 		(fields_autoplaced yes)
@@ -8801,7 +8847,7 @@
 		)
 		(uuid "5c9ef519-a863-4e3a-b9f6-ca2166521ed0")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 149.3376 189.23 0)
+			(at 148.37 189.23 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8811,7 +8857,7 @@
 			)
 		)
 	)
-	(global_label "GPIO_4"
+	(global_label "GPIO4"
 		(shape input)
 		(at 144.78 153.67 180)
 		(fields_autoplaced yes)
@@ -8823,7 +8869,7 @@
 		)
 		(uuid "6506a532-c9ec-47f8-bf85-6e2c47188743")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 135.1424 153.67 0)
+			(at 136.11 153.67 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8833,7 +8879,7 @@
 			)
 		)
 	)
-	(global_label "GPIO_UNDECIDED"
+	(global_label "GPIO_UNDECIDE_B"
 		(shape input)
 		(at 119.38 95.25 0)
 		(fields_autoplaced yes)
@@ -8845,7 +8891,7 @@
 		)
 		(uuid "7b868e55-9813-4c60-ac78-519dab023454")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 138.4519 95.25 0)
+			(at 139.4195 95.25 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8855,7 +8901,7 @@
 			)
 		)
 	)
-	(global_label "GPIO_17"
+	(global_label "GPIO17"
 		(shape input)
 		(at 144.78 121.92 180)
 		(fields_autoplaced yes)
@@ -8867,7 +8913,7 @@
 		)
 		(uuid "7ca77a7d-fff7-48e5-acb0-09de42dfadec")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 133.9329 121.92 0)
+			(at 134.9005 121.92 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8877,7 +8923,7 @@
 			)
 		)
 	)
-	(global_label "GPIO_1"
+	(global_label "GPIO1"
 		(shape input)
 		(at 170.18 181.61 180)
 		(fields_autoplaced yes)
@@ -8889,7 +8935,7 @@
 		)
 		(uuid "867af008-78b9-4018-ae9e-b259c99ee5ef")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 160.5424 181.61 0)
+			(at 161.51 181.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8921,7 +8967,7 @@
 			)
 		)
 	)
-	(global_label "GPIO_12"
+	(global_label "GPIO12"
 		(shape input)
 		(at 88.9 158.75 0)
 		(fields_autoplaced yes)
@@ -8933,7 +8979,7 @@
 		)
 		(uuid "b14a1904-0fa4-4eb8-b738-74c56c117b41")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 99.7471 158.75 0)
+			(at 98.7795 158.75 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8965,7 +9011,7 @@
 			)
 		)
 	)
-	(global_label "GPIO_6"
+	(global_label "GPIO6"
 		(shape input)
 		(at 142.24 163.83 180)
 		(fields_autoplaced yes)
@@ -8977,7 +9023,7 @@
 		)
 		(uuid "ea69da67-3f73-473a-9144-97147f1a05e9")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 132.6024 163.83 0)
+			(at 133.57 163.83 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8987,7 +9033,7 @@
 			)
 		)
 	)
-	(global_label "GPIO_0"
+	(global_label "GPIO0"
 		(shape input)
 		(at 179.07 184.15 180)
 		(fields_autoplaced yes)
@@ -8999,7 +9045,7 @@
 		)
 		(uuid "f49675c1-2210-454d-a453-ec4d37764c8b")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 169.4324 184.15 0)
+			(at 170.4 184.15 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9009,7 +9055,7 @@
 			)
 		)
 	)
-	(global_label "GPIO_13"
+	(global_label "GPIO13"
 		(shape input)
 		(at 22.86 147.32 180)
 		(fields_autoplaced yes)
@@ -9021,7 +9067,7 @@
 		)
 		(uuid "fae422f1-7c64-4f5d-b5da-835ce5a08591")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 12.0129 147.32 0)
+			(at 12.9805 147.32 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9031,7 +9077,7 @@
 			)
 		)
 	)
-	(global_label "GPIO_10"
+	(global_label "GPIO10"
 		(shape input)
 		(at 88.9 151.13 0)
 		(fields_autoplaced yes)
@@ -9043,7 +9089,7 @@
 		)
 		(uuid "fe2aaf31-f23c-422b-ac8f-fe0bdaeab379")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 99.7471 151.13 0)
+			(at 98.7795 151.13 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9078,7 +9124,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+		(property "Footprint" "Resistor_SMD:R_0201_0603Metric"
 			(at 287.02 55.372 90)
 			(effects
 				(font
@@ -9153,7 +9199,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+		(property "Footprint" "Resistor_SMD:R_0201_0603Metric"
 			(at 287.02 62.992 90)
 			(effects
 				(font
@@ -10065,7 +10111,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "RP2040_minimal:Crystal_SMD_HC49-US"
+		(property "Footprint" "Crystal:Crystal_SMD_HC49-SD"
 			(at 154.94 29.21 0)
 			(effects
 				(font
@@ -10199,7 +10245,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "5.1k"
+		(property "Value" "5K1"
 			(at 182.88 180.3399 0)
 			(effects
 				(font
@@ -10208,7 +10254,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 182.118 179.07 90)
 			(effects
 				(font
@@ -10552,7 +10598,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "5.1k"
+		(property "Value" "5K1"
 			(at 149.86 182.8799 0)
 			(effects
 				(font
@@ -10561,7 +10607,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 149.098 181.61 90)
 			(effects
 				(font
@@ -10706,7 +10752,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 27.94 145.542 90)
 			(effects
 				(font
@@ -10832,7 +10878,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "5.1k"
+		(property "Value" "5K1"
 			(at 76.2 38.0999 0)
 			(effects
 				(font
@@ -10841,7 +10887,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 75.438 36.83 90)
 			(effects
 				(font
@@ -11187,7 +11233,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 119.888 100.33 90)
 			(effects
 				(font
@@ -11254,7 +11300,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 172.72 32.512 90)
 			(effects
 				(font
@@ -11299,6 +11345,71 @@
 			(project "picopet"
 				(path "/2479187f-6e89-4e48-b054-a0f48c7b4f36"
 					(reference "R18")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 226.06 180.34 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "4492a4e1-68f2-43bf-86c4-4de7780f1ad7")
+		(property "Reference" "#PWR014"
+			(at 226.06 186.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 222.25 181.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Footprint" ""
+			(at 226.06 180.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 226.06 180.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 226.06 180.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "e26d6cfa-4b1f-4c8a-93f3-6863f039c5e4")
+		)
+		(instances
+			(project "picopet"
+				(path "/2479187f-6e89-4e48-b054-a0f48c7b4f36"
+					(reference "#PWR014")
 					(unit 1)
 				)
 			)
@@ -11703,7 +11814,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 116.84 36.83 0)
+		(at 120.65 36.83 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -11711,7 +11822,7 @@
 		(dnp no)
 		(uuid "55d0526b-7c8e-41c2-a027-ac2d7e8be196")
 		(property "Reference" "#PWR031"
-			(at 116.84 43.18 0)
+			(at 120.65 43.18 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11720,7 +11831,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 113.03 38.1 0)
+			(at 116.84 38.1 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11729,7 +11840,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 116.84 36.83 0)
+			(at 120.65 36.83 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11738,7 +11849,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 116.84 36.83 0)
+			(at 120.65 36.83 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11747,7 +11858,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 116.84 36.83 0)
+			(at 120.65 36.83 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12030,7 +12141,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "5.1k"
+		(property "Value" "5K1"
 			(at 219.71 186.6899 0)
 			(effects
 				(font
@@ -12039,7 +12150,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 218.948 185.42 90)
 			(effects
 				(font
@@ -12083,7 +12194,7 @@
 	)
 	(symbol
 		(lib_id "power:VCOM")
-		(at 116.84 25.4 0)
+		(at 120.65 25.4 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -12091,7 +12202,7 @@
 		(dnp no)
 		(uuid "68356d17-44f2-4316-b6c4-91027624d8eb")
 		(property "Reference" "#PWR030"
-			(at 116.84 29.21 0)
+			(at 120.65 29.21 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12100,7 +12211,7 @@
 			)
 		)
 		(property "Value" "VBAT"
-			(at 116.84 21.844 0)
+			(at 120.65 21.844 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12108,7 +12219,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 116.84 25.4 0)
+			(at 120.65 25.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12117,7 +12228,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 116.84 25.4 0)
+			(at 120.65 25.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12126,7 +12237,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"VCOM\""
-			(at 116.84 25.4 0)
+			(at 120.65 25.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12172,7 +12283,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Button_Switch_SMD:SW_SPST_EVQP2_MiddlePushTravel_H2.5mm"
 			(at 114.3 67.31 0)
 			(effects
 				(font
@@ -12469,7 +12580,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 124.46 70.612 90)
 			(effects
 				(font
@@ -12545,7 +12656,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_USB:USB_C_Receptacle_G-Switch_GT-USB-7025"
+		(property "Footprint" "Connector_USB:USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal"
 			(at 31.75 36.83 0)
 			(effects
 				(font
@@ -12757,6 +12868,83 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:C")
+		(at 226.06 175.26 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "805968bf-79ab-4530-9e02-587fb3d37a31")
+		(property "Reference" "C4"
+			(at 228.981 174.0916 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "4.7u"
+			(at 228.981 176.403 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+			(at 227.0252 179.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/1811121310_Samsung-Electro-Mechanics-CL21A106KAYNNNE_C15850.pdf"
+			(at 226.06 175.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 226.06 175.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC" "C15850"
+			(at 226.06 175.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "9e28964c-2c35-4cc6-b1bd-b2b0d2652035")
+		)
+		(pin "2"
+			(uuid "6a2ff2e6-bf24-412d-b4e1-1782f28dd9a9")
+		)
+		(instances
+			(project "picopet"
+				(path "/2479187f-6e89-4e48-b054-a0f48c7b4f36"
+					(reference "C4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:VCOM")
 		(at 118.11 85.09 0)
 		(unit 1)
@@ -12904,7 +13092,7 @@
 				)
 			)
 		)
-		(property "Value" "5.1k"
+		(property "Value" "5K1"
 			(at 54.61 25.4 90)
 			(effects
 				(font
@@ -12912,7 +13100,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 54.61 30.988 90)
 			(effects
 				(font
@@ -12956,7 +13144,7 @@
 	)
 	(symbol
 		(lib_id "Device:C")
-		(at 116.84 31.75 0)
+		(at 120.65 31.75 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -12964,7 +13152,7 @@
 		(dnp no)
 		(uuid "85e1f423-20f9-4e1e-8a08-350fc3ed301a")
 		(property "Reference" "C15"
-			(at 119.761 30.5816 0)
+			(at 123.571 30.5816 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12973,7 +13161,7 @@
 			)
 		)
 		(property "Value" "4.7u"
-			(at 119.761 32.893 0)
+			(at 123.571 32.893 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12982,7 +13170,7 @@
 			)
 		)
 		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
-			(at 117.8052 35.56 0)
+			(at 121.6152 35.56 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12991,7 +13179,7 @@
 			)
 		)
 		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/1811121310_Samsung-Electro-Mechanics-CL21A106KAYNNNE_C15850.pdf"
-			(at 116.84 31.75 0)
+			(at 120.65 31.75 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13000,7 +13188,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 116.84 31.75 0)
+			(at 120.65 31.75 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13008,7 +13196,7 @@
 			)
 		)
 		(property "LCSC" "C15850"
-			(at 116.84 31.75 0)
+			(at 120.65 31.75 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13059,7 +13247,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 31.242 139.7 90)
 			(effects
 				(font
@@ -13531,7 +13719,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "5.1k"
+		(property "Value" "5K1"
 			(at 140.97 185.4199 0)
 			(effects
 				(font
@@ -13540,7 +13728,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 140.208 184.15 90)
 			(effects
 				(font
@@ -13669,7 +13857,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "5.1k"
+		(property "Value" "5K1"
 			(at 173.99 177.7999 0)
 			(effects
 				(font
@@ -13678,7 +13866,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 173.228 176.53 90)
 			(effects
 				(font
@@ -13953,7 +14141,7 @@
 				)
 			)
 		)
-		(property "Footprint" "RP2040_minimal:RP2040-QFN-56"
+		(property "Footprint" "Package_DFN_QFN:QFN-56-1EP_7x7mm_P0.4mm_EP3.2x3.2mm"
 			(at 220.98 105.41 0)
 			(effects
 				(font
@@ -14326,7 +14514,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 119.888 90.17 90)
 			(effects
 				(font
@@ -14363,6 +14551,71 @@
 			(project "picopet"
 				(path "/2479187f-6e89-4e48-b054-a0f48c7b4f36"
 					(reference "R8")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 102.87 185.42 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "bea59e9d-8c61-4b2a-9109-ffc29e6f50d3")
+		(property "Reference" "#PWR012"
+			(at 102.87 191.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 99.06 186.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Footprint" ""
+			(at 102.87 185.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 102.87 185.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 102.87 185.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "05a4b0be-502b-4f3f-ad49-c3f52ab95a5d")
+		)
+		(instances
+			(project "picopet"
+				(path "/2479187f-6e89-4e48-b054-a0f48c7b4f36"
+					(reference "#PWR012")
 					(unit 1)
 				)
 			)
@@ -14453,7 +14706,7 @@
 				)
 			)
 		)
-		(property "Value" "5.1k"
+		(property "Value" "5K1"
 			(at 48.26 22.86 90)
 			(effects
 				(font
@@ -14461,7 +14714,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 48.26 28.448 90)
 			(effects
 				(font
@@ -14968,7 +15221,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 137.922 57.15 90)
 			(effects
 				(font
@@ -15784,6 +16037,83 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:C")
+		(at 102.87 180.34 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "f7f60611-73b2-4936-a8aa-cfe69d581cd0")
+		(property "Reference" "C3"
+			(at 105.791 179.1716 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "4.7u"
+			(at 105.791 181.483 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+			(at 103.8352 184.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/1811121310_Samsung-Electro-Mechanics-CL21A106KAYNNNE_C15850.pdf"
+			(at 102.87 180.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 102.87 180.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC" "C15850"
+			(at 102.87 180.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "05fd5a42-251d-4409-9999-752f3ebbe707")
+		)
+		(pin "2"
+			(uuid "126ff21e-d769-4e29-895e-558d417c2654")
+		)
+		(instances
+			(project "picopet"
+				(path "/2479187f-6e89-4e48-b054-a0f48c7b4f36"
+					(reference "C3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Device:R")
 		(at 44.45 140.97 270)
 		(unit 1)
@@ -15809,7 +16139,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 44.45 139.192 90)
 			(effects
 				(font
@@ -15876,7 +16206,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Package_SO:SOIC-8_5.23x5.23mm_P1.27mm"
+		(property "Footprint" "Package_SO:SOIC-8_5.3x5.3mm_P1.27mm"
 			(at 154.94 74.93 0)
 			(effects
 				(font

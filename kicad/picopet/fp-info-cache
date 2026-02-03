@@ -1,4 +1,4 @@
-3539751816956
+1769961323266
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -104222,13 +104222,6 @@ Varistor VF
 0
 2
 2
-custom
-PQFP-128_28x28mm_P0.8mm
-PQFP, 128 Pin (JEITA/EIAJ ED-7311A (variation 128-001-KD) / JEDEC MS-022 (variation DB-2), 3.40mm body thickness, https://www.jeita.or.jp/japanese/standard/book/ED-7311A/#target/page_no=78, https://www.jedec.org/document_search?search_api_views_fulltext=MS-022), generated with kicad-footprint-generator ipc_gullwing_generator.py
-PQFP QFP P-QFP128-28.00x28.00-0.80 P-QFP128-2828-0.80 MQFP-128
-0
-14
-14
 custom
 ST7735_P0.8mm
 PQFP, 128 Pin (JEITA/EIAJ ED-7311A (variation 128-001-KD) / JEDEC MS-022 (variation DB-2), 3.40mm body thickness, https://www.jeita.or.jp/japanese/standard/book/ED-7311A/#target/page_no=78, https://www.jedec.org/document_search?search_api_views_fulltext=MS-022), generated with kicad-footprint-generator ipc_gullwing_generator.py
