@@ -38,6 +38,7 @@ impl SceneBehavior for NyiScene {
             // limit checks to 1hz
             // return;
         }
+        let hardware = crate::game::globals::get_hardware();
         let nvm = crate::game::globals::get_nvm();
         nvm.pet.is_hungry = false;
         let now = crate::game::globals::get_hardware().get_date_time();
@@ -185,7 +186,18 @@ impl SceneBehavior for NyiScene {
                 "{}",
                 if nvm.pet.is_hungry { "YES" } else { "NO" }
             ),
-        )
+        );
+
+        y += 8;
+        draw_text(8, y, FontStyle::Small, Rgb332::BLACK, "BATTERY?:");
+        y += 8;
+        draw_text(
+            8,
+            y,
+            FontStyle::Small,
+            Rgb332::BLACK,
+            &fixedstr::str_format!(fixedstr::str32, "{}", hardware.get_vsense()),
+        );
     }
 
     fn next_scene(&self) -> &Option<SceneType> {

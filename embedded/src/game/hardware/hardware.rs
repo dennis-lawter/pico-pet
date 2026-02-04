@@ -18,6 +18,7 @@ use waveshare_rp2040_lcd_0_96::hal::pac;
 use waveshare_rp2040_lcd_0_96::hal::pio::PIOExt;
 use waveshare_rp2040_lcd_0_96::hal::sio::SioFifo;
 use waveshare_rp2040_lcd_0_96::hal::watchdog::Watchdog;
+use waveshare_rp2040_lcd_0_96::hal::Adc;
 use waveshare_rp2040_lcd_0_96::hal::Sio;
 use waveshare_rp2040_lcd_0_96::hal::{self};
 use waveshare_rp2040_lcd_0_96::pac::PPB;
@@ -61,6 +62,8 @@ type Key2Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio2, hal::gpio::Input<hal::gpi
 type Key3Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio3, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key5Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio5, hal::gpio::Input<hal::gpio::PullUp>>;
 
+type Adc0Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio26, hal::gpio::Input<hal::gpio::Floating>>;
+
 type VibePin = hal::gpio::Pin<hal::gpio::bank0::Gpio6, hal::gpio::Output<hal::gpio::PushPull>>;
 
 type I2CBus = hal::I2C<
@@ -89,6 +92,8 @@ pub struct HardwareComponents {
     pub ppb_ptr: *mut PPB,
     pub fifo_ptr: *mut SioFifo,
     pub i2c_bus: I2CBus,
+    pub adc: Adc,
+    pub vsense_pin: Adc0Pin,
 }
 impl HardwareComponents {
     pub fn new() -> Self {
@@ -159,6 +164,9 @@ impl HardwareComponents {
             let key3 = pins.gpio3.into_pull_up_input();
 
             let second_clock = pins.gpio5.into_pull_up_input();
+
+            let adc: Adc = Adc::new(pac.ADC, &mut pac.RESETS);
+            let vsense_pin = pins.gpio26.into_floating_input();
 
             let mut vibe = pins.gpio6.into_push_pull_output();
             vibe.set_low().unwrap();
@@ -236,12 +244,26 @@ impl HardwareComponents {
                 ppb_ptr,
                 fifo_ptr,
                 i2c_bus,
+                adc,
+                vsense_pin,
             };
 
             // enable 1hz clock
             s.write_sqw_pin_mode(0x00);
 
             s
+        }
+    }
+
+    pub fn get_vsense(&mut self) -> u16 {
+        let r = <Adc as embedded_hal::prelude::_embedded_hal_adc_OneShot<
+            Adc,
+            u16,
+            hal::gpio::Pin<hal::gpio::bank0::Gpio26, hal::gpio::Input<hal::gpio::Floating>>,
+        >>::read(&mut self.adc, &mut self.vsense_pin);
+        match r {
+            Ok(val) => val,
+            Err(_) => 0,
         }
     }
 
