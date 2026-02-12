@@ -25,7 +25,20 @@ use waveshare_rp2040_lcd_0_96::entry;
 fn main() -> ! {
     init_globals();
 
-    spawn_secondary_core_worker();
+    // spawn_secondary_core_worker();
 
     run_primary_main_loop()
+}
+
+// Enable hardware interrupt to wake the CPU from wfi()
+use waveshare_rp2040_lcd_0_96::pac::interrupt;
+#[interrupt]
+fn IO_IRQ_BANK0() {
+    unsafe {
+        let p = waveshare_rp2040_lcd_0_96::pac::Peripherals::steal();
+
+        // Clear all GPIO interrupt sources
+        p.IO_BANK0.intr[0].write(|w| w.bits(0xffffffff));
+        p.IO_BANK0.intr[1].write(|w| w.bits(0xffffffff));
+    }
 }

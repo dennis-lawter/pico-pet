@@ -76,11 +76,8 @@ pub fn primary_main_loop() -> ! {
             hardware.end_tone();
             crate::game::display::render::draw(&mut hardware.display);
 
-            // Would be nice to have a delay,
-            // especially in a low power mode,
-            // but it requires interrupts so user input immediately ends the sleep.
+            hardware.wfi();
 
-            // hardware.delay.delay_ms(1000);
             continue;
         } else if any_key_pressed {
             idle_frame_counter = 0;
