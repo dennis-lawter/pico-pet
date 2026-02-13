@@ -9,8 +9,12 @@ use crate::game::hardware::rtc::RealDate;
 use crate::game::scenes::SceneBehavior;
 use crate::game::scenes::SceneType;
 
+const NUM_BAT_SAMPLES: usize = 32;
+
 pub struct NyiScene {
     next_scene: Option<SceneType>,
+    running_bat_readings: [u16; NUM_BAT_SAMPLES],
+    bat_reading_i: usize,
 }
 
 impl SceneBehavior for NyiScene {
@@ -188,15 +192,28 @@ impl SceneBehavior for NyiScene {
             ),
         );
 
+        self.bat_reading_i += 1;
+        if self.bat_reading_i >= self.running_bat_readings.len() {
+            self.bat_reading_i = 0;
+        }
+        let vsense = hardware.get_vsense();
+        self.running_bat_readings[self.bat_reading_i] = vsense;
+
+        let mut vsense_sum: u32 = 0;
+        for vs in self.running_bat_readings.iter() {
+            vsense_sum += *vs as u32;
+        }
+        let vsense_avg = vsense_sum / NUM_BAT_SAMPLES as u32;
+
         y += 8;
-        draw_text(8, y, FontStyle::Small, Rgb332::BLACK, "BATTERY?:");
+        draw_text(8, y, FontStyle::Small, Rgb332::BLACK, "BATTERY LEVEL:");
         y += 8;
         draw_text(
             8,
             y,
             FontStyle::Small,
             Rgb332::BLACK,
-            &fixedstr::str_format!(fixedstr::str32, "{}", hardware.get_vsense()),
+            &fixedstr::str_format!(fixedstr::str32, "{}", vsense_avg),
         );
     }
 
@@ -206,6 +223,10 @@ impl SceneBehavior for NyiScene {
 }
 impl Default for NyiScene {
     fn default() -> Self {
-        Self { next_scene: None }
+        Self {
+            next_scene: None,
+            running_bat_readings: [0; NUM_BAT_SAMPLES],
+            bat_reading_i: 0,
+        }
     }
 }
