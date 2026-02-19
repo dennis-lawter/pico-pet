@@ -40,7 +40,7 @@ use crate::game::hardware::rtc::RealDate;
 use crate::game::hardware::rtc::RealDateTime;
 
 pub const LCD_WIDTH: usize = 128;
-pub const LCD_HEIGHT: usize = 128;
+pub const LCD_HEIGHT: usize = 160;
 
 pub const BRIGHTNESS_LUT: [u16; 16] = [
     306, 438, 626, 895, 1281, 1831, 2619, 3746, 5357, 7660, 10955, 15667, 22406, 32043, 45825,
@@ -58,11 +58,11 @@ type LcdBlPinChannel = hal::pwm::Channel<hal::pwm::Pwm6, hal::pwm::FreeRunning, 
 type BuzzerPinChannel = hal::pwm::Channel<hal::pwm::Pwm2, hal::pwm::FreeRunning, hal::pwm::A>;
 type BuzzerPwmSlice = hal::pwm::Slice<hal::pwm::Pwm2, hal::pwm::FreeRunning>;
 
-type Key0Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio15, hal::gpio::Input<hal::gpio::PullUp>>;
-type Key1Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio17, hal::gpio::Input<hal::gpio::PullUp>>;
+type Key0Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio19, hal::gpio::Input<hal::gpio::PullUp>>;
+type Key1Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio18, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key1AltPin = hal::gpio::Pin<hal::gpio::bank0::Gpio29, hal::gpio::Input<hal::gpio::PullUp>>;
-type Key2Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio2, hal::gpio::Input<hal::gpio::PullUp>>;
-type Key3Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio3, hal::gpio::Input<hal::gpio::PullUp>>;
+type Key2Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio17, hal::gpio::Input<hal::gpio::PullUp>>;
+type Key3Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio16, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key5Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio5, hal::gpio::Input<hal::gpio::PullUp>>;
 
 type Adc0Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio26, hal::gpio::Input<hal::gpio::Floating>>;
@@ -160,11 +160,11 @@ impl HardwareComponents {
             (*buzzer_pwm_slice_ptr).set_top(0);
             (*buzzer_pwm_slice_ptr).enable();
 
-            let key0 = pins.gpio15.into_pull_up_input();
-            let key1 = pins.gpio17.into_pull_up_input();
+            let key0 = pins.gpio19.into_pull_up_input();
+            let key1 = pins.gpio18.into_pull_up_input();
             let key1_alt = pins.gpio29.into_pull_up_input();
-            let key2 = pins.gpio2.into_pull_up_input();
-            let key3 = pins.gpio3.into_pull_up_input();
+            let key2 = pins.gpio17.into_pull_up_input();
+            let key3 = pins.gpio16.into_pull_up_input();
 
             let second_clock = pins.gpio5.into_pull_up_input();
 
@@ -192,7 +192,7 @@ impl HardwareComponents {
             let spi = spi.init(
                 &mut pac.RESETS,
                 clocks.peripheral_clock.freq(),
-                10.MHz(),
+                15.MHz(),
                 &embedded_hal::spi::MODE_0,
             );
 
@@ -200,15 +200,16 @@ impl HardwareComponents {
                 spi,
                 lcd_dc,
                 lcd_rst,
-                false,
+                true,
                 false,
                 LCD_WIDTH as u32,
                 LCD_HEIGHT as u32,
             );
 
             display.init(&mut delay).unwrap();
-            display.set_orientation(&Orientation::Portrait).unwrap();
-
+            display
+                .set_orientation(&Orientation::PortraitSwapped)
+                .unwrap();
             display.set_offset(2, 1);
 
             let psm_ptr: *mut PSM = &mut pac.PSM as *mut PSM;
