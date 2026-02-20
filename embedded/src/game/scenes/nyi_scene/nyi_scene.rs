@@ -15,6 +15,19 @@ pub struct NyiScene {
     next_scene: Option<SceneType>,
     running_bat_readings: [u16; NUM_BAT_SAMPLES],
     bat_reading_i: usize,
+    frame_count: usize,
+    fps: usize,
+}
+impl Default for NyiScene {
+    fn default() -> Self {
+        Self {
+            next_scene: None,
+            running_bat_readings: [0; NUM_BAT_SAMPLES],
+            bat_reading_i: 0,
+            frame_count: 0,
+            fps: 0,
+        }
+    }
 }
 
 impl SceneBehavior for NyiScene {
@@ -23,10 +36,14 @@ impl SceneBehavior for NyiScene {
         if input.get_state(&KeyNames::Back).just_released {
             self.next_scene = Some(SceneType::Main);
         }
+        if input.get_state(&KeyNames::Clock).just_released {
+            self.fps = self.frame_count;
+            self.frame_count = 0;
+        }
     }
 
     fn tick(&mut self) {
-        ()
+        self.frame_count += 1;
     }
 
     fn sound(&mut self) {
@@ -215,18 +232,18 @@ impl SceneBehavior for NyiScene {
             Rgb332::BLACK,
             &fixedstr::str_format!(fixedstr::str32, "{}", vsense_avg),
         );
+
+        y += 8;
+        draw_text(
+            8,
+            y,
+            FontStyle::Small,
+            Rgb332::BLACK,
+            &fixedstr::str_format!(fixedstr::str32, "FPS: {}", self.fps),
+        );
     }
 
     fn next_scene(&self) -> &Option<SceneType> {
         &self.next_scene
-    }
-}
-impl Default for NyiScene {
-    fn default() -> Self {
-        Self {
-            next_scene: None,
-            running_bat_readings: [0; NUM_BAT_SAMPLES],
-            bat_reading_i: 0,
-        }
     }
 }

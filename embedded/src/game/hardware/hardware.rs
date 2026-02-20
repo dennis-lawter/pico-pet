@@ -59,10 +59,9 @@ type BuzzerPinChannel = hal::pwm::Channel<hal::pwm::Pwm2, hal::pwm::FreeRunning,
 type BuzzerPwmSlice = hal::pwm::Slice<hal::pwm::Pwm2, hal::pwm::FreeRunning>;
 
 type Key0Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio19, hal::gpio::Input<hal::gpio::PullUp>>;
-type Key1Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio18, hal::gpio::Input<hal::gpio::PullUp>>;
-type Key1AltPin = hal::gpio::Pin<hal::gpio::bank0::Gpio29, hal::gpio::Input<hal::gpio::PullUp>>;
+type Key1Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio16, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key2Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio17, hal::gpio::Input<hal::gpio::PullUp>>;
-type Key3Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio16, hal::gpio::Input<hal::gpio::PullUp>>;
+type Key3Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio18, hal::gpio::Input<hal::gpio::PullUp>>;
 type Key5Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio5, hal::gpio::Input<hal::gpio::PullUp>>;
 
 type Adc0Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio26, hal::gpio::Input<hal::gpio::Floating>>;
@@ -86,7 +85,6 @@ pub struct HardwareComponents {
     pub delay: Delay,
     pub key0: Key0Pin,
     pub key1: Key1Pin,
-    pub key1_alt: Key1AltPin,
     pub key2: Key2Pin,
     pub key3: Key3Pin,
     pub second_clock: Key5Pin,
@@ -160,13 +158,11 @@ impl HardwareComponents {
             (*buzzer_pwm_slice_ptr).set_top(0);
             (*buzzer_pwm_slice_ptr).enable();
 
-            let key0 = pins.gpio19.into_pull_up_input();
-            let key1 = pins.gpio18.into_pull_up_input();
-            let key1_alt = pins.gpio29.into_pull_up_input();
-            let key2 = pins.gpio17.into_pull_up_input();
-            let key3 = pins.gpio16.into_pull_up_input();
-
-            let second_clock = pins.gpio5.into_pull_up_input();
+            let key0: Key0Pin = pins.gpio19.into_pull_up_input();
+            let key1: Key1Pin = pins.gpio16.into_pull_up_input();
+            let key2: Key2Pin = pins.gpio17.into_pull_up_input();
+            let key3: Key3Pin = pins.gpio18.into_pull_up_input();
+            let key5: Key5Pin = pins.gpio5.into_pull_up_input();
 
             let adc: Adc = Adc::new(pac.ADC, &mut pac.RESETS);
             let vsense_pin = pins.gpio26.into_floating_input();
@@ -192,7 +188,7 @@ impl HardwareComponents {
             let spi = spi.init(
                 &mut pac.RESETS,
                 clocks.peripheral_clock.freq(),
-                15.MHz(),
+                33.MHz(),
                 &embedded_hal::spi::MODE_0,
             );
 
@@ -239,10 +235,9 @@ impl HardwareComponents {
                 delay,
                 key0,
                 key1,
-                key1_alt,
                 key2,
                 key3,
-                second_clock,
+                second_clock: key5,
                 vibe,
                 psm_ptr,
                 ppb_ptr,
@@ -252,7 +247,7 @@ impl HardwareComponents {
                 vsense_pin,
             };
 
-            s.init_wfi();
+            // s.init_wfi();
 
             // enable 1hz clock
             s.write_sqw_pin_mode(0x00);
@@ -278,7 +273,7 @@ impl HardwareComponents {
     }
 
     pub fn key1_pressed(&self) -> bool {
-        self.key1.is_low().unwrap() || self.key1_alt.is_low().unwrap()
+        self.key1.is_low().unwrap()
     }
 
     pub fn key2_pressed(&self) -> bool {
@@ -465,18 +460,18 @@ impl HardwareComponents {
         self.delay.delay_ms(5);
     }
 
-    pub fn init_wfi(&mut self) {
-        self.key3
-            .set_interrupt_enabled(hal::gpio::Interrupt::EdgeLow, true);
-        self.second_clock
-            .set_interrupt_enabled(hal::gpio::Interrupt::EdgeHigh, true);
+    // pub fn init_wfi(&mut self) {
+    //     self.key3
+    //         .set_interrupt_enabled(hal::gpio::Interrupt::EdgeLow, true);
+    //     self.second_clock
+    //         .set_interrupt_enabled(hal::gpio::Interrupt::EdgeHigh, true);
 
-        unsafe {
-            NVIC::unmask(Interrupt::IO_IRQ_BANK0);
-        }
-    }
+    //     unsafe {
+    //         NVIC::unmask(Interrupt::IO_IRQ_BANK0);
+    //     }
+    // }
 
-    pub fn wfi(&self) {
-        wfi();
-    }
+    // pub fn wfi(&self) {
+    //     wfi();
+    // }
 }
