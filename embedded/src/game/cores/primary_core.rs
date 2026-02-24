@@ -76,7 +76,7 @@ pub fn primary_main_loop() -> ! {
             hardware.end_tone();
             crate::game::display::render::draw(&mut hardware.display);
 
-            // hardware.wfi();
+            hardware.wfi();
 
             continue;
         } else if any_key_pressed {

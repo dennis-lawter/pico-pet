@@ -297,7 +297,7 @@ impl HardwareComponents {
                 vsense_pin,
             };
 
-            // s.init_wfi();
+            s.init_wfi();
 
             // enable 1hz clock
             s.write_sqw_pin_mode(0x00);
@@ -513,18 +513,18 @@ impl HardwareComponents {
         self.delay.delay_ms(5);
     }
 
-    // pub fn init_wfi(&mut self) {
-    //     self.key3
-    //         .set_interrupt_enabled(hal::gpio::Interrupt::EdgeLow, true);
-    //     self.second_clock
-    //         .set_interrupt_enabled(hal::gpio::Interrupt::EdgeHigh, true);
+    pub fn init_wfi(&mut self) {
+        self.key3
+            .set_interrupt_enabled(rp2040_hal::gpio::Interrupt::EdgeLow, true);
+        self.second_clock
+            .set_interrupt_enabled(rp2040_hal::gpio::Interrupt::EdgeHigh, true);
 
-    //     unsafe {
-    //         NVIC::unmask(Interrupt::IO_IRQ_BANK0);
-    //     }
-    // }
+        unsafe {
+            pac::NVIC::unmask(pac::Interrupt::IO_IRQ_BANK0);
+        }
+    }
 
-    // pub fn wfi(&self) {
-    //     wfi();
-    // }
+    pub fn wfi(&self) {
+        cortex_m::asm::wfi();
+    }
 }
