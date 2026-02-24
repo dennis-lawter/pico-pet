@@ -77,6 +77,7 @@ type I2CBus = hal::I2C<
     ),
 >;
 
+#[allow(unused)]
 pub struct HardwareComponents {
     pub display: Lcd,
     pub sys_freq: u32,

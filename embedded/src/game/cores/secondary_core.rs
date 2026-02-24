@@ -1,7 +1,9 @@
 use waveshare_rp2040_lcd_0_96::hal::multicore::Stack;
 use waveshare_rp2040_lcd_0_96::pac;
 
+#[allow(unused)]
 pub static mut CORE1_STACK: Stack<4096> = Stack::new();
+#[allow(unused)]
 pub fn secondary_main_loop(sys_freq: u32) -> ! {
     let core = unsafe { pac::CorePeripherals::steal() };
 

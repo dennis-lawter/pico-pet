@@ -15,8 +15,10 @@ extern crate waveshare_rp2040_lcd_0_96;
 
 mod game;
 
-use game::cores::run_primary_main_loop;
+#[allow(unused_imports)]
 use game::cores::spawn_secondary_core_worker;
+
+use game::cores::run_primary_main_loop;
 use game::globals::init_globals;
 
 use waveshare_rp2040_lcd_0_96::entry;

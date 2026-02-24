@@ -7,6 +7,7 @@ use self::secondary_core::secondary_main_loop;
 
 use waveshare_rp2040_lcd_0_96::hal::multicore::Multicore;
 
+#[allow(unused)]
 pub fn spawn_secondary_core_worker() {
     unsafe {
         let hardware = crate::game::globals::get_hardware();
