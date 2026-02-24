@@ -13,18 +13,16 @@ embedded-time = "0.12.1"
 embedded-graphics = "0.8.1"
 fugit = "0.3.7"
 defmt-rtt = "0.4.0"
-waveshare-rp2040-lcd-0-96 = "0.6.0"
 debugless-unwrap = "0.0.4"
 fixedstr = { version = "0.4.3", default-features = false }
+rp2040-hal = { version = "0.8.0", features = ["rt"] }
 
 [[bin]]
 name = "pico-pet"
 path = "src/main.rs"
 
 [profile.release]
-# s-level optimization breaks the reboot() function???
-# opt-level = 's'
-opt-level = 3
+opt-level = 's'
 lto = true
 overflow-checks = false
 debug = false

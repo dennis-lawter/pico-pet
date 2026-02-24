@@ -5,7 +5,7 @@ pub mod secondary_core;
 use self::primary_core::primary_main_loop;
 use self::secondary_core::secondary_main_loop;
 
-use waveshare_rp2040_lcd_0_96::hal::multicore::Multicore;
+use rp2040_hal::multicore::Multicore;
 
 #[allow(unused)]
 pub fn spawn_secondary_core_worker() {

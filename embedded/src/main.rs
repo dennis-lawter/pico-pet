@@ -10,10 +10,15 @@ extern crate embedded_hal;
 extern crate embedded_time;
 extern crate fixedstr;
 extern crate fugit;
+extern crate rp2040_hal;
 extern crate st7735_lcd;
-extern crate waveshare_rp2040_lcd_0_96;
 
 mod game;
+
+#[link_section = ".boot2"]
+#[no_mangle]
+#[used]
+pub static BOOT2_FIRMWARE: [u8; 256] = rp2040_boot2::BOOT_LOADER_W25Q080;
 
 #[allow(unused_imports)]
 use game::cores::spawn_secondary_core_worker;
@@ -21,7 +26,7 @@ use game::cores::spawn_secondary_core_worker;
 use game::cores::run_primary_main_loop;
 use game::globals::init_globals;
 
-use waveshare_rp2040_lcd_0_96::entry;
+use rp2040_hal::entry;
 
 #[entry]
 fn main() -> ! {
@@ -32,15 +37,15 @@ fn main() -> ! {
     run_primary_main_loop()
 }
 
-// Enable hardware interrupt to wake the CPU from wfi()
-use waveshare_rp2040_lcd_0_96::pac::interrupt;
-#[interrupt]
-fn IO_IRQ_BANK0() {
-    unsafe {
-        let p = waveshare_rp2040_lcd_0_96::pac::Peripherals::steal();
+// // Enable hardware interrupt to wake the CPU from wfi()
+// use waveshare_rp2040_lcd_0_96::pac::interrupt;
+// #[interrupt]
+// fn IO_IRQ_BANK0() {
+//     unsafe {
+//         let p = waveshare_rp2040_lcd_0_96::pac::Peripherals::steal();
 
-        // Clear all GPIO interrupt sources
-        p.IO_BANK0.intr[0].write(|w| w.bits(0xffffffff));
-        p.IO_BANK0.intr[1].write(|w| w.bits(0xffffffff));
-    }
-}
+//         // Clear all GPIO interrupt sources
+//         p.IO_BANK0.intr[0].write(|w| w.bits(0xffffffff));
+//         p.IO_BANK0.intr[1].write(|w| w.bits(0xffffffff));
+//     }
+// }

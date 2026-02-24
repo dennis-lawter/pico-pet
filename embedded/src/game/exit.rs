@@ -1,4 +1,4 @@
-use waveshare_rp2040_lcd_0_96::hal::rom_data;
+use rp2040_hal::rom_data;
 
 use crate::game::color::Rgb332;
 use crate::game::display::render;
@@ -9,7 +9,7 @@ use crate::game::display::text_writer;
 fn panic(info: &core::panic::PanicInfo) -> ! {
     if unsafe { crate::game::globals::HARDWARE.is_none() } {
         loop {
-            rom_data::reset_to_usb_boot(0, 0);
+            // rom_data::reset_to_usb_boot(0, 0);
             // if reset fails, just sleep
             cortex_m::asm::wfi();
         }

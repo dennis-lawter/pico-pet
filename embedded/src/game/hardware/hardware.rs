@@ -1,6 +1,6 @@
 use cortex_m::delay::Delay;
 
-use cortex_m::asm::wfi;
+// use cortex_m::asm::wfi;
 use debugless_unwrap::DebuglessUnwrap;
 use embedded_graphics::pixelcolor::Rgb565;
 use embedded_graphics::prelude::DrawTarget;
@@ -12,21 +12,21 @@ use embedded_hal::prelude::_embedded_hal_blocking_i2c_Write;
 use embedded_hal::PwmPin;
 use fugit::RateExtU32;
 
-use waveshare_rp2040_lcd_0_96::hal::clocks::init_clocks_and_plls;
-use waveshare_rp2040_lcd_0_96::hal::clocks::Clock;
-use waveshare_rp2040_lcd_0_96::hal::gpio::Pins;
-use waveshare_rp2040_lcd_0_96::hal::pac;
-use waveshare_rp2040_lcd_0_96::hal::pio::PIOExt;
-use waveshare_rp2040_lcd_0_96::hal::sio::SioFifo;
-use waveshare_rp2040_lcd_0_96::hal::watchdog::Watchdog;
-use waveshare_rp2040_lcd_0_96::hal::Adc;
-use waveshare_rp2040_lcd_0_96::hal::Sio;
-use waveshare_rp2040_lcd_0_96::hal::{self};
-use waveshare_rp2040_lcd_0_96::pac::Interrupt;
-use waveshare_rp2040_lcd_0_96::pac::NVIC;
-use waveshare_rp2040_lcd_0_96::pac::PPB;
-use waveshare_rp2040_lcd_0_96::pac::PSM;
-use waveshare_rp2040_lcd_0_96::XOSC_CRYSTAL_FREQ;
+use rp2040_hal::clocks::init_clocks_and_plls;
+use rp2040_hal::clocks::Clock;
+use rp2040_hal::gpio::Pins;
+use rp2040_hal::pac;
+// use rp2040_hal::pac::Interrupt;
+// use rp2040_hal::pac::NVIC;
+use rp2040_hal::pac::PPB;
+use rp2040_hal::pac::PSM;
+// use rp2040_hal::pac::XOSC_CRYSTAL_FREQ;
+use rp2040_hal::pio::PIOExt;
+use rp2040_hal::sio::SioFifo;
+use rp2040_hal::watchdog::Watchdog;
+use rp2040_hal::Adc;
+use rp2040_hal::Sio;
+use rp2040_hal::{self};
 
 use st7735_lcd::Orientation;
 use st7735_lcd::ST7735;
@@ -48,32 +48,76 @@ pub const BRIGHTNESS_LUT: [u16; 16] = [
 ];
 pub const VOLUME_LUT: [u16; 6] = [0, 32768 / 256, 32768 / 128, 32768 / 64, 32768 / 32, 32768];
 
-type DisplaySdi = hal::Spi<hal::spi::Enabled, pac::SPI1, 8>;
-type DisplayDc = hal::gpio::Pin<hal::gpio::bank0::Gpio8, hal::gpio::Output<hal::gpio::PushPull>>;
-type DisplayRst = hal::gpio::Pin<hal::gpio::bank0::Gpio12, hal::gpio::Output<hal::gpio::PushPull>>;
+type DisplaySdi = rp2040_hal::Spi<rp2040_hal::spi::Enabled, pac::SPI1, 8>;
+type DisplayDc = rp2040_hal::gpio::Pin<
+    rp2040_hal::gpio::bank0::Gpio8,
+    rp2040_hal::gpio::Output<rp2040_hal::gpio::PushPull>,
+>;
+type DisplayRst = rp2040_hal::gpio::Pin<
+    rp2040_hal::gpio::bank0::Gpio12,
+    rp2040_hal::gpio::Output<rp2040_hal::gpio::PushPull>,
+>;
 
 pub type Lcd = ST7735<DisplaySdi, DisplayDc, DisplayRst>;
 
-type LcdBlPinChannel = hal::pwm::Channel<hal::pwm::Pwm6, hal::pwm::FreeRunning, hal::pwm::B>;
-type BuzzerPinChannel = hal::pwm::Channel<hal::pwm::Pwm2, hal::pwm::FreeRunning, hal::pwm::A>;
-type BuzzerPwmSlice = hal::pwm::Slice<hal::pwm::Pwm2, hal::pwm::FreeRunning>;
+type LcdBlPinChannel = rp2040_hal::pwm::Channel<
+    rp2040_hal::pwm::Pwm6,
+    rp2040_hal::pwm::FreeRunning,
+    rp2040_hal::pwm::B,
+>;
+type BuzzerPinChannel = rp2040_hal::pwm::Channel<
+    rp2040_hal::pwm::Pwm2,
+    rp2040_hal::pwm::FreeRunning,
+    rp2040_hal::pwm::A,
+>;
+type BuzzerPwmSlice = rp2040_hal::pwm::Slice<rp2040_hal::pwm::Pwm2, rp2040_hal::pwm::FreeRunning>;
 
-type Key0Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio15, hal::gpio::Input<hal::gpio::PullUp>>;
-type Key1Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio17, hal::gpio::Input<hal::gpio::PullUp>>;
-type Key1AltPin = hal::gpio::Pin<hal::gpio::bank0::Gpio29, hal::gpio::Input<hal::gpio::PullUp>>;
-type Key2Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio2, hal::gpio::Input<hal::gpio::PullUp>>;
-type Key3Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio3, hal::gpio::Input<hal::gpio::PullUp>>;
-type Key5Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio5, hal::gpio::Input<hal::gpio::PullUp>>;
+type Key0Pin = rp2040_hal::gpio::Pin<
+    rp2040_hal::gpio::bank0::Gpio15,
+    rp2040_hal::gpio::Input<rp2040_hal::gpio::PullUp>,
+>;
+type Key1Pin = rp2040_hal::gpio::Pin<
+    rp2040_hal::gpio::bank0::Gpio17,
+    rp2040_hal::gpio::Input<rp2040_hal::gpio::PullUp>,
+>;
+type Key1AltPin = rp2040_hal::gpio::Pin<
+    rp2040_hal::gpio::bank0::Gpio29,
+    rp2040_hal::gpio::Input<rp2040_hal::gpio::PullUp>,
+>;
+type Key2Pin = rp2040_hal::gpio::Pin<
+    rp2040_hal::gpio::bank0::Gpio2,
+    rp2040_hal::gpio::Input<rp2040_hal::gpio::PullUp>,
+>;
+type Key3Pin = rp2040_hal::gpio::Pin<
+    rp2040_hal::gpio::bank0::Gpio3,
+    rp2040_hal::gpio::Input<rp2040_hal::gpio::PullUp>,
+>;
+type Key5Pin = rp2040_hal::gpio::Pin<
+    rp2040_hal::gpio::bank0::Gpio5,
+    rp2040_hal::gpio::Input<rp2040_hal::gpio::PullUp>,
+>;
 
-type Adc0Pin = hal::gpio::Pin<hal::gpio::bank0::Gpio26, hal::gpio::Input<hal::gpio::Floating>>;
+type Adc0Pin = rp2040_hal::gpio::Pin<
+    rp2040_hal::gpio::bank0::Gpio26,
+    rp2040_hal::gpio::Input<rp2040_hal::gpio::Floating>,
+>;
 
-type VibePin = hal::gpio::Pin<hal::gpio::bank0::Gpio6, hal::gpio::Output<hal::gpio::PushPull>>;
+type VibePin = rp2040_hal::gpio::Pin<
+    rp2040_hal::gpio::bank0::Gpio6,
+    rp2040_hal::gpio::Output<rp2040_hal::gpio::PushPull>,
+>;
 
-type I2CBus = hal::I2C<
+type I2CBus = rp2040_hal::I2C<
     pac::I2C0,
     (
-        hal::gpio::Pin<hal::gpio::bank0::Gpio0, hal::gpio::Function<hal::gpio::I2C>>,
-        hal::gpio::Pin<hal::gpio::bank0::Gpio1, hal::gpio::Function<hal::gpio::I2C>>,
+        rp2040_hal::gpio::Pin<
+            rp2040_hal::gpio::bank0::Gpio0,
+            rp2040_hal::gpio::Function<rp2040_hal::gpio::I2C>,
+        >,
+        rp2040_hal::gpio::Pin<
+            rp2040_hal::gpio::bank0::Gpio1,
+            rp2040_hal::gpio::Function<rp2040_hal::gpio::I2C>,
+        >,
     ),
 >;
 
@@ -108,7 +152,7 @@ impl HardwareComponents {
             let mut watchdog = Watchdog::new(pac.WATCHDOG);
 
             let clocks = init_clocks_and_plls(
-                XOSC_CRYSTAL_FREQ,
+                12_000_000,
                 pac.XOSC,
                 pac.CLOCKS,
                 pac.PLL_SYS,
@@ -128,7 +172,8 @@ impl HardwareComponents {
             );
 
             // Init PWMs
-            let mut pwm_slices: hal::pwm::Slices = hal::pwm::Slices::new(pac.PWM, &mut pac.RESETS);
+            let mut pwm_slices: rp2040_hal::pwm::Slices =
+                rp2040_hal::pwm::Slices::new(pac.PWM, &mut pac.RESETS);
 
             // Configure LCD PWM slice
             let pwm6 = &mut pwm_slices.pwm6;
@@ -181,14 +226,14 @@ impl HardwareComponents {
             let (mut _pio, _sm0, _, _, _) = pac.PIO0.split(&mut pac.RESETS);
 
             let lcd_dc = pins.gpio8.into_push_pull_output();
-            let mut _lcd_cs = pins.gpio9.into_mode::<hal::gpio::FunctionSpi>();
-            let mut _lcd_clk = pins.gpio10.into_mode::<hal::gpio::FunctionSpi>();
-            let mut _lcd_mosi = pins.gpio11.into_mode::<hal::gpio::FunctionSpi>();
+            let mut _lcd_cs = pins.gpio9.into_mode::<rp2040_hal::gpio::FunctionSpi>();
+            let mut _lcd_clk = pins.gpio10.into_mode::<rp2040_hal::gpio::FunctionSpi>();
+            let mut _lcd_mosi = pins.gpio11.into_mode::<rp2040_hal::gpio::FunctionSpi>();
             let lcd_rst = pins
                 .gpio12
-                .into_push_pull_output_in_state(hal::gpio::PinState::High);
+                .into_push_pull_output_in_state(rp2040_hal::gpio::PinState::High);
 
-            let spi = hal::Spi::<_, _, 8>::new(pac.SPI1);
+            let spi = rp2040_hal::Spi::<_, _, 8>::new(pac.SPI1);
 
             let spi = spi.init(
                 &mut pac.RESETS,
@@ -218,10 +263,10 @@ impl HardwareComponents {
 
             display.clear(Rgb565::BLACK).debugless_unwrap();
 
-            let sda_pin = pins.gpio0.into_mode::<hal::gpio::FunctionI2C>();
-            let scl_pin = pins.gpio1.into_mode::<hal::gpio::FunctionI2C>();
+            let sda_pin = pins.gpio0.into_mode::<rp2040_hal::gpio::FunctionI2C>();
+            let scl_pin = pins.gpio1.into_mode::<rp2040_hal::gpio::FunctionI2C>();
 
-            let i2c_bus: I2CBus = hal::I2C::i2c0(
+            let i2c_bus: I2CBus = rp2040_hal::I2C::i2c0(
                 pac.I2C0,
                 sda_pin,
                 scl_pin,
@@ -252,7 +297,7 @@ impl HardwareComponents {
                 vsense_pin,
             };
 
-            s.init_wfi();
+            // s.init_wfi();
 
             // enable 1hz clock
             s.write_sqw_pin_mode(0x00);
@@ -265,7 +310,10 @@ impl HardwareComponents {
         let r = <Adc as embedded_hal::prelude::_embedded_hal_adc_OneShot<
             Adc,
             u16,
-            hal::gpio::Pin<hal::gpio::bank0::Gpio26, hal::gpio::Input<hal::gpio::Floating>>,
+            rp2040_hal::gpio::Pin<
+                rp2040_hal::gpio::bank0::Gpio26,
+                rp2040_hal::gpio::Input<rp2040_hal::gpio::Floating>,
+            >,
         >>::read(&mut self.adc, &mut self.vsense_pin);
         match r {
             Ok(val) => val,
@@ -465,18 +513,18 @@ impl HardwareComponents {
         self.delay.delay_ms(5);
     }
 
-    pub fn init_wfi(&mut self) {
-        self.key3
-            .set_interrupt_enabled(hal::gpio::Interrupt::EdgeLow, true);
-        self.second_clock
-            .set_interrupt_enabled(hal::gpio::Interrupt::EdgeHigh, true);
+    // pub fn init_wfi(&mut self) {
+    //     self.key3
+    //         .set_interrupt_enabled(hal::gpio::Interrupt::EdgeLow, true);
+    //     self.second_clock
+    //         .set_interrupt_enabled(hal::gpio::Interrupt::EdgeHigh, true);
 
-        unsafe {
-            NVIC::unmask(Interrupt::IO_IRQ_BANK0);
-        }
-    }
+    //     unsafe {
+    //         NVIC::unmask(Interrupt::IO_IRQ_BANK0);
+    //     }
+    // }
 
-    pub fn wfi(&self) {
-        wfi();
-    }
+    // pub fn wfi(&self) {
+    //     wfi();
+    // }
 }
