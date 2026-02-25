@@ -9,7 +9,7 @@ use crate::game::display::text_writer;
 fn panic(info: &core::panic::PanicInfo) -> ! {
     if unsafe { crate::game::globals::HARDWARE.is_none() } {
         loop {
-            // rom_data::reset_to_usb_boot(0, 0);
+            rom_data::reset_to_usb_boot(0, 0);
             // if reset fails, just sleep
             cortex_m::asm::wfi();
         }
