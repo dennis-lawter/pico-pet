@@ -1,14 +1,12 @@
 use cortex_m::delay::Delay;
 
-// use cortex_m::asm::wfi;
-use debugless_unwrap::DebuglessUnwrap;
+use cortex_m::prelude::_embedded_hal_blocking_i2c_Read;
+use cortex_m::prelude::_embedded_hal_blocking_i2c_Write;
 use embedded_graphics::pixelcolor::Rgb565;
 use embedded_graphics::prelude::DrawTarget;
 use embedded_graphics::prelude::RgbColor;
 use embedded_hal::digital::v2::InputPin;
 use embedded_hal::digital::v2::OutputPin;
-use embedded_hal::prelude::_embedded_hal_blocking_i2c_Read;
-use embedded_hal::prelude::_embedded_hal_blocking_i2c_Write;
 use embedded_hal::PwmPin;
 use fugit::RateExtU32;
 
@@ -16,11 +14,8 @@ use rp2040_hal::clocks::init_clocks_and_plls;
 use rp2040_hal::clocks::Clock;
 use rp2040_hal::gpio::Pins;
 use rp2040_hal::pac;
-// use rp2040_hal::pac::Interrupt;
-// use rp2040_hal::pac::NVIC;
 use rp2040_hal::pac::PPB;
 use rp2040_hal::pac::PSM;
-// use rp2040_hal::pac::XOSC_CRYSTAL_FREQ;
 use rp2040_hal::pio::PIOExt;
 use rp2040_hal::sio::SioFifo;
 use rp2040_hal::watchdog::Watchdog;
@@ -261,7 +256,9 @@ impl HardwareComponents {
             let ppb_ptr: *mut PPB = &mut pac.PPB as *mut PPB;
             let fifo_ptr: *mut SioFifo = &mut sio.fifo as *mut SioFifo;
 
-            display.clear(Rgb565::BLACK).debugless_unwrap();
+            display
+                .clear(Rgb565::BLACK)
+                .expect("Could not initialize display");
 
             let sda_pin = pins.gpio0.into_mode::<rp2040_hal::gpio::FunctionI2C>();
             let scl_pin = pins.gpio1.into_mode::<rp2040_hal::gpio::FunctionI2C>();

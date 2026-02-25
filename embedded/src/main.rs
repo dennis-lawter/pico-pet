@@ -1,18 +1,6 @@
 #![no_std]
 #![no_main]
 
-extern crate cortex_m;
-extern crate cortex_m_rt;
-extern crate debugless_unwrap;
-extern crate defmt_rtt;
-extern crate embedded_graphics;
-extern crate embedded_hal;
-extern crate embedded_time;
-extern crate fixedstr;
-extern crate fugit;
-extern crate rp2040_hal;
-extern crate st7735_lcd;
-
 mod game;
 
 #[link_section = ".boot2"]
