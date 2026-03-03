@@ -264,7 +264,7 @@ impl HardwareComponents {
             let spi = spi.init(
                 &mut pac.RESETS,
                 clocks.peripheral_clock.freq(),
-                6.MHz(),
+                24.MHz(),
                 &embedded_hal::spi::MODE_0,
             );
 
