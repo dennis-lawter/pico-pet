@@ -230,10 +230,41 @@ impl HardwareComponents {
 
             let spi = rp2040_hal::Spi::<_, _, 8>::new(pac.SPI1);
 
+            // This frequency dictates our rate of communication to the display.
+            // There is a strong correlation between frequency and FPS.
+            // Should we choose to move from 128x128 to 128x160, these numbers all change.
+            // Additionally, there are "thresholds" where the FPS will not change. So 24-30 MHz all produce 31-32 FPS.
+            // Readings are reported per second, and due to the 1hz clock & FPS count desynchronizing, that produces 2 FPS readings.
+            // Essentially we have a floating point FPS somewhere between the 2 integers reported.
+            // There may need to be power consumption investigations for the different frequencies as well.
+            //
+            // 128x128 using write_pixels_buffered():
+            // 43-44 FPS    63MHz+
+            // 35-36 FPS    32MHz - 62MHz
+            // 31-32 FPS    21MHz - 31MHz
+            // 27-28 FPS    16MHz - 20MHz
+            // 25-26 FPS    13MHz - 15MHz
+            // 22-23 FPS    11MHz - 12MHz
+            // 20-21 FPS    9MHz - 10MHz
+            // 19-20 FPS    8MHz
+            // 17-18 FPS    7MHz
+            // 15-16 FPS    6MHz
+            // 13-14 FPS    5MHz
+            // 11-12 FPS    4MHz
+            // 9-10 FPS    3MHz
+            // 6-7 FPS    2MHz
+            // 3-4 FPS    1MHz
+            //
+            // 21MHz = 33.7mA
+            // 31MHz = 33.6mA
+            // 6MHz = 30.5mA
+            // So FPS has _some_ effect,
+            // but MHz likely has no effect
+
             let spi = spi.init(
                 &mut pac.RESETS,
                 clocks.peripheral_clock.freq(),
-                10.MHz(),
+                6.MHz(),
                 &embedded_hal::spi::MODE_0,
             );
 

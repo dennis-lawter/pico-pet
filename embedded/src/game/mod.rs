@@ -12,4 +12,4 @@ pub mod nvm;
 pub mod scenes;
 pub mod setting_value;
 
-pub const FRAME_RATE: u32 = 22;
+pub const APPROXIMATE_FRAME_RATE: u32 = 15;

@@ -7,7 +7,7 @@ use crate::game::hardware::hardware::Lcd;
 use crate::game::hardware::hardware::LCD_HEIGHT;
 use crate::game::hardware::hardware::LCD_WIDTH;
 
-static mut BUFFER: [u16; LCD_WIDTH * LCD_HEIGHT] = [0b00000_111111_00000; 128 * 128];
+static mut BUFFER: [u16; LCD_WIDTH * LCD_HEIGHT] = [0b00000_111111_00000; LCD_WIDTH * LCD_HEIGHT];
 
 pub fn draw(display: &mut Lcd) {
     unsafe {

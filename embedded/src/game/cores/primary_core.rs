@@ -9,11 +9,12 @@ use crate::game::hardware::hardware::LCD_WIDTH;
 use crate::game::hardware::input::KeyNames;
 use crate::game::scenes::main_scene::MainScene;
 use crate::game::scenes::SceneType;
+use crate::game::APPROXIMATE_FRAME_RATE;
 
 use super::scene_manager::SceneManager;
 
-const APPROX_FRAMES_PER_SECOND: usize = 21;
-const SECONDS_UNTIL_IDLE: usize = 60 * APPROX_FRAMES_PER_SECOND;
+const SECONDS_UNTIL_IDLE: usize = 60;
+const FRAMES_UNTIL_IDLE: usize = SECONDS_UNTIL_IDLE * APPROXIMATE_FRAME_RATE as usize;
 
 pub fn primary_main_loop() -> ! {
     let mut scene_manager = SceneManager::default();
@@ -43,7 +44,7 @@ pub fn primary_main_loop() -> ! {
             || hardware.key1_pressed()
             || hardware.key2_pressed()
             || hardware.key3_pressed();
-        if idle_frame_counter >= SECONDS_UNTIL_IDLE {
+        if idle_frame_counter >= FRAMES_UNTIL_IDLE {
             input.force_reset();
             if any_key_pressed {
                 // next frame will return from idle state
