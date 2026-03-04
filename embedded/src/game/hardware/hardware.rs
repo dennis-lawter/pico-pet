@@ -37,6 +37,13 @@ use crate::game::hardware::rtc::RealDateTime;
 pub const LCD_WIDTH: usize = 128;
 pub const LCD_HEIGHT: usize = 128;
 
+const RTC_ADDRESS: u8 = 0x68;
+
+// For the module from Amazon
+const NVM_ADDRESS: u8 = 0x57;
+// For my custom module with flipped bits, whoops
+// const NVM_ADDRESS: u8 = 0b_0_1010_000;
+
 pub const BRIGHTNESS_LUT: [u16; 16] = [
     306, 438, 626, 895, 1281, 1831, 2619, 3746, 5357, 7660, 10955, 15667, 22406, 32043, 45825,
     65535,
@@ -426,8 +433,8 @@ impl HardwareComponents {
 
     fn write_sqw_pin_mode(&mut self, mode: u8) -> () {
         let mut buffer = [0u8; 1];
-        self.i2c_bus.write(0x68, &[0x0E]).unwrap();
-        self.i2c_bus.read(0x68, &mut buffer).unwrap();
+        self.i2c_bus.write(RTC_ADDRESS, &[0x0E]).unwrap();
+        self.i2c_bus.read(RTC_ADDRESS, &mut buffer).unwrap();
         let mut ctrl = buffer[0];
 
         ctrl &= !0x04; // turn off INTCON
@@ -435,7 +442,7 @@ impl HardwareComponents {
 
         ctrl |= mode;
 
-        self.i2c_bus.write(0x68, &[0x0E, ctrl]).unwrap();
+        self.i2c_bus.write(RTC_ADDRESS, &[0x0E, ctrl]).unwrap();
     }
 
     pub fn get_time(&mut self) -> RealTime {
@@ -450,8 +457,8 @@ impl HardwareComponents {
 
     pub fn get_date_time(&mut self) -> RealDateTime {
         let mut buffer = [0u8; 7];
-        self.i2c_bus.write(0x68, &[0x00]).unwrap();
-        self.i2c_bus.read(0x68, &mut buffer).unwrap();
+        self.i2c_bus.write(RTC_ADDRESS, &[0x00]).unwrap();
+        self.i2c_bus.read(RTC_ADDRESS, &mut buffer).unwrap();
 
         let sec = rtc::bcd_to_dec(buffer[0]);
         let min = rtc::bcd_to_dec(buffer[1]);
@@ -485,7 +492,7 @@ impl HardwareComponents {
 
         let data = [0x00, sec_bcd, min_bcd, hr_bcd];
 
-        self.i2c_bus.write(0x68, &data).unwrap();
+        self.i2c_bus.write(RTC_ADDRESS, &data).unwrap();
     }
 
     pub fn set_date(&mut self, new_date: &RealDate) {
@@ -504,7 +511,7 @@ impl HardwareComponents {
             (century << 7) | year_bcd,
         ];
 
-        self.i2c_bus.write(0x68, &data).unwrap();
+        self.i2c_bus.write(RTC_ADDRESS, &data).unwrap();
     }
 
     fn page_to_address(page: u16) -> [u8; 2] {
@@ -519,8 +526,8 @@ impl HardwareComponents {
 
         let address = Self::page_to_address(page);
 
-        self.i2c_bus.write(0x57, &address).unwrap();
-        self.i2c_bus.read(0x57, &mut buffer).unwrap();
+        self.i2c_bus.write(NVM_ADDRESS, &address).unwrap();
+        self.i2c_bus.read(NVM_ADDRESS, &mut buffer).unwrap();
 
         buffer
     }
@@ -535,7 +542,7 @@ impl HardwareComponents {
         buffer[1] = address[1];
         buffer[2..].copy_from_slice(data);
 
-        self.i2c_bus.write(0x57, &buffer).unwrap();
+        self.i2c_bus.write(NVM_ADDRESS, &buffer).unwrap();
 
         // wait for the EEPROM to complete its write
         self.delay.delay_ms(5);

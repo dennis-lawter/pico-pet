@@ -3,6 +3,7 @@ use rp2040_hal::rom_data;
 use crate::game::color::Rgb332;
 use crate::game::display::render;
 use crate::game::display::text_writer;
+use crate::game::hardware::hardware::LCD_HEIGHT;
 
 #[panic_handler]
 #[allow(static_mut_refs)]
@@ -41,7 +42,7 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 
     text_writer::draw_text_centered(
         64,
-        128 - 15,
+        LCD_HEIGHT as i32 - 15,
         text_writer::FontStyle::Small,
         Rgb332::WHITE,
         "press any key to reboot",
@@ -77,7 +78,7 @@ pub fn reboot() -> ! {
     }
     text_writer::draw_text_centered(
         64,
-        128 - 15,
+        LCD_HEIGHT as i32 - 15,
         text_writer::FontStyle::Small,
         Rgb332::WHITE,
         "Rebooting...",

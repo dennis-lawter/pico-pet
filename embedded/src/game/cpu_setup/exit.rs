@@ -41,7 +41,7 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 
     text_writer::draw_text_centered(
         64,
-        128 - 15,
+        LCD_HEIGHT as i32 - 15,
         text_writer::FontStyle::Small,
         Rgb332::WHITE,
         "press any key to reboot",
@@ -77,7 +77,7 @@ pub fn reboot() -> ! {
     }
     text_writer::draw_text_centered(
         64,
-        128 - 15,
+        LCD_HEIGHT as i32 - 15,
         text_writer::FontStyle::Small,
         Rgb332::WHITE,
         "Rebooting...",

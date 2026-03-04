@@ -3,6 +3,8 @@ use core::usize;
 use crate::game::color::Rgb332;
 use crate::game::display::render;
 use crate::game::display::text_writer;
+use crate::game::hardware::hardware::LCD_HEIGHT;
+use crate::game::hardware::hardware::LCD_WIDTH;
 use crate::game::hardware::input::KeyNames;
 use crate::game::scenes::SceneBehavior;
 use crate::game::scenes::SceneType;
@@ -53,7 +55,13 @@ impl SceneBehavior for IntroScene {
         if self.frame > anim_end {
             text_writer::full_dialog_box("Setup", "DEBUGGING\npress ok to skip");
         } else {
-            render::fill_rect(0, 0, 128, 128, Self::fade_function(anim_frame as u8))
+            render::fill_rect(
+                0,
+                0,
+                LCD_WIDTH,
+                LCD_HEIGHT,
+                Self::fade_function(anim_frame as u8),
+            )
         }
     }
 

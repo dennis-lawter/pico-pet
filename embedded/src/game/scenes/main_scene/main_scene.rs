@@ -6,6 +6,7 @@ use crate::game::display::sprite::Sprite;
 use crate::game::display::sprite_factory;
 use crate::game::display::sprite_factory::MENU_DIMENSIONS;
 use crate::game::hardware::hardware::LCD_HEIGHT;
+use crate::game::hardware::hardware::LCD_WIDTH;
 use crate::game::hardware::input::KeyNames;
 use crate::game::scenes::SceneBehavior;
 use crate::game::scenes::SceneType;
@@ -25,8 +26,8 @@ pub struct MainScene<'a> {
 impl Default for MainScene<'static> {
     fn default() -> Self {
         let ferris = sprite_factory::new_ferris_sprite(
-            (128 - sprite_factory::FERRIS_DIMENSIONS.w as i32) / 2,
-            128 - 64,
+            (LCD_WIDTH as i32 - sprite_factory::FERRIS_DIMENSIONS.w as i32) / 2,
+            LCD_HEIGHT as i32 - 64,
         );
 
         let menu_sprite = sprite_factory::new_menu_sprite(0, 0);

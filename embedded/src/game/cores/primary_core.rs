@@ -24,7 +24,7 @@ pub fn primary_main_loop() -> ! {
 
     // Draw the first frame to initialize the screen
     // Black fails to initialize the display
-    render::flood(Rgb332::DARKEST_BLUE);
+    render::flood(Rgb332::RED);
     swap();
 
     loop {
@@ -58,7 +58,7 @@ pub fn primary_main_loop() -> ! {
             }
             let lowest_brightness = BRIGHTNESS_LUT[0];
             // Can't draw a fully black frame
-            render::flood(Rgb332::DARKEST_BLUE);
+            render::flood(Rgb332::BLUE);
 
             let x = LCD_WIDTH as i32 / 2;
             let y = LCD_HEIGHT as i32 / 2 - FontStyle::Big.get_glyph_dimensions().1 as i32 / 2;

@@ -1,6 +1,8 @@
 use core::ptr::addr_of;
 
 use crate::game::color::Rgb332;
+use crate::game::hardware::hardware::LCD_HEIGHT;
+use crate::game::hardware::hardware::LCD_WIDTH;
 
 use super::font::Font;
 use super::font::FontFactory;
@@ -79,12 +81,12 @@ fn get_font(style: FontStyle) -> &'static Font<'static> {
 pub fn bottom_dialog_box(text: &str) {
     let height = 18usize;
     let box_x: i32 = 0;
-    let box_y = 128 - 24 - height as i32;
-    let text_x = 128 / 2;
-    let text_y = 128 - 24 + 4 - height as i32;
+    let box_y = LCD_HEIGHT as i32 - 24 - height as i32;
+    let text_x = LCD_WIDTH as i32 / 2;
+    let text_y = LCD_HEIGHT as i32 - 24 + 4 - height as i32;
 
-    render::fill_rect(box_x, box_y, 128, height, Rgb332::WHITE);
-    render::fancy_border(box_x, box_y, 128, height);
+    render::fill_rect(box_x, box_y, LCD_WIDTH, height, Rgb332::WHITE);
+    render::fancy_border(box_x, box_y, LCD_WIDTH, height);
 
     draw_text_centered(text_x, text_y, FontStyle::Small, Rgb332::BLUE, text)
 }
@@ -92,12 +94,12 @@ pub fn bottom_dialog_box(text: &str) {
 pub fn bottom_big_dialog_box_custom_color(text: &str, color: Rgb332) {
     let height = 24usize;
     let box_x: i32 = 24;
-    let box_y = 128 - height as i32;
-    let text_x = 128 / 2;
-    let text_y = 128 + 4 + 2 - height as i32;
+    let box_y = LCD_HEIGHT as i32 - height as i32;
+    let text_x = LCD_WIDTH as i32 / 2;
+    let text_y = LCD_HEIGHT as i32 + 4 + 2 - height as i32;
 
-    render::fill_rect(box_x, box_y, 128 - (24 * 2), height, Rgb332::WHITE);
-    render::fancy_border(box_x, box_y, 128 - (24 * 2), height);
+    render::fill_rect(box_x, box_y, LCD_WIDTH - (24 * 2), height, Rgb332::WHITE);
+    render::fancy_border(box_x, box_y, LCD_WIDTH - (24 * 2), height);
 
     draw_text_centered(text_x, text_y, FontStyle::BigBold, color, text)
 }
@@ -107,7 +109,7 @@ pub fn full_dialog_box(title: &str, text: &str) {
     let title_x = 64 - (title_width / 2);
 
     render::flood(Rgb332::WHITE);
-    render::fancy_border(0, 0, 128, 128);
+    render::fancy_border(0, 0, LCD_WIDTH, LCD_HEIGHT);
 
     draw_text(title_x, 5, FontStyle::BigBold, Rgb332::BLACK, title);
     draw_text(5, 18, FontStyle::Small, Rgb332::BLUE, text);
