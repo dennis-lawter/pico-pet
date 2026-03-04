@@ -40,7 +40,7 @@ pub const LCD_HEIGHT: usize = 128;
 const RTC_ADDRESS: u8 = 0x68;
 
 // For the module from Amazon
-const NVM_ADDRESS: u8 = 0x57;
+// const NVM_ADDRESS: u8 = 0x57;
 // For my custom module with flipped bits, whoops
 // const NVM_ADDRESS: u8 = 0b_0_1010_000;
 
@@ -144,6 +144,7 @@ pub struct HardwareComponents {
     pub i2c_bus: I2CBus,
     pub adc: Adc,
     pub vsense_pin: Adc0Pin,
+    pub nvm_addr: u8,
 }
 impl HardwareComponents {
     pub fn new() -> Self {
@@ -301,7 +302,7 @@ impl HardwareComponents {
             let sda_pin = pins.gpio0.into_mode::<rp2040_hal::gpio::FunctionI2C>();
             let scl_pin = pins.gpio1.into_mode::<rp2040_hal::gpio::FunctionI2C>();
 
-            let i2c_bus: I2CBus = rp2040_hal::I2C::i2c0(
+            let mut i2c_bus: I2CBus = rp2040_hal::I2C::i2c0(
                 pac.I2C0,
                 sda_pin,
                 scl_pin,
@@ -309,6 +310,18 @@ impl HardwareComponents {
                 &mut pac.RESETS,
                 &clocks.system_clock,
             );
+
+            let probe_addr = [0u8, 0u8];
+            let mut nvm_addr = 0x50;
+            for possible_addr in 0x50..=0x57 {
+                match i2c_bus.write(possible_addr, &probe_addr) {
+                    Ok(_) => {
+                        nvm_addr = possible_addr;
+                        break;
+                    }
+                    Err(_) => {}
+                };
+            }
 
             let mut s = Self {
                 display,
@@ -330,6 +343,7 @@ impl HardwareComponents {
                 i2c_bus,
                 adc,
                 vsense_pin,
+                nvm_addr,
             };
 
             s.init_wfi();
@@ -526,8 +540,8 @@ impl HardwareComponents {
 
         let address = Self::page_to_address(page);
 
-        self.i2c_bus.write(NVM_ADDRESS, &address).unwrap();
-        self.i2c_bus.read(NVM_ADDRESS, &mut buffer).unwrap();
+        self.i2c_bus.write(self.nvm_addr, &address).unwrap();
+        self.i2c_bus.read(self.nvm_addr, &mut buffer).unwrap();
 
         buffer
     }
@@ -542,7 +556,7 @@ impl HardwareComponents {
         buffer[1] = address[1];
         buffer[2..].copy_from_slice(data);
 
-        self.i2c_bus.write(NVM_ADDRESS, &buffer).unwrap();
+        self.i2c_bus.write(self.nvm_addr, &buffer).unwrap();
 
         // wait for the EEPROM to complete its write
         self.delay.delay_ms(5);
