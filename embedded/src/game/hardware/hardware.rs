@@ -312,7 +312,7 @@ impl HardwareComponents {
             );
 
             let probe_addr = [0u8, 0u8];
-            let mut nvm_addr = 0x50;
+            let mut nvm_addr = 0x00;
             for possible_addr in 0x50..=0x57 {
                 match i2c_bus.write(possible_addr, &probe_addr) {
                     Ok(_) => {
@@ -321,6 +321,10 @@ impl HardwareComponents {
                     }
                     Err(_) => {}
                 };
+            }
+            if nvm_addr == 0x00 {
+                // This message will not display as the hardware component is not initialized yet
+                panic!("No NVM detected.");
             }
 
             let mut s = Self {
