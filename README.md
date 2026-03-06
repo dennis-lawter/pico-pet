@@ -352,6 +352,16 @@ You can of course just use whatever text editor you like, and simply enter the f
 nix develop
 ```
 
+#### Arch
+```
+sudo pacman -S rustup
+rustup default nightly
+cargo install elf2uf2-rs
+make init
+make run
+```
+When the pico is plugged in you'll be prompted to mount the device. You must mount and run the device for this process to complete successfully.
+
 #### Other Linux Distros
 You'll need Rust installed and set to nightly-2023-11-16. Other versions may not be supported. You will likely also need udev to detect the raspberry pico. To use the makefile, you'll also want gnu make. You can review the `flake.nix` and attempt to reproduce it in your own OS.
 
