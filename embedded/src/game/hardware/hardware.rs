@@ -82,10 +82,6 @@ type Key1Pin = rp2040_hal::gpio::Pin<
     rp2040_hal::gpio::bank0::Gpio17,
     rp2040_hal::gpio::Input<rp2040_hal::gpio::PullUp>,
 >;
-type Key1AltPin = rp2040_hal::gpio::Pin<
-    rp2040_hal::gpio::bank0::Gpio29,
-    rp2040_hal::gpio::Input<rp2040_hal::gpio::PullUp>,
->;
 type Key2Pin = rp2040_hal::gpio::Pin<
     rp2040_hal::gpio::bank0::Gpio2,
     rp2040_hal::gpio::Input<rp2040_hal::gpio::PullUp>,
@@ -102,6 +98,11 @@ type Key5Pin = rp2040_hal::gpio::Pin<
 type Adc0Pin = rp2040_hal::gpio::Pin<
     rp2040_hal::gpio::bank0::Gpio26,
     rp2040_hal::gpio::Input<rp2040_hal::gpio::Floating>,
+>;
+
+type VsenseEnablePin = rp2040_hal::gpio::Pin<
+    rp2040_hal::gpio::bank0::Gpio22,
+    rp2040_hal::gpio::Output<rp2040_hal::gpio::PushPull>,
 >;
 
 type VibePin = rp2040_hal::gpio::Pin<
@@ -133,7 +134,6 @@ pub struct HardwareComponents {
     pub delay: Delay,
     pub key0: Key0Pin,
     pub key1: Key1Pin,
-    pub key1_alt: Key1AltPin,
     pub key2: Key2Pin,
     pub key3: Key3Pin,
     pub second_clock: Key5Pin,
@@ -144,6 +144,7 @@ pub struct HardwareComponents {
     pub i2c_bus: I2CBus,
     pub adc: Adc,
     pub vsense_pin: Adc0Pin,
+    pub vsense_enable_pin: VsenseEnablePin,
     pub nvm_addr: u8,
 }
 impl HardwareComponents {
@@ -211,11 +212,12 @@ impl HardwareComponents {
 
             let key0 = pins.gpio15.into_pull_up_input();
             let key1 = pins.gpio17.into_pull_up_input();
-            let key1_alt = pins.gpio29.into_pull_up_input();
             let key2 = pins.gpio2.into_pull_up_input();
             let key3 = pins.gpio3.into_pull_up_input();
 
             let second_clock = pins.gpio5.into_pull_up_input();
+
+            let vsense_enable_pin = pins.gpio22.into_push_pull_output();
 
             let adc: Adc = Adc::new(pac.ADC, &mut pac.RESETS);
             let vsense_pin = pins.gpio26.into_floating_input();
@@ -336,7 +338,6 @@ impl HardwareComponents {
                 delay,
                 key0,
                 key1,
-                key1_alt,
                 key2,
                 key3,
                 second_clock,
@@ -347,6 +348,7 @@ impl HardwareComponents {
                 i2c_bus,
                 adc,
                 vsense_pin,
+                vsense_enable_pin,
                 nvm_addr,
             };
 
@@ -360,6 +362,7 @@ impl HardwareComponents {
     }
 
     pub fn get_vsense(&mut self) -> u16 {
+        self.vsense_enable_pin.set_high().unwrap();
         let r = <Adc as embedded_hal::prelude::_embedded_hal_adc_OneShot<
             Adc,
             u16,
@@ -368,6 +371,7 @@ impl HardwareComponents {
                 rp2040_hal::gpio::Input<rp2040_hal::gpio::Floating>,
             >,
         >>::read(&mut self.adc, &mut self.vsense_pin);
+        self.vsense_enable_pin.set_low().unwrap();
         match r {
             Ok(val) => val,
             Err(_) => 0,
@@ -379,7 +383,7 @@ impl HardwareComponents {
     }
 
     pub fn key1_pressed(&self) -> bool {
-        self.key1.is_low().unwrap() || self.key1_alt.is_low().unwrap()
+        self.key1.is_low().unwrap()
     }
 
     pub fn key2_pressed(&self) -> bool {
