@@ -6,9 +6,8 @@ use crate::game::display::text_writer;
 use crate::game::hardware::hardware::LCD_HEIGHT;
 
 #[panic_handler]
-#[allow(static_mut_refs)]
 fn panic(info: &core::panic::PanicInfo) -> ! {
-    if unsafe { crate::game::globals::HARDWARE.is_none() } {
+    if !crate::game::globals::is_hardware_initialized() {
         loop {
             rom_data::reset_to_usb_boot(0, 0);
             // if reset fails, just sleep
@@ -61,9 +60,8 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
     cortex_m::peripheral::SCB::sys_reset()
 }
 
-#[allow(static_mut_refs)]
 pub fn reboot() -> ! {
-    if unsafe { crate::game::globals::HARDWARE.is_none() } {
+    if !crate::game::globals::is_hardware_initialized() {
         loop {
             rom_data::reset_to_usb_boot(0, 0);
             // if reset fails, just sleep

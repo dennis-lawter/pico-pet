@@ -86,4 +86,11 @@ impl SceneManager<'static> {
             None => {}
         }
     }
+
+    pub fn is_current_scene_unidleable(&self) -> bool {
+        match self.active_scene {
+            SceneType::Pomo | SceneType::Intro => true,
+            _ => false,
+        }
+    }
 }
