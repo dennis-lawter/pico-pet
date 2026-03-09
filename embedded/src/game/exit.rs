@@ -5,10 +5,21 @@ use crate::game::display::render;
 use crate::game::display::text_writer;
 use crate::game::hardware::hardware::LCD_HEIGHT;
 
+/// Custom panic handler
+/// When we have access to an initialized global hardware struct,
+/// The error is displayed to the screen with the line number of the error.
+/// Any active audio is cancelled.
+/// The display brightness is temporarily maximized.
+/// Then you can press a button to reboot.
+///
+/// If the hardware isn't yet initialized,
+/// we just reboot.
 #[panic_handler]
 fn panic(info: &core::panic::PanicInfo) -> ! {
     if !crate::game::globals::is_hardware_initialized() {
         loop {
+            // TODO: change this to regular reboot for release
+            // cortex_m::peripheral::SCB::sys_reset();
             rom_data::reset_to_usb_boot(0, 0);
             // if reset fails, just sleep
             cortex_m::asm::wfi();
@@ -54,15 +65,21 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
         && !hardware.key2_pressed()
         && !hardware.key3_pressed()
     {}
-    // TODO (RELEASE): don't reset to USB
+    // TODO (Release): don't reset to USB
     rom_data::reset_to_usb_boot(0, 0);
     // if reset fails, just reboot
     cortex_m::peripheral::SCB::sys_reset()
 }
 
+/// A small scene for the reboot operation.
+/// The screen informs the user a reboot is in progress.
+/// Any active audio is cancelled.
+/// The display brightness is temporarily maximized.
 pub fn reboot() -> ! {
     if !crate::game::globals::is_hardware_initialized() {
         loop {
+            // TODO: change this to regular reboot for release
+            // cortex_m::peripheral::SCB::sys_reset();
             rom_data::reset_to_usb_boot(0, 0);
             // if reset fails, just sleep
             cortex_m::asm::wfi();

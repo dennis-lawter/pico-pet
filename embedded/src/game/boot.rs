@@ -1,3 +1,5 @@
+/// We use a W25Q32JVSSIQ in the RP2040-Plus
+/// This sets up our boot loader via macros
 #[link_section = ".boot2"]
 #[no_mangle]
 #[used]

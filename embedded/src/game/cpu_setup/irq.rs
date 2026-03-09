@@ -1,5 +1,6 @@
-// Enable hardware interrupt to wake the CPU from wfi()
 use rp2040_hal::pac::interrupt;
+
+/// Enable hardware interrupt to wake the CPU from wfi() calls
 #[interrupt]
 fn IO_IRQ_BANK0() {
     unsafe {

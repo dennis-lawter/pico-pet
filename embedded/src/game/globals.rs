@@ -32,18 +32,22 @@ pub fn init_globals() {
     display::text_writer::init_singleton_fonts();
 }
 
+/// Test if the hardware global is initialized.
 #[allow(static_mut_refs)]
 pub fn is_hardware_initialized() -> bool {
     unsafe { !self::HARDWARE.is_none() }
 }
+/// Mutably reference the hardware global.
 #[allow(static_mut_refs)]
 pub fn get_hardware() -> &'static mut HardwareComponents {
     unsafe { self::HARDWARE.as_mut().unwrap() }
 }
+/// Mutably reference the input global.
 #[allow(static_mut_refs)]
 pub fn get_input() -> &'static mut InputHandler {
     unsafe { self::INPUT.as_mut().unwrap() }
 }
+/// Mutably reference the nvm global.
 #[allow(static_mut_refs)]
 pub fn get_nvm() -> &'static mut Nvm {
     unsafe { self::NVM.as_mut().unwrap() }
