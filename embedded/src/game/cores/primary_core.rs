@@ -84,7 +84,7 @@ pub fn primary_main_loop() -> ! {
                 );
                 hardware.set_backlight_raw(lowest_brightness);
                 hardware.end_tone();
-                crate::game::display::render::draw(&mut hardware.display);
+                crate::game::display::render::draw_buffer_to_screen(&mut hardware.display);
 
                 hardware.wfi();
 
@@ -152,5 +152,5 @@ fn perform_starve() {
 fn swap() {
     let hardware = crate::game::globals::get_hardware();
     hardware.set_backlight_from_lut();
-    crate::game::display::render::draw(&mut hardware.display);
+    crate::game::display::render::draw_buffer_to_screen(&mut hardware.display);
 }

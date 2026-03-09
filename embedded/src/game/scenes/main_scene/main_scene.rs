@@ -1,3 +1,11 @@
+/// # Main Scene
+/// When the user first wakes the vpet for the day,
+/// this is where they will be.
+///
+/// Contains a menu to reach many of the other scenes.
+///
+/// We should have little animations on this screen,
+/// where the pet expresses their personality.
 use crate::game::audio::audio_library::AudioId;
 use crate::game::audio::audio_player::AudioPlayer;
 use crate::game::audio::audio_player::AutoPlayMode;

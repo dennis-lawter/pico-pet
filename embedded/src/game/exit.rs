@@ -42,7 +42,7 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
         "PANIC!",
     );
 
-    text_writer::draw_text_wrapped(
+    text_writer::draw_text_left_aligned_wrapped(
         0,
         16,
         text_writer::FontStyle::Small,
@@ -58,7 +58,7 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
         "press any key to reboot",
     );
 
-    render::draw(&mut hardware.display);
+    render::draw_buffer_to_screen(&mut hardware.display);
 
     while !hardware.key0_pressed()
         && !hardware.key1_pressed()
@@ -99,7 +99,7 @@ pub fn reboot() -> ! {
         "Rebooting...",
     );
 
-    render::draw(&mut hardware.display);
+    render::draw_buffer_to_screen(&mut hardware.display);
 
     hardware.delay.delay_ms(1_000);
     cortex_m::peripheral::SCB::sys_reset()

@@ -1,3 +1,14 @@
+/// #Intro Scene
+/// Intended to introduce the user to the vpet,
+/// teach them about pomodoros,
+/// and setup some basic settings.
+///
+/// Importantly, this scene is our boot scene.
+/// If the nvm is in a "fresh" state,
+/// we stay on this scene,
+/// otherwise we skip straight to main.
+///
+/// Completing this scene writes a new save file to the NVM.
 use core::usize;
 
 use crate::game::color::Rgb332;
@@ -19,8 +30,6 @@ impl Default for IntroScene {
         let next_scene = if nvm.fresh {
             None
         } else {
-            // DEBUG
-            // None
             Some(SceneType::Main)
         };
         Self {
@@ -45,7 +54,7 @@ impl SceneBehavior for IntroScene {
     }
 
     fn sound(&mut self) {
-        //
+        ()
     }
 
     fn draw(&mut self) {
@@ -70,6 +79,9 @@ impl SceneBehavior for IntroScene {
     }
 }
 impl IntroScene {
+    /// Probably a placeholder unless we keep it...
+    /// Fades the screen through some rainbow colours,
+    /// based on the current frame of the animation.
     fn fade_function(f: u8) -> Rgb332 {
         // frame 1: red = 1
         // frame 2: green = 1

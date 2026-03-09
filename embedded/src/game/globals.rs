@@ -16,7 +16,7 @@ fn init_input() {
 }
 
 fn init_nvm() {
-    unsafe { self::NVM = Some(Nvm::load_or_write_default()) }
+    unsafe { self::NVM = Some(Nvm::load_or_create_default()) }
 }
 
 /// Initialize all the globals required by the game

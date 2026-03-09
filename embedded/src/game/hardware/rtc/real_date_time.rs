@@ -6,14 +6,14 @@ use super::month::Month;
 use super::real_date::RealDate;
 use super::real_time::RealTime;
 
-#[allow(dead_code)]
+#[allow(unused)]
 #[derive(Copy, Clone)]
 pub struct RealDateTime {
     pub time: RealTime,
     pub date: RealDate,
 }
 impl RealDateTime {
-    #[allow(dead_code)]
+    #[allow(unused)]
     pub fn new(time: RealTime, date: RealDate) -> Self {
         Self { time, date }
     }

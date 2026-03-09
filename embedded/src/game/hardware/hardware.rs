@@ -427,9 +427,9 @@ impl HardwareComponents {
             VOLUME_LUT[volume.get_value() as usize]
         };
         unsafe {
-            (*self.buzzer_pwm_slice_ptr).set_top(tone_settings.0);
-            (*self.buzzer_pwm_slice_ptr).set_div_int(tone_settings.1);
-            (*self.buzzer_pwm_slice_ptr).set_div_frac(tone_settings.2);
+            (*self.buzzer_pwm_slice_ptr).set_top(tone_settings.get_top());
+            (*self.buzzer_pwm_slice_ptr).set_div_int(tone_settings.get_div_int());
+            (*self.buzzer_pwm_slice_ptr).set_div_frac(tone_settings.get_div_frac());
             (*self.buzzer_channel_ptr).set_duty(effective_volume);
             (*self.buzzer_channel_ptr).enable();
         }
