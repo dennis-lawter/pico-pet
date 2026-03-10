@@ -2456,6 +2456,12 @@
 		)
 	)
 	(junction
+		(at 167.64 39.37)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "1c445fb1-c038-4f90-b618-eb0043d225f8")
+	)
+	(junction
 		(at 36.83 68.58)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -2478,6 +2484,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "8fa5fa83-6604-466a-820f-a949c912d4ec")
+	)
+	(junction
+		(at 160.02 24.13)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "a375a66a-59f6-481d-ac9f-e69857946ff7")
 	)
 	(junction
 		(at 184.15 118.11)
@@ -2671,13 +2683,23 @@
 	)
 	(wire
 		(pts
-			(xy 160.02 33.02) (xy 160.02 34.29)
+			(xy 160.02 24.13) (xy 160.02 34.29)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "2ba1f622-d72d-4e94-b3f7-0e1e4b66131e")
+	)
+	(wire
+		(pts
+			(xy 167.64 24.13) (xy 167.64 25.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2e644585-c027-4d62-acaa-cf9bb63c3775")
 	)
 	(wire
 		(pts
@@ -2951,6 +2973,16 @@
 	)
 	(wire
 		(pts
+			(xy 160.02 24.13) (xy 167.64 24.13)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9c977a5f-9b6f-4fc6-aef1-9b482f69c82f")
+	)
+	(wire
+		(pts
 			(xy 160.02 55.88) (xy 160.02 57.15)
 		)
 		(stroke
@@ -3081,6 +3113,16 @@
 	)
 	(wire
 		(pts
+			(xy 167.64 33.02) (xy 167.64 39.37)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cf101a47-0360-44f9-9289-8d295cc3142a")
+	)
+	(wire
+		(pts
 			(xy 82.55 49.53) (xy 82.55 52.07)
 		)
 		(stroke
@@ -3118,6 +3160,16 @@
 			(type default)
 		)
 		(uuid "d74e6890-598b-41b8-88bc-37cd004f3b24")
+	)
+	(wire
+		(pts
+			(xy 160.02 22.86) (xy 160.02 24.13)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d9192c0c-00bf-4d35-b044-cfc24c6c8d3a")
 	)
 	(wire
 		(pts
@@ -4570,7 +4622,7 @@
 	)
 	(symbol
 		(lib_id "power:VCOM")
-		(at 160.02 33.02 0)
+		(at 160.02 22.86 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -4578,7 +4630,7 @@
 		(dnp no)
 		(uuid "810c2428-7dd7-4325-84de-28ea491e079f")
 		(property "Reference" "#PWR04"
-			(at 160.02 36.83 0)
+			(at 160.02 26.67 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4587,7 +4639,7 @@
 			)
 		)
 		(property "Value" "VSENSE"
-			(at 160.02 29.464 0)
+			(at 160.02 19.304 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4595,7 +4647,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 160.02 33.02 0)
+			(at 160.02 22.86 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4604,7 +4656,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 160.02 33.02 0)
+			(at 160.02 22.86 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4613,7 +4665,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"VCOM\""
-			(at 160.02 33.02 0)
+			(at 160.02 22.86 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5737,6 +5789,76 @@
 			(project "usb"
 				(path "/04b8416f-1444-47df-9f1d-0c05dd751dad"
 					(reference "U1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 167.64 29.21 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "f0be25e2-53bf-49c9-a18f-1f2807417b1b")
+		(property "Reference" "R8"
+			(at 170.18 27.9399 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "1m"
+			(at 170.18 30.4799 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder"
+			(at 165.862 29.21 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 167.64 29.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 167.64 29.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "6eddc47c-8bd6-491e-980f-d568d8b2c46a")
+		)
+		(pin "2"
+			(uuid "3f3dabbb-ee7b-4b8c-85a1-e18bde1dd3ce")
+		)
+		(instances
+			(project "usb"
+				(path "/04b8416f-1444-47df-9f1d-0c05dd751dad"
+					(reference "R8")
 					(unit 1)
 				)
 			)

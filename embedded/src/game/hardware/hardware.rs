@@ -100,10 +100,10 @@ type Adc0Pin = rp2040_hal::gpio::Pin<
     rp2040_hal::gpio::Input<rp2040_hal::gpio::Floating>,
 >;
 
-type VsenseEnablePin = rp2040_hal::gpio::Pin<
-    rp2040_hal::gpio::bank0::Gpio22,
-    rp2040_hal::gpio::Output<rp2040_hal::gpio::PushPull>,
->;
+// type VsenseEnablePin = rp2040_hal::gpio::Pin<
+//     rp2040_hal::gpio::bank0::Gpio22,
+//     rp2040_hal::gpio::Output<rp2040_hal::gpio::PushPull>,
+// >;
 
 type VibePin = rp2040_hal::gpio::Pin<
     rp2040_hal::gpio::bank0::Gpio6,
@@ -144,7 +144,7 @@ pub struct HardwareComponents {
     pub i2c_bus: I2CBus,
     pub adc: Adc,
     pub vsense_pin: Adc0Pin,
-    pub vsense_enable_pin: VsenseEnablePin,
+    // pub vsense_enable_pin: VsenseEnablePin,
     pub nvm_addr: u8,
 }
 impl HardwareComponents {
@@ -217,7 +217,8 @@ impl HardwareComponents {
 
             let second_clock = pins.gpio5.into_pull_up_input();
 
-            let vsense_enable_pin = pins.gpio22.into_push_pull_output();
+            let mut vsense_enable_pin = pins.gpio22.into_push_pull_output();
+            vsense_enable_pin.set_high().unwrap();
 
             let adc: Adc = Adc::new(pac.ADC, &mut pac.RESETS);
             let vsense_pin = pins.gpio26.into_floating_input();
@@ -348,7 +349,7 @@ impl HardwareComponents {
                 i2c_bus,
                 adc,
                 vsense_pin,
-                vsense_enable_pin,
+                // vsense_enable_pin,
                 nvm_addr,
             };
 
@@ -362,7 +363,7 @@ impl HardwareComponents {
     }
 
     pub fn get_vsense(&mut self) -> u16 {
-        self.vsense_enable_pin.set_high().unwrap();
+        // self.vsense_enable_pin.set_high().unwrap();
         let r = <Adc as embedded_hal::prelude::_embedded_hal_adc_OneShot<
             Adc,
             u16,
@@ -371,7 +372,7 @@ impl HardwareComponents {
                 rp2040_hal::gpio::Input<rp2040_hal::gpio::Floating>,
             >,
         >>::read(&mut self.adc, &mut self.vsense_pin);
-        self.vsense_enable_pin.set_low().unwrap();
+        // self.vsense_enable_pin.set_low().unwrap();
         match r {
             Ok(val) => val,
             Err(_) => 0,
